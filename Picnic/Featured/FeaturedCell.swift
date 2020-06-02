@@ -31,12 +31,12 @@ class FeaturedCell: UICollectionViewCell {
         // configure cell
         self.layer.cornerRadius = 30
         self.layer.shadowPath = UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width: 150, height: 200), cornerRadius: 30).cgPath
-        buttonShadow(view: self, radius: 30, color: UIColor.darkGray.cgColor, opacity: 0.9, offset: CGSize(width: 0, height: 5))
+        buttonShadow(view: self, radius: 10, color: UIColor.darkGray.cgColor, opacity: 0.9, offset: CGSize(width: 0, height: 5))
         
         // configure title
         title = UILabel(frame: frame)
+        title.textAlignment = .center
         title.translatesAutoresizingMaskIntoConstraints = false
-//        title = UILabel(frame: CGRect(x: 210, y: 20, width: 100, height: 160))
         title.numberOfLines = 3
         contentView.addSubview(title)
         
@@ -49,6 +49,16 @@ class FeaturedCell: UICollectionViewCell {
         userDescription.translatesAutoresizingMaskIntoConstraints = false
         state.numberOfLines = 1
         contentView.addSubview(state)
+        
+        let testShape = Rating(frame: .zero, rating: 3)
+        contentView.addSubview(testShape)
+        
+        NSLayoutConstraint.activate([
+            testShape.topAnchor.constraint(equalTo: self.title.bottomAnchor, constant: 5),
+            testShape.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor),
+            testShape.widthAnchor.constraint(equalToConstant: 79),
+            testShape.heightAnchor.constraint(equalToConstant: 15)
+        ])
     }
     
     required init?(coder: NSCoder) {
@@ -74,7 +84,9 @@ class FeaturedCell: UICollectionViewCell {
             self.imageView.heightAnchor.constraint(equalToConstant: imageViewSize.width),
             
             self.title.topAnchor.constraint(equalTo: self.imageView.bottomAnchor, constant: 10),
-            self.title.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor)
+            self.title.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor),
+            self.title.widthAnchor.constraint(equalToConstant: 100),
+            self.title.heightAnchor.constraint(equalToConstant: 20)
         ])
     }
 }

@@ -26,6 +26,7 @@
 		27BFC414248318E200A3C968 /* MapIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BFC413248318E200A3C968 /* MapIcon.swift */; };
 		27BFC4162485980100A3C968 /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BFC4152485980100A3C968 /* DatabaseManager.swift */; };
 		27BFC4182486D12700A3C968 /* loading.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 27BFC4172486D12700A3C968 /* loading.jpg */; };
+		27BFC41A2486E7FB00A3C968 /* Rating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BFC4192486E7FB00A3C968 /* Rating.swift */; };
 		27EB2DC32478CA4E0093362C /* FeaturedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EB2DC22478CA4E0093362C /* FeaturedCell.swift */; };
 		27EB2DC62478CC1D0093362C /* Picnic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EB2DC52478CC1D0093362C /* Picnic.swift */; };
 		27EB2DD52478CE730093362C /* LoadData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EB2DD42478CE730093362C /* LoadData.swift */; };
@@ -68,6 +69,7 @@
 		27BFC413248318E200A3C968 /* MapIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapIcon.swift; sourceTree = "<group>"; };
 		27BFC4152485980100A3C968 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
 		27BFC4172486D12700A3C968 /* loading.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = loading.jpg; sourceTree = "<group>"; };
+		27BFC4192486E7FB00A3C968 /* Rating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rating.swift; sourceTree = "<group>"; };
 		27EB2DC22478CA4E0093362C /* FeaturedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedCell.swift; sourceTree = "<group>"; };
 		27EB2DC52478CC1D0093362C /* Picnic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Picnic.swift; sourceTree = "<group>"; };
 		27EB2DD42478CE730093362C /* LoadData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadData.swift; sourceTree = "<group>"; };
@@ -191,6 +193,7 @@
 				2756C28A247F2BCA0070D61A /* NewLocationController.swift */,
 				275AD1482481BCAB00EE3DBA /* LocationPopover.swift */,
 				275AD14A2482CAE300EE3DBA /* LocationLabel.swift */,
+				27BFC4192486E7FB00A3C968 /* Rating.swift */,
 			);
 			path = Featured;
 			sourceTree = "<group>";
@@ -382,6 +385,7 @@
 				275AD1492481BCAB00EE3DBA /* LocationPopover.swift in Sources */,
 				27BFC4162485980100A3C968 /* DatabaseManager.swift in Sources */,
 				27B072EF247CCC94009974BD /* TabController.swift in Sources */,
+				27BFC41A2486E7FB00A3C968 /* Rating.swift in Sources */,
 				27EB2DD52478CE730093362C /* LoadData.swift in Sources */,
 				27B072EA247CC7BB009974BD /* CustomFlowLayout.swift in Sources */,
 				275AD14B2482CAE300EE3DBA /* LocationLabel.swift in Sources */,
