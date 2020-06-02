@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>366260307285-7j7l5p3s57iciggg102pfmrqhvmgc3fg.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.366260307285-7j7l5p3s57iciggg102pfmrqhvmgc3fg</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAQpvQtyttiNEOa4Dgwo7d6-nyMNeT9xoY</string>
+	<key>GCM_SENDER_ID</key>
+	<string>366260307285</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>kyle.Picnic</string>
+	<key>PROJECT_ID</key>
+	<string>picnic-1c64f</string>
+	<key>STORAGE_BUCKET</key>
+	<string>picnic-1c64f.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:366260307285:ios:db623d1fc374aec06e9bdc</string>
+	<key>DATABASE_URL</key>
+	<string>https://picnic-1c64f.firebaseio.com</string>
+</dict>
+</plist>
