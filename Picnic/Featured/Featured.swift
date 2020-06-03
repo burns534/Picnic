@@ -83,7 +83,7 @@ class Featured: UICollectionViewController {
         }
         let picnic = locations[indexPath.item]
         cell.setup(cellSize: cellSize)
-        cell.configure(title: picnic.name, imageName: picnic.imageName, userDescription: picnic.userDescription, state: picnic.state, imageViewSize: cellSize / 2)
+        cell.configure(title: picnic.name, imageName: picnic.imageName, userDescription: picnic.userDescription, state: picnic.state, imageViewSize: cellSize / 2, rating: picnic.rating)
         
         return cell
     }

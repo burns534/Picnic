@@ -58,12 +58,12 @@ class FeaturedCell: UICollectionViewCell {
         state.numberOfLines = 1
         contentView.addSubview(state)
         
-        rating = Rating(frame: .zero, rating: 4.26)
+        rating = Rating(frame: .zero)
         rating.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(rating)
     }
     
-    func configure(title: String, imageName: String, userDescription: String, state: String, imageViewSize: CGSize) {
+    func configure(title: String, imageName: String, userDescription: String, state: String, imageViewSize: CGSize, rating: Float) {
         dbManager.image(for: imageName) { image, error in
             if let _ = error {
                 return
@@ -74,7 +74,7 @@ class FeaturedCell: UICollectionViewCell {
         self.title.text = title
         self.userDescription.text = userDescription
         self.state.text = state
-    
+        self.rating.configure(rating: rating)
         // constraints
         NSLayoutConstraint.activate([
             // supplied

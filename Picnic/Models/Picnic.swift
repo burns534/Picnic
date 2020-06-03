@@ -15,8 +15,8 @@ struct Picnic: Identifiable, Codable {
     var userDescription: String
     var category: String
     var state: String
-    fileprivate var coordinates: Coordinates
     var imageName: String
+    var rating: Float
     var id: String
     var isFeatured: Bool
     var isLiked: Bool
@@ -25,9 +25,10 @@ struct Picnic: Identifiable, Codable {
     var location: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: coordinates.latitude, longitude: coordinates.longitude)
     }
+    fileprivate var coordinates: Coordinates
     
     init() {
-        self.init(name: "loading", userDescription: "", category: "", state: "", coordinates: .init(latitude: 0, longitude: 0), isFeatured: false, isLiked: false, isFavorite: false, park: "", imageName: "loading.jpg")
+        self.init(name: "loading", userDescription: "", category: "", state: "", coordinates: .init(latitude: 0, longitude: 0), isFeatured: false, isLiked: false, isFavorite: false, park: "", imageName: "loading", rating: 5.0)
     }
     
     init(fromDictionary dict: [String: Any]) {
@@ -38,17 +39,18 @@ struct Picnic: Identifiable, Codable {
             let safeLat = dict["latitude"] as? Double,
             let safeLong = dict["longitude"] as? Double,
             let safeImageName = dict["imageName"] as? String,
-            let id = dict["key"] as? String {
+            let id = dict["key"] as? String,
+            let safeRating = (dict["rating"] as? NSNumber)?.floatValue {
             
             let safeCoordinates = Coordinates(latitude: safeLat, longitude: safeLong)
-            self.init(name: safeName, userDescription: safeUserDescription, category: safeCategory, state: safeState, coordinates: safeCoordinates, isFeatured: false, isLiked: false, isFavorite: false, park: "", imageName: safeImageName, id: id)
+            self.init(name: safeName, userDescription: safeUserDescription, category: safeCategory, state: safeState, coordinates: safeCoordinates, isFeatured: false, isLiked: false, isFavorite: false, park: "", imageName: safeImageName, rating: safeRating, id: id)
         } else {
             print("Error: Picnic: init: fromDictionary: Could not initialize")
             self.init()
         }
     }
     
-    init(name: String, userDescription: String, category: String, state: String, coordinates: Coordinates, isFeatured: Bool, isLiked: Bool, isFavorite: Bool, park: String, imageName: String, id: String? = nil) {
+    init(name: String, userDescription: String, category: String, state: String, coordinates: Coordinates, isFeatured: Bool, isLiked: Bool, isFavorite: Bool, park: String, imageName: String, rating: Float, id: String? = nil) {
         self.name = name
         self.userDescription = userDescription
         self.category = category
@@ -64,6 +66,7 @@ struct Picnic: Identifiable, Codable {
         self.isFavorite = isFavorite
         self.park = park
         self.imageName = imageName
+        self.rating = rating
     }
 }
 

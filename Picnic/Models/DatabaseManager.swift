@@ -59,7 +59,8 @@ class DatabaseManager {
             "state": picnic.state,
             "latitude": picnic.location.latitude,
             "longitude": picnic.location.longitude,
-            "imageName": picnic.imageName
+            "imageName": picnic.imageName,
+            "rating": picnic.rating
             ]
         
         db.child("Picnics").child(picnic.id).setValue(value, withCompletionBlock: { error, ref in

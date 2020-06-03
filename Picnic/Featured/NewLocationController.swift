@@ -21,6 +21,7 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
     var state: UITextField!
     var image: UIImage!
     var addImage: UIButton!
+    var interactiveRating: Rating!
     
     var map: MapIcon!
     
@@ -31,9 +32,14 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
     let frame = CGRect(x: 0, y: 0, width: 300, height: 50)
     var coordinates: CLLocationCoordinate2D!
     
+    let locationManager = CLLocationManager()
+    
     init() {
         super.init(nibName: nil, bundle: nil)
         title = "Create Picnic"
+        locationManager.requestAlwaysAuthorization()
+        locationManager.startUpdatingLocation()
+        locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
     }
     
     required init?(coder: NSCoder) {
@@ -72,7 +78,7 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
         map.heightAnchor.constraint(equalToConstant: 200),
         ])
     }
-    /* FIX -- Not saving */
+    
     @objc func save(_ sender: UIBarButtonItem) {
         guard let _ = self.coordinates else { return }
         // need to provide user with feedback here
@@ -84,7 +90,7 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
             print("Error: found nil for image \(safelyUnwrappedName)")
             return
         }
-        let newPicnic: Picnic = Picnic(name: safelyUnwrappedName, userDescription: userDescription.text ?? "", category: category.text ?? "", state: state.text ?? "", coordinates: .init(latitude: coordinates.latitude, longitude: coordinates.longitude), isFeatured: false, isLiked: false, isFavorite: false, park: "none", imageName: safelyUnwrappedName)
+        let newPicnic: Picnic = Picnic(name: safelyUnwrappedName, userDescription: userDescription.text ?? "", category: category.text ?? "", state: state.text ?? "", coordinates: .init(latitude: coordinates.latitude, longitude: coordinates.longitude), isFeatured: false, isLiked: false, isFavorite: false, park: "none", imageName: safelyUnwrappedName, rating: interactiveRating.rating)
         locations.append(newPicnic)
         // Issue with redundancy in the database needs to be handled with random UUID
         
@@ -119,7 +125,7 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
     func configureMap() {
         map = MapIcon(frame: .init(x: 0, y: 0, width: 200, height: 200))
         map.translatesAutoresizingMaskIntoConstraints = false
-        map.mapView.delegate = self
+        map.configureMap(startCoordinate: (locationManager.location?.coordinate) ?? startCoordinate)
 
         let mapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.handleMapGesture))
         map.mapView.addGestureRecognizer(mapGestureRecognizer)
@@ -148,7 +154,10 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
         addImage.setTitleColor(.systemBlue, for: .normal)
         addImage.addTarget(self, action: #selector(presentImagePicker), for: .touchUpInside)
         
-        stackView = UIStackView(arrangedSubviews: [name, userDescription, category, state, addImage].map { view in
+        interactiveRating = Rating(frame: .zero, rating: 0.0, isInteractive: true)
+        interactiveRating.translatesAutoresizingMaskIntoConstraints = false
+        
+        stackView = UIStackView(arrangedSubviews: [name, userDescription, category, state, addImage, interactiveRating].map { view in
             view?.translatesAutoresizingMaskIntoConstraints = false
             return view!
         })
@@ -158,7 +167,11 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.spacing = 10
     }
-
+    
+    @objc func rateTap(_ gesture: UITapGestureRecognizer) {
+        print("rateTap called")
+        print("location: (\(gesture.location(in: interactiveRating).x), \(gesture.location(in: interactiveRating)))")
+    }
 }
 
 extension NewLocationController: UITextFieldDelegate {
