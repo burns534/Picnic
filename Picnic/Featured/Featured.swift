@@ -11,6 +11,8 @@ import FirebaseDatabase
 
 private let reuseIdentifier = "Cell"
 
+let cellSize = CGSize(width: 300, height: 300)
+
 class Featured: UICollectionViewController {
     
     var locations = [Picnic]()
@@ -35,7 +37,6 @@ class Featured: UICollectionViewController {
     }
     
     func refresh() {
-        print("refresh called")
         dbManager.picnic { data in
             self.locations = data
             self.collectionView.reloadData()
@@ -44,7 +45,6 @@ class Featured: UICollectionViewController {
     
     func refresh(picnic: Picnic, dbRef: DatabaseReference) {
         self.locations.append(picnic)
-        print(self.locations[self.locations.count - 1].name)
         self.collectionView.insertItems(at: [.init(item: self.locations.count - 1, section: 0)])
     }
     
@@ -56,31 +56,20 @@ class Featured: UICollectionViewController {
         
         self.collectionView!.register(FeaturedCell.self, forCellWithReuseIdentifier: reuseIdentifier)
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus.square"), style: .plain, target: self, action: #selector(rightButton))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus.square"), style: .plain, target: self, action: #selector(rightBarButton))
         navigationItem.rightBarButtonItem?.tintColor = .black
         
         navigationController?.title = "Featured"
     }
     
-    @objc func rightButton() {
+    @objc func rightBarButton() {
         
         navigationController?.pushViewController(NewLocationController(), animated: true)
     }
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
-    }
-    */
-
     // MARK: UICollectionViewDataSource
 
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
         return 1
     }
 
@@ -96,9 +85,10 @@ class Featured: UICollectionViewController {
             print("Error: Could not load cell")
             return UICollectionViewCell()
         }
+        let picnic = locations[indexPath.item]
+        cell.setup(cellSize: cellSize)
+        cell.configure(title: picnic.name, imageName: picnic.imageName, userDescription: picnic.userDescription, state: picnic.state, imageViewSize: cellSize / 2)
         
-        cell.configure(title: locations[indexPath.item].name, imageName: locations[indexPath.item].imageName, imageViewSize: .init(width: 140, height: 200))
-    
         return cell
     }
 

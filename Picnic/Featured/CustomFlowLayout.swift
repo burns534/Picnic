@@ -13,7 +13,7 @@ class CustomFlowLayout: UICollectionViewFlowLayout {
     override init() {
         super.init()
         self.scrollDirection = .vertical
-        self.itemSize = CGSize(width: 150, height: 200)
+        self.itemSize = CGSize(width: cellSize.width, height: cellSize.height)
         self.minimumLineSpacing = 25
         self.sectionInset = UIEdgeInsets(top: 25, left: 25, bottom: 25, right: 25)
     }

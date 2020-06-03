@@ -15,6 +15,22 @@ func buttonShadow(view: UIView, radius: CGFloat, color: CGColor?, opacity: Float
      view.layer.shadowOpacity = opacity
 }
 
+extension CGSize {
+    static func +(left: CGSize, right: CGSize) -> CGSize {
+        return CGSize(width: left.width + right.width, height: left.height + right.height)
+    }
+    
+    static func /(left: CGSize, right: Int) -> CGSize {
+        let r = CGFloat(right)
+        return CGSize(width: left.width / r, height: left.height / r)
+    }
+    
+    static func -(left: CGSize, right: Int) -> CGSize {
+        let r = CGFloat(right)
+        return CGSize(width: left.width - r, height: left.height - r)
+    }
+}
+
 // someone else's code
 extension UIColor {
   public convenience init(rgba: String) {

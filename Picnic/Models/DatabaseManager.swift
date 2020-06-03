@@ -25,7 +25,6 @@ class DatabaseManager {
                 print("Error: DatabaseManager: image: could not load image from firebase storage: \(error.localizedDescription)")
                 return
             }
-            print(UIImage(data: data!)!.size)
             completion(UIImage(data: data!), error)
         }
     }
@@ -67,7 +66,6 @@ class DatabaseManager {
             if let _ = error {
                 print("Error: error uploading picnic")
             } else {
-                print("DatabaseManager: storePicnic: Successfully reached completion closure with picnic \(picnic.name)")
                 completion(picnic, ref)
             }
         })
@@ -94,7 +92,6 @@ class DatabaseManager {
             let locations : [Picnic] = dict.map { dictionary in
                 Picnic(fromDictionary: dictionary)
             }
-            print("DatabaseManager: picnic: Successfully reached completion closure with locations count \(locations.count)")
             completion(locations)
         })
     }

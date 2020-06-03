@@ -31,18 +31,16 @@ class Rating: UIView {
     var underlayStars = [UIImageView]()
     
     func setup() {
-        self.translatesAutoresizingMaskIntoConstraints = false
-        
         for i in 0..<5 {
             let star = UIImageView(frame: .zero)
-            star.image = UIImage(systemName: "star")!.withTintColor(.yellow, renderingMode: .alwaysOriginal)
+            star.image = UIImage(systemName: "star")!.withTintColor(.systemYellow, renderingMode: .alwaysOriginal)
             star.contentMode = .scaleAspectFit
             star.translatesAutoresizingMaskIntoConstraints = false
             overlayStars.append(star)
             addSubview(star)
             
             let underlayStar = UIImageView(frame: .zero)
-            underlayStar.image = UIImage(systemName: "star.fill")!.withTintColor(.yellow, renderingMode: .alwaysOriginal)
+            underlayStar.image = UIImage(systemName: "star.fill")!.withTintColor(.systemYellow, renderingMode: .alwaysOriginal)
             underlayStar.contentMode = .scaleAspectFit
             underlayStar.translatesAutoresizingMaskIntoConstraints = false
             underlayStars.append(underlayStar)
@@ -52,30 +50,14 @@ class Rating: UIView {
                 star.widthAnchor.constraint(equalToConstant: 15),
                 star.heightAnchor.constraint(equalToConstant: 15),
                 star.leftAnchor.constraint(equalTo: self.leftAnchor, constant: CGFloat(16 * i)),
+                star.topAnchor.constraint(equalTo: self.topAnchor),
+                
                 underlayStar.widthAnchor.constraint(equalToConstant: 15),
                 underlayStar.heightAnchor.constraint(equalToConstant: 15),
-                underlayStar.leftAnchor.constraint(equalTo: self.leftAnchor, constant: CGFloat(16 * i))
+                underlayStar.leftAnchor.constraint(equalTo: self.leftAnchor, constant: CGFloat(16 * i)),
+                underlayStar.topAnchor.constraint(equalTo: self.topAnchor)
             ])
         }
-        
-//        overlay = UIStackView(arrangedSubviews: overlayStars)
-//        overlay.translatesAutoresizingMaskIntoConstraints = false
-//        overlay.axis = .horizontal
-//        overlay.spacing = 1
-//        overlay.alignment = .firstBaseline
-//        self.addSubview(overlay)
-//
-//        underlay = UIStackView(arrangedSubviews: underlayStars)
-//        underlay.translatesAutoresizingMaskIntoConstraints = false
-//        underlay.axis = .horizontal
-//        underlay.spacing = 1
-//        underlay.alignment = .firstBaseline
-//        self.addSubview(underlay)
-//
-//        NSLayoutConstraint.activate([
-//            overlay.centerXAnchor.constraint(equalTo: self.centerXAnchor),
-//            underlay.centerXAnchor.constraint(equalTo: self.centerXAnchor)
-//        ])
     }
    
     func configure(rating: Double) {
