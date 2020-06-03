@@ -66,6 +66,16 @@ class Rating: UIView {
             if Double(i + 1) <= rating {
                 overlayStars[i].isHidden = true
                 underlayStars[i].isHidden = false
+                // partial fill case
+            } else if Double(i + 1) > rating && Double(i) < rating {
+                let maskLayer = CALayer()
+                /* the star imageView is width 15 but the actual width of the star is approximately 10, centered at 7.5. The mask also is applied backwards hence the 1 - (i + 1 - rating)*/
+                let maskWidth = CGFloat(1 - Double(i + 1) + rating) * 10 + 2.5
+                maskLayer.frame = .init(x: 0, y: 0, width: maskWidth, height: 15)
+                maskLayer.backgroundColor = UIColor.black.cgColor
+                underlayStars[i].layer.mask = maskLayer
+                underlayStars[i].isHidden = false
+                overlayStars[i].isHidden = false
             } else {
                 overlayStars[i].isHidden = false
                 underlayStars[i].isHidden = true

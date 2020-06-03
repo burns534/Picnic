@@ -11,7 +11,7 @@ import FirebaseDatabase
 
 private let reuseIdentifier = "Cell"
 
-let cellSize = CGSize(width: 300, height: 300)
+let cellSize = CGSize(width: 350, height: 300)
 
 class Featured: UICollectionViewController {
     
@@ -29,10 +29,6 @@ class Featured: UICollectionViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-        
         configure()
     }
     

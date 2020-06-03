@@ -49,6 +49,7 @@ class FeaturedCell: UICollectionViewCell {
         contentView.addSubview(title)
         
         userDescription = UITextView(frame: frame)
+        userDescription.isUserInteractionEnabled = false
         userDescription.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(userDescription)
         
@@ -57,7 +58,7 @@ class FeaturedCell: UICollectionViewCell {
         state.numberOfLines = 1
         contentView.addSubview(state)
         
-        rating = Rating(frame: .zero, rating: 3)
+        rating = Rating(frame: .zero, rating: 4.26)
         rating.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(rating)
     }
@@ -72,13 +73,11 @@ class FeaturedCell: UICollectionViewCell {
         }
         self.title.text = title
         self.userDescription.text = userDescription
-        self.userDescription.sizeToFit()
         self.state.text = state
     
         // constraints
         NSLayoutConstraint.activate([
             // supplied
-            
             self.contentView.topAnchor.constraint(equalTo: self.topAnchor),
             self.contentView.leftAnchor.constraint(equalTo: self.leftAnchor),
             self.contentView.heightAnchor.constraint(equalTo: self.heightAnchor),
@@ -101,10 +100,9 @@ class FeaturedCell: UICollectionViewCell {
             
             // Slight issue with text alignment here
             self.userDescription.topAnchor.constraint(equalTo: self.rating.bottomAnchor, constant: 5),
-            self.userDescription.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor),
-//            self.userDescription.widthAnchor.constraint(equalToConstant: 250),
-//            self.userDescription.heightAnchor.constraint(equalToConstant: 80),
-            
+            self.userDescription.leftAnchor.constraint(equalTo: self.imageView.leftAnchor),
+            self.userDescription.widthAnchor.constraint(equalToConstant: 250),
+            self.userDescription.heightAnchor.constraint(equalToConstant: 60),
             
             self.state.topAnchor.constraint(equalTo: self.userDescription.bottomAnchor, constant: 5),
             self.state.widthAnchor.constraint(equalToConstant: 200),
