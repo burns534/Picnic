@@ -19,13 +19,21 @@ class FeaturedCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        setup()
     }
     
     required init?(coder: NSCoder) {
         fatalError("NSCoding not supported")
     }
     
-    func setup(cellSize: CGSize) {
+    func setupShadow(cellSize: CGSize) {
+        // configure cell
+        self.layer.cornerRadius = 30
+        self.layer.shadowPath = UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width: cellSize.width, height: cellSize.height), cornerRadius: 30).cgPath
+        buttonShadow(view: self, radius: 10, color: UIColor.darkGray.cgColor, opacity: 0.9, offset: CGSize(width: 0, height: 5))
+    }
+    
+    func setup() {
         self.backgroundColor = .white
         //self.translatesAutoresizingMaskIntoConstraints = false
         self.contentView.translatesAutoresizingMaskIntoConstraints = false
@@ -36,10 +44,6 @@ class FeaturedCell: UICollectionViewCell {
         imageView.layer.cornerRadius = 25
         imageView.clipsToBounds = true
         contentView.addSubview(imageView!)
-        // configure cell
-        self.layer.cornerRadius = 30
-        self.layer.shadowPath = UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width: cellSize.width, height: cellSize.height), cornerRadius: 30).cgPath
-        buttonShadow(view: self, radius: 10, color: UIColor.darkGray.cgColor, opacity: 0.9, offset: CGSize(width: 0, height: 5))
         
         // configure title
         title = UILabel(frame: frame)
@@ -57,13 +61,9 @@ class FeaturedCell: UICollectionViewCell {
         state.translatesAutoresizingMaskIntoConstraints = false
         state.numberOfLines = 1
         contentView.addSubview(state)
-        
-        rating = Rating(frame: .zero)
-        rating.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(rating)
     }
     
-    func configure(title: String, imageName: String, userDescription: String, state: String, imageViewSize: CGSize, rating: Float) {
+    func configure(title: String, imageName: String, userDescription: String, state: String, imageViewSize: CGSize, rating: Rating) {
         dbManager.image(for: imageName) { image, error in
             if let _ = error {
                 return
@@ -74,7 +74,9 @@ class FeaturedCell: UICollectionViewCell {
         self.title.text = title
         self.userDescription.text = userDescription
         self.state.text = state
-        self.rating.configure(rating: rating)
+        self.rating = rating
+        self.rating.translatesAutoresizingMaskIntoConstraints = false
+        self.contentView.addSubview(self.rating)
         // constraints
         NSLayoutConstraint.activate([
             // supplied
@@ -95,8 +97,8 @@ class FeaturedCell: UICollectionViewCell {
             
             self.rating.topAnchor.constraint(equalTo: self.imageView.bottomAnchor, constant: 5),
             self.rating.centerXAnchor.constraint(equalTo: self.imageView.centerXAnchor),
-            self.rating.widthAnchor.constraint(equalToConstant: 79),
-            self.rating.heightAnchor.constraint(equalToConstant: 15),
+            self.rating.widthAnchor.constraint(equalToConstant: self.rating.width),
+            self.rating.heightAnchor.constraint(equalToConstant: self.rating.starSize.height),
             
             // Slight issue with text alignment here
             self.userDescription.topAnchor.constraint(equalTo: self.rating.bottomAnchor, constant: 5),

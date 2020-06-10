@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2739E8D024915BDB009AD607 /* StarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2739E8CF24915BDB009AD607 /* StarButton.swift */; };
 		2743860D2478925D0029F00F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2743860C2478925D0029F00F /* AppDelegate.swift */; };
 		2743860F2478925D0029F00F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2743860E2478925D0029F00F /* SceneDelegate.swift */; };
 		274386122478925D0029F00F /* Picnic.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 274386102478925D0029F00F /* Picnic.xcdatamodeld */; };
@@ -48,6 +49,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2739E8CF24915BDB009AD607 /* StarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarButton.swift; sourceTree = "<group>"; };
 		274386092478925D0029F00F /* Picnic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Picnic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2743860C2478925D0029F00F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2743860E2478925D0029F00F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -194,6 +196,7 @@
 				275AD1482481BCAB00EE3DBA /* LocationPopover.swift */,
 				275AD14A2482CAE300EE3DBA /* LocationLabel.swift */,
 				27BFC4192486E7FB00A3C968 /* Rating.swift */,
+				2739E8CF24915BDB009AD607 /* StarButton.swift */,
 			);
 			path = Featured;
 			sourceTree = "<group>";
@@ -388,6 +391,7 @@
 				27BFC41A2486E7FB00A3C968 /* Rating.swift in Sources */,
 				27EB2DD52478CE730093362C /* LoadData.swift in Sources */,
 				27B072EA247CC7BB009974BD /* CustomFlowLayout.swift in Sources */,
+				2739E8D024915BDB009AD607 /* StarButton.swift in Sources */,
 				275AD14B2482CAE300EE3DBA /* LocationLabel.swift in Sources */,
 				2743860D2478925D0029F00F /* AppDelegate.swift in Sources */,
 				27EB2DC62478CC1D0093362C /* Picnic.swift in Sources */,

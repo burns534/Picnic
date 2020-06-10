@@ -10,109 +10,84 @@ import UIKit
 
 // will display rating and number of ratings with stars
 class Rating: UIView {
-    
-    private var isInteractive : Bool = false
-    
-    convenience init(frame: CGRect, rating: Float = 0.0, isInteractive: Bool = false) {
-        self.init(frame: frame)
-        self.isInteractive = isInteractive
-        self.rating = rating
-    }
 
-    override init(frame: CGRect) {
+    var overlay: UIStackView!
+    var underlay: UIStackView!
+    var stars = [StarButton]()
+    
+    var starSize: CGSize
+    var spacing: CGFloat
+    var rating: CGFloat
+    
+    var width: CGFloat
+    
+    init(frame: CGRect, starSize: CGSize, spacing: CGFloat, rating: CGFloat) {
+        self.starSize = starSize
+        self.spacing = spacing
+        self.rating = rating
+        self.width = 5 * starSize.width + 4 * spacing
         super.init(frame: frame)
         setup()
-        isInteractive ? refresh(rating: rating) : configure(rating: rating)
+        configureFloat(rating: rating)
     }
     
     required init?(coder: NSCoder) {
         fatalError("NSCoding not supported")
     }
     
-    var overlay: UIStackView!
-    var underlay: UIStackView!
-    var overlayStars = [UIImageView]()
-    var underlayStars = [UIImageView]()
-    
-    var tapRecognizer: UITapGestureRecognizer!
-    
-    var rating: Float = 0.0
-    
-    @objc func rateTap(_ gesture: UITapGestureRecognizer) {
-        print("rateTap called")
-        print("location: (\(gesture.location(in: self).x), \(gesture.location(in: self)))")
+    @objc func starPress(_ sender: UIButton) {
+        print("starPress rating: \(sender.tag)")
+        self.rating = CGFloat(sender.tag + 1)
+        refresh(rating: self.rating)
     }
     
     func setup() {
-        if isInteractive {
-            self.isUserInteractionEnabled = true
-            self.tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(rateTap))
-            addGestureRecognizer(self.tapRecognizer)
-        }
         
+        self.isUserInteractionEnabled = false
+
         for i in 0..<5 {
-            let star = UIImageView(frame: .zero)
-            star.isUserInteractionEnabled = true
-            star.image = UIImage(systemName: "star")!.withTintColor(.systemYellow, renderingMode: .alwaysOriginal)
-            star.contentMode = .scaleAspectFit
-            star.translatesAutoresizingMaskIntoConstraints = false
-            overlayStars.append(star)
-            
-            let underlayStar = UIImageView(frame: .zero)
-            underlayStar.isUserInteractionEnabled = true
-            underlayStar.image = UIImage(systemName: "star.fill")!.withTintColor(.systemYellow, renderingMode: .alwaysOriginal)
-            underlayStar.contentMode = .scaleAspectFit
-            underlayStar.translatesAutoresizingMaskIntoConstraints = false
-            underlayStars.append(underlayStar)
-            
-            addSubview(star)
-            addSubview(underlayStar)
-            
+
+            let starButton = StarButton(frame: .zero, starSize: self.starSize)
+            starButton.translatesAutoresizingMaskIntoConstraints = false
+            starButton.addTarget(self, action: #selector(starPress), for: .touchUpInside)
+            starButton.tag = i
+            stars.append(starButton)
+
+            addSubview(starButton)
+
             NSLayoutConstraint.activate([
-                star.widthAnchor.constraint(equalToConstant: 15),
-                star.heightAnchor.constraint(equalToConstant: 15),
-                star.leftAnchor.constraint(equalTo: self.leftAnchor, constant: CGFloat(16 * i)),
-                star.topAnchor.constraint(equalTo: self.topAnchor),
-                
-                underlayStar.widthAnchor.constraint(equalToConstant: 15),
-                underlayStar.heightAnchor.constraint(equalToConstant: 15),
-                underlayStar.leftAnchor.constraint(equalTo: self.leftAnchor, constant: CGFloat(16 * i)),
-                underlayStar.topAnchor.constraint(equalTo: self.topAnchor)
+                starButton.widthAnchor.constraint(equalToConstant: starSize.width),
+                starButton.heightAnchor.constraint(equalToConstant: starSize.height),
+                starButton.leftAnchor.constraint(equalTo: self.leftAnchor, constant: (starSize.width + spacing) * CGFloat(i)),
+                starButton.topAnchor.constraint(equalTo: self.topAnchor)
             ])
         }
     }
     
-    func refresh(rating: Float) {
+    func refresh(rating: CGFloat) {
+        self.rating = rating
         for i in 0..<5 {
-            if Float(i + 1) <= rating {
-                overlayStars[i].isHidden = true
-                underlayStars[i].isHidden = false
+            if CGFloat(i) < rating {
+                stars[i].fillStar()
             } else {
-                overlayStars[i].isHidden = false
-                underlayStars[i].isHidden = true
+                stars[i].emptyStar()
             }
         }
     }
-   
-    func configure(rating: Float) {
+    // for use with floating point rating
+    func configureFloat(rating: CGFloat) {
+        self.rating = rating
         for i in 0..<5 {
             // automatically show filled stars
-            if Float(i + 1) <= rating {
-                overlayStars[i].isHidden = true
-                underlayStars[i].isHidden = false
+            if CGFloat(i + 1) <= rating {
+                stars[i].fillStar()
                 // partial fill case
-            } else if Float(i + 1) > rating && Float(i) < rating {
-                let maskLayer = CALayer()
+            } else if CGFloat(i + 1) > rating && CGFloat(i) < rating {
                 /* the star imageView is width 15 but the actual width of the star is approximately 10, centered at 7.5. The mask also is applied backwards hence the 1 - (i + 1 - rating)*/
-                let maskWidth = CGFloat(1 - Float(i + 1) + rating) * 10 + 2.5
-                maskLayer.frame = .init(x: 0, y: 0, width: maskWidth, height: 15)
-                maskLayer.backgroundColor = UIColor.black.cgColor
-                underlayStars[i].layer.mask = maskLayer
-                underlayStars[i].isHidden = false
-                overlayStars[i].isHidden = false
+                let maskWidth = starSize.width * (CGFloat(1 - CGFloat(i + 1) + rating) * 0.66667 + 0.3333)
+                stars[i].addMask(maskWidth: maskWidth)
             } else {
-                overlayStars[i].isHidden = false
-                underlayStars[i].isHidden = true
+                stars[i].emptyStar()
             }
         }
     }

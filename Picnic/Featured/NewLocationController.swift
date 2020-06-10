@@ -21,11 +21,9 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
     var state: UITextField!
     var image: UIImage!
     var addImage: UIButton!
-    var interactiveRating: Rating!
+    var interactiveRating: Rating
     
     var map: MapIcon!
-    
-    var stackView: UIStackView!
     
     private var locatedUser: Bool = false
     
@@ -34,7 +32,8 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
     
     let locationManager = CLLocationManager()
     
-    init() {
+    init(rating: Rating) {
+        self.interactiveRating = rating
         super.init(nibName: nil, bundle: nil)
         title = "Create Picnic"
         locationManager.requestAlwaysAuthorization()
@@ -55,28 +54,14 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
         super.viewDidLoad()
         
         view.backgroundColor = .white
-        
-        configureStackView()
-        
-        view.addSubview(stackView)
+        view.isUserInteractionEnabled = true
         
         configureMap()
-        
-        view.addSubview(map)
+        configureStackView()
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(save))
         navigationItem.rightBarButtonItem?.tintColor = .systemBlue
         
-        NSLayoutConstraint.activate([
-        stackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
-        stackView.heightAnchor.constraint(equalToConstant: 300),
-        stackView.widthAnchor.constraint(equalToConstant: 200),
-        stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-        map.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
-        map.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-        map.widthAnchor.constraint(equalToConstant: 200),
-        map.heightAnchor.constraint(equalToConstant: 200),
-        ])
     }
     
     @objc func save(_ sender: UIBarButtonItem) {
@@ -90,9 +75,9 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
             print("Error: found nil for image \(safelyUnwrappedName)")
             return
         }
-        let newPicnic: Picnic = Picnic(name: safelyUnwrappedName, userDescription: userDescription.text ?? "", category: category.text ?? "", state: state.text ?? "", coordinates: .init(latitude: coordinates.latitude, longitude: coordinates.longitude), isFeatured: false, isLiked: false, isFavorite: false, park: "none", imageName: safelyUnwrappedName, rating: interactiveRating.rating)
+        let newPicnic: Picnic = Picnic(name: safelyUnwrappedName, userDescription: userDescription.text ?? "", category: category.text ?? "", state: state.text ?? "", coordinates: .init(latitude: coordinates.latitude, longitude: coordinates.longitude), isFeatured: false, isLiked: false, isFavorite: false, park: "none", imageName: safelyUnwrappedName, rating: Float(interactiveRating.rating))
+        print("appending new picnic named \(newPicnic.name)")
         locations.append(newPicnic)
-        // Issue with redundancy in the database needs to be handled with random UUID
         
         if let featured = self.navigationController?.viewControllers[(self.navigationController?.viewControllers.count)! - 2] as? Featured {
                 dbManager.storeImage(for: safelyUnwrappedName, image: safelyUnwrappedImage) {
@@ -102,7 +87,6 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
                         print("storePicnic completion")
                         featured.refresh(picnic: picnic, dbRef: ref)
                     }
-//                    featured.collectionView.reloadData()
                     self.navigationController?.popViewController(animated: true)
                 }
         }
@@ -129,48 +113,80 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
 
         let mapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.handleMapGesture))
         map.mapView.addGestureRecognizer(mapGestureRecognizer)
+        view.addSubview(map)
+        
+        NSLayoutConstraint.activate([
+        map.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
+        map.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+        map.widthAnchor.constraint(equalToConstant: 200),
+        map.heightAnchor.constraint(equalToConstant: 200),
+        ])
     }
     
 // MARK -- Text Fields
     func configureStackView() {
         name = UITextField(frame: .zero)
+        name.translatesAutoresizingMaskIntoConstraints = false
         name.placeholder = "name"
         name.delegate = self
+        view.addSubview(name)
         
         userDescription = UITextField(frame: .zero)
+        userDescription.translatesAutoresizingMaskIntoConstraints = false
         userDescription.placeholder = "Enter a description"
         userDescription.delegate = self
+        view.addSubview(userDescription)
 
         category = UITextField(frame: .zero)
+        category.translatesAutoresizingMaskIntoConstraints = false
         category.placeholder = "tag"    // will need rework for tagging system
         category.delegate = self
+        view.addSubview(category)
         
         state = UITextField(frame: .zero)
+        state.translatesAutoresizingMaskIntoConstraints = false
         state.placeholder = "state"
         state.delegate = self
+        view.addSubview(state)
         
         addImage = UIButton(frame: .zero)
+        addImage.translatesAutoresizingMaskIntoConstraints = false
         addImage.setTitle("Add Images", for: .normal)
         addImage.setTitleColor(.systemBlue, for: .normal)
         addImage.addTarget(self, action: #selector(presentImagePicker), for: .touchUpInside)
+        view.addSubview(addImage)
         
-        interactiveRating = Rating(frame: .zero, rating: 0.0, isInteractive: true)
         interactiveRating.translatesAutoresizingMaskIntoConstraints = false
+        interactiveRating.isUserInteractionEnabled = true
+        view.addSubview(interactiveRating)
         
-        stackView = UIStackView(arrangedSubviews: [name, userDescription, category, state, addImage, interactiveRating].map { view in
-            view?.translatesAutoresizingMaskIntoConstraints = false
-            return view!
-        })
-        stackView.axis = .vertical
-        stackView.distribution = .equalSpacing
-        stackView.alignment = .leading
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.spacing = 10
-    }
-    
-    @objc func rateTap(_ gesture: UITapGestureRecognizer) {
-        print("rateTap called")
-        print("location: (\(gesture.location(in: interactiveRating).x), \(gesture.location(in: interactiveRating)))")
+        NSLayoutConstraint.activate([
+            name.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            name.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
+            name.rightAnchor.constraint(lessThanOrEqualTo: map.leftAnchor),
+            
+            userDescription.topAnchor.constraint(equalTo: name.bottomAnchor, constant: 5),
+            userDescription.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
+            userDescription.rightAnchor.constraint(lessThanOrEqualTo: map.leftAnchor),
+            
+            category.topAnchor.constraint(equalTo: userDescription.bottomAnchor, constant: 5),
+            category.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
+            category.rightAnchor.constraint(lessThanOrEqualTo: map.leftAnchor),
+            
+            state.topAnchor.constraint(equalTo: category.bottomAnchor, constant: 5),
+            state.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
+            state.rightAnchor.constraint(lessThanOrEqualTo: map.leftAnchor),
+            
+            addImage.topAnchor.constraint(equalTo: state.bottomAnchor, constant: 5),
+            addImage.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
+            addImage.rightAnchor.constraint(lessThanOrEqualTo: map.leftAnchor),
+            
+            interactiveRating.topAnchor.constraint(equalTo: addImage.bottomAnchor, constant: 100),
+            interactiveRating.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
+//            interactiveRating.rightAnchor.constraint(lessThanOrEqualTo: map.leftAnchor),
+            interactiveRating.widthAnchor.constraint(equalToConstant: interactiveRating.width),
+            interactiveRating.heightAnchor.constraint(equalToConstant: interactiveRating.starSize.height)
+        ])
     }
 }
 
