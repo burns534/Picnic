@@ -47,6 +47,16 @@ class DatabaseManager {
         
     }
     
+    func deleteImage(for title: String, completion: @escaping () -> ()) {
+        storage.reference().child("images/" + title + ".jpg").delete { error in
+            if let _ = error {
+                print("Error: DatabaseManager: Could not delete image \(title)")
+                return
+            }
+            completion()
+        }
+    }
+    
     func removeAllObservers(picnic: Picnic) {
         db.child("Picnics").child(picnic.id).removeAllObservers()
     }
@@ -95,6 +105,16 @@ class DatabaseManager {
             }
             completion(locations)
         })
+    }
+
+    func deletePicnic(picnic: Picnic, completion: @escaping () -> ()) {
+        db.child("Picnics").child(picnic.id).removeValue { error, ref in
+            if let _ = error {
+                print("Error: DatabaseManager: deletePicnic: Could not delete picnic \(picnic.name)")
+                return
+            }
+            completion()
+        }
     }
 }
 

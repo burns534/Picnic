@@ -11,10 +11,15 @@ import MapKit
 
 class MapView: UIViewController {
     
+    private enum AnnotationReuseID: String {
+        case pin
+    }
+    
     var map: MKMapView!
     var coordinates: CLLocationCoordinate2D!
     var sender: NewLocationController
     var confirmButton: UIButton!
+    var searchBar: UISearchBar!
     
     init(sender: UIViewController) {
         self.sender = sender as! NewLocationController
@@ -31,12 +36,12 @@ class MapView: UIViewController {
         
         view.backgroundColor = .white
 
-        // Do any additional setup after loading the view.
         map = MKMapView(frame: .zero)
-        // assign delegate
-        map.delegate = self
+        //map.delegate = self
         
-        map.setRegion(sender.map.mapView.region, animated: true)
+        // set region to the map icon's region in the new picnic page
+        //map.setRegion(sender.map.mapView.region, animated: true)
+        map.region = sender.map.mapView.region
         
         map.showsUserLocation = true
         map.mapType = .hybrid
@@ -44,27 +49,46 @@ class MapView: UIViewController {
         map.showsScale = true
         map.translatesAutoresizingMaskIntoConstraints = false
         
+        // add annotations from map icon
         for annotation in sender.map.mapView.annotations {
+            print("annotation sent from sender")
             self.map.addAnnotation(annotation)
         }
         
         confirmButton = UIButton(frame: .zero)
         confirmButton.setTitle("Confirm Selection", for: .normal)
-        confirmButton.addTarget(self, action: #selector(handleDoneButton), for: .touchUpInside)
         confirmButton.setTitleColor(.systemBlue, for: .normal)
+        confirmButton.addTarget(self, action: #selector(handleDoneButton), for: .touchUpInside)
         confirmButton.translatesAutoresizingMaskIntoConstraints = false
-        
+        // for dropping pins
         let lpgr = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture))
-        map.addGestureRecognizer(lpgr)
         lpgr.minimumPressDuration = 0.3
+        map.addGestureRecognizer(lpgr)
+        
+        searchBar = UISearchBar(frame: .zero)
+        searchBar.delegate = self
+        searchBar.barTintColor = UIColor.white.withAlphaComponent(0.6)
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.layer.cornerRadius = 10
+        searchBar.clipsToBounds = true
+        
         view.addSubview(map)
         view.addSubview(confirmButton)
+        view.addSubview(searchBar)
+      //  navigationController?.navigationItem.searchController
+        
         NSLayoutConstraint.activate([
-        confirmButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-        confirmButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-        map.bottomAnchor.constraint(equalToSystemSpacingBelow: view.safeAreaLayoutGuide.bottomAnchor, multiplier: 1),
+        searchBar.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+        searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+        searchBar.widthAnchor.constraint(equalToConstant: 400),
+        searchBar.heightAnchor.constraint(equalToConstant: 30),
+        map.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 5),
         map.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, constant: 0),
-        map.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 1.0, constant: -60)
+        map.heightAnchor.constraint(equalToConstant: 500),
+        confirmButton.topAnchor.constraint(equalTo: map.bottomAnchor),
+        confirmButton.widthAnchor.constraint(equalToConstant: 200),
+        confirmButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+        confirmButton.heightAnchor.constraint(equalToConstant: 50)
         ])
     }
     // does not appear to be necessary
@@ -73,43 +97,40 @@ class MapView: UIViewController {
         map.removeAnnotations(map.annotations)
     }
     
-    @objc func track(_ sender: UIButton) {
-        // show user location
-        map.showsUserLocation = true
-        map.setUserTrackingMode(.follow, animated: true)
-    }
-    
     @objc func handleDoneButton() {
-        dismiss(animated: true) {
-                if self.coordinates != nil {
-                    self.sender.coordinates = self.coordinates
-                    self.sender.map.mapView.setRegion(self.map.region, animated: true)
-                    let annotation = MKPointAnnotation()
-                    annotation.coordinate = self.coordinates
-                    self.sender.map.mapView.removeAnnotations(self.sender.map.mapView.annotations)
-                    self.sender.map.mapView.addAnnotation(annotation)
-                    self.sender.reloadInputViews()
-            }
+        if self.coordinates != nil {
+            self.sender.coordinates = self.coordinates
+            self.sender.map.mapView.removeAnnotations(self.sender.map.mapView.annotations)
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = self.coordinates
+            navigationController?.popViewController(animated: true)
+            self.sender.map.mapView.setCenter(annotation.coordinate, animated: true)
+            self.sender.map.mapView.addAnnotation(annotation)
+            self.sender.reloadInputViews()
         }
     }
-    
+    // There is a problem with the gesture recognizer
     @objc func handleLongPressGesture(_ gesture: UILongPressGestureRecognizer) {
-        if gesture.state == .began {
-            self.map.removeAnnotations(self.map.annotations)
+        print("handleLongPressGesture")
+        switch gesture.state {
+        case .began:
+            print(".began")
             let screenLocation = gesture.location(in: self.map)
             let mapCoordinate = map.convert(screenLocation, toCoordinateFrom: self.map)
-            let annotation = MKPointAnnotation()
-            annotation.coordinate = mapCoordinate
+            let annotation = PlaceAnnotation(coordinate: mapCoordinate)
+            annotation.title = "hello"
             self.map.addAnnotation(annotation)
             self.coordinates = mapCoordinate
+        case .ended:
+            print(".ended")
+        default:
+            return
         }
     }
 }
 
-extension MapView: MKMapViewDelegate {
-   
-}
-
-extension MapView: UINavigationControllerDelegate {
-    
+extension MapView: UISearchBarDelegate {
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        print("searchBarTextDidBeginEditing")
+    }
 }

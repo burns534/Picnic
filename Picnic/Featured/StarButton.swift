@@ -14,10 +14,10 @@ class StarButton: UIButton {
     var empty: UIImageView
     var starSize: CGSize
     
-    init(frame: CGRect, starSize: CGSize) {
-        let emptyStar = UIImage(systemName: "star")!.withTintColor(.systemYellow, renderingMode: .alwaysOriginal)
+    init(frame: CGRect, starSize: CGSize, color: UIColor) {
+        let emptyStar = UIImage(systemName: "star")!.withTintColor(color, renderingMode: .alwaysOriginal)
         
-        let fullStar = UIImage(systemName: "star.fill")!.withTintColor(.systemYellow, renderingMode: .alwaysOriginal)
+        let fullStar = UIImage(systemName: "star.fill")!.withTintColor(color, renderingMode: .alwaysOriginal)
         
         self.empty = UIImageView(image: emptyStar)
         empty.translatesAutoresizingMaskIntoConstraints = false

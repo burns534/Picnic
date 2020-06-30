@@ -16,6 +16,10 @@ class FeaturedCell: UICollectionViewCell {
     var userDescription: UITextView!
     var state: UILabel!
     var rating: Rating!
+    var deleteButton: UIButton!
+    var parent: Featured!
+    
+    var picnic: Picnic!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -61,19 +65,44 @@ class FeaturedCell: UICollectionViewCell {
         state.translatesAutoresizingMaskIntoConstraints = false
         state.numberOfLines = 1
         contentView.addSubview(state)
+        
+        deleteButton = UIButton(frame: .zero)
+        deleteButton.translatesAutoresizingMaskIntoConstraints = false
+        deleteButton.addTarget(self, action: #selector(deletePress), for: .touchUpInside)
+        deleteButton.setTitle("delete", for: .normal)
+        deleteButton.setTitleColor(.black, for: .normal)
+        contentView.addSubview(deleteButton)
     }
     
-    func configure(title: String, imageName: String, userDescription: String, state: String, imageViewSize: CGSize, rating: Rating) {
-        dbManager.image(for: imageName) { image, error in
+    /* mostly works.... the collection view bug is pretty much irrelevant though
+     it really doesn't even make sense to have a delete button at all... not sure what I was thinking. */
+    @objc func deletePress(_ sender: UIButton) {
+        print("deletePress called")
+        let index = parent.collectionView.indexPath(for: self)!
+        dbManager.deletePicnic(picnic: self.picnic) {
+            print("deletePicnic completion")
+            dbManager.deleteImage(for: self.picnic.name) {
+                print("deleteImage completion")
+                self.parent.locations.remove(at: index.item)
+                self.parent.collectionView.deleteItems(at: [index])
+            }
+        }
+        
+    }
+    
+    func configure(parent: Featured, picnic: Picnic, imageViewSize: CGSize, rating: Rating) {
+        dbManager.image(for: picnic.imageName) { image, error in
             if let _ = error {
                 return
             } else {
                 self.imageView.image = image
             }
         }
-        self.title.text = title
-        self.userDescription.text = userDescription
-        self.state.text = state
+        self.parent = parent
+        self.picnic = picnic
+        self.title.text = picnic.name
+        self.userDescription.text = picnic.userDescription
+        self.state.text = picnic.state
         self.rating = rating
         self.rating.translatesAutoresizingMaskIntoConstraints = false
         self.contentView.addSubview(self.rating)
@@ -109,7 +138,12 @@ class FeaturedCell: UICollectionViewCell {
             self.state.topAnchor.constraint(equalTo: self.userDescription.bottomAnchor, constant: 5),
             self.state.widthAnchor.constraint(equalToConstant: 200),
             self.state.heightAnchor.constraint(equalToConstant: 20),
-            self.state.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor)
+            self.state.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor),
+            
+            self.deleteButton.topAnchor.constraint(equalTo: self.title.bottomAnchor, constant: 10),
+            self.deleteButton.leftAnchor.constraint(equalTo: self.imageView.rightAnchor, constant: 10),
+            self.deleteButton.heightAnchor.constraint(equalToConstant: 30),
+            self.deleteButton.widthAnchor.constraint(equalToConstant: 100)
         ])
     }
 }

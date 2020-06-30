@@ -92,12 +92,8 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
     
-    @objc func presentMap() {
-        present(MapView(sender: self), animated: true)
-    }
-    
     @objc func handleMapGesture(_ gesture: UITapGestureRecognizer) {
-        present(MapView(sender: self), animated: true)
+        navigationController?.pushViewController(MapView(sender: self), animated: true)
     }
     
     @objc func presentImagePicker(_ sender: UIButton) {
@@ -181,9 +177,9 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
             addImage.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
             addImage.rightAnchor.constraint(lessThanOrEqualTo: map.leftAnchor),
             
-            interactiveRating.topAnchor.constraint(equalTo: addImage.bottomAnchor, constant: 100),
+            interactiveRating.topAnchor.constraint(equalTo: addImage.bottomAnchor, constant: 5),
             interactiveRating.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
-//            interactiveRating.rightAnchor.constraint(lessThanOrEqualTo: map.leftAnchor),
+            interactiveRating.rightAnchor.constraint(lessThanOrEqualTo: map.leftAnchor),
             interactiveRating.widthAnchor.constraint(equalToConstant: interactiveRating.width),
             interactiveRating.heightAnchor.constraint(equalToConstant: interactiveRating.starSize.height)
         ])

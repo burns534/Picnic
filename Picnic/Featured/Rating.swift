@@ -36,7 +36,6 @@ class Rating: UIView {
     }
     
     @objc func starPress(_ sender: UIButton) {
-        print("starPress rating: \(sender.tag)")
         self.rating = CGFloat(sender.tag + 1)
         refresh(rating: self.rating)
     }
@@ -47,7 +46,7 @@ class Rating: UIView {
 
         for i in 0..<5 {
 
-            let starButton = StarButton(frame: .zero, starSize: self.starSize)
+            let starButton = StarButton(frame: .zero, starSize: self.starSize, color: .systemYellow)
             starButton.translatesAutoresizingMaskIntoConstraints = false
             starButton.addTarget(self, action: #selector(starPress), for: .touchUpInside)
             starButton.tag = i

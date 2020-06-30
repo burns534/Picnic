@@ -60,7 +60,7 @@ class Featured: UICollectionViewController {
     
     @objc func rightBarButton() {
         
-        navigationController?.pushViewController(NewLocationController(rating: .init(frame: .zero, starSize: .init(width: 70, height: 70), spacing: 1, rating: 0)), animated: true)
+        navigationController?.pushViewController(NewLocationController(rating: .init(frame: .zero, starSize: .init(width: 30, height: 30), spacing: 1, rating: 0)), animated: true)
     }
 
     // MARK: UICollectionViewDataSource
@@ -83,7 +83,7 @@ class Featured: UICollectionViewController {
         }
         let picnic = locations[indexPath.item]
         cell.setupShadow(cellSize: cellSize)
-        cell.configure(title: picnic.name, imageName: picnic.imageName, userDescription: picnic.userDescription, state: picnic.state, imageViewSize: cellSize / 2, rating: Rating(frame: .zero, starSize: .init(width: 20, height: 20), spacing: 1, rating: CGFloat(picnic.rating)))
+        cell.configure(parent: self, picnic: picnic, imageViewSize: cellSize / 2, rating: Rating(frame: .zero, starSize: .init(width: 20, height: 20), spacing: 1, rating: CGFloat(picnic.rating)))
         
         return cell
     }
