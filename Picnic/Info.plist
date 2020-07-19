@@ -59,6 +59,8 @@
 	<string>To use map features</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>To use map features</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>For posting</string>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

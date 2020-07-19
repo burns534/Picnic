@@ -10,12 +10,19 @@
 		2716B5B0249186E80092A622 /* PlaceAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2716B5AF249186E80092A622 /* PlaceAnnotation.swift */; };
 		2716B5B22491A83A0092A622 /* MapSearchResultsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2716B5B12491A83A0092A622 /* MapSearchResultsController.swift */; };
 		2739E8D024915BDB009AD607 /* StarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2739E8CF24915BDB009AD607 /* StarButton.swift */; };
+		27407AD424C4004F00AE7AAF /* FloatingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27407AD324C4004F00AE7AAF /* FloatingMenu.swift */; };
 		2743860D2478925D0029F00F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2743860C2478925D0029F00F /* AppDelegate.swift */; };
 		2743860F2478925D0029F00F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2743860E2478925D0029F00F /* SceneDelegate.swift */; };
 		274386122478925D0029F00F /* Picnic.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 274386102478925D0029F00F /* Picnic.xcdatamodeld */; };
 		274386162478925F0029F00F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 274386152478925F0029F00F /* Assets.xcassets */; };
 		274386192478925F0029F00F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 274386182478925F0029F00F /* Preview Assets.xcassets */; };
 		2743861C2478925F0029F00F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2743861A2478925F0029F00F /* LaunchScreen.storyboard */; };
+		274B051F24AD308900747D25 /* CustomImagePickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274B051E24AD308900747D25 /* CustomImagePickerController.swift */; };
+		274B052124BF928100747D25 /* ImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274B052024BF928100747D25 /* ImageCell.swift */; };
+		274B052324BF9B5100747D25 /* CustomPickerFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274B052224BF9B5100747D25 /* CustomPickerFlowLayout.swift */; };
+		274B052624C39ECC00747D25 /* ZoomableImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274B052524C39ECC00747D25 /* ZoomableImage.swift */; };
+		274B052A24C3C8AD00747D25 /* NewLocationCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274B052924C3C8AD00747D25 /* NewLocationCollectionViewCell.swift */; };
+		274B052D24C3FB9100747D25 /* PicnicDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274B052C24C3FB9100747D25 /* PicnicDetailViewController.swift */; };
 		2756C288247D84080070D61A /* AddImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2756C287247D84080070D61A /* AddImage.swift */; };
 		2756C28B247F2BCA0070D61A /* NewLocationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2756C28A247F2BCA0070D61A /* NewLocationController.swift */; };
 		275AD147248180F100EE3DBA /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275AD146248180F100EE3DBA /* MapView.swift */; };
@@ -54,6 +61,7 @@
 		2716B5AF249186E80092A622 /* PlaceAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceAnnotation.swift; sourceTree = "<group>"; };
 		2716B5B12491A83A0092A622 /* MapSearchResultsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSearchResultsController.swift; sourceTree = "<group>"; };
 		2739E8CF24915BDB009AD607 /* StarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarButton.swift; sourceTree = "<group>"; };
+		27407AD324C4004F00AE7AAF /* FloatingMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingMenu.swift; sourceTree = "<group>"; };
 		274386092478925D0029F00F /* Picnic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Picnic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2743860C2478925D0029F00F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2743860E2478925D0029F00F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -62,6 +70,12 @@
 		274386182478925F0029F00F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		2743861B2478925F0029F00F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2743861D2478925F0029F00F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		274B051E24AD308900747D25 /* CustomImagePickerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomImagePickerController.swift; sourceTree = "<group>"; };
+		274B052024BF928100747D25 /* ImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCell.swift; sourceTree = "<group>"; };
+		274B052224BF9B5100747D25 /* CustomPickerFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomPickerFlowLayout.swift; sourceTree = "<group>"; };
+		274B052524C39ECC00747D25 /* ZoomableImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableImage.swift; sourceTree = "<group>"; };
+		274B052924C3C8AD00747D25 /* NewLocationCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewLocationCollectionViewCell.swift; sourceTree = "<group>"; };
+		274B052C24C3FB9100747D25 /* PicnicDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PicnicDetailViewController.swift; sourceTree = "<group>"; };
 		2756C287247D84080070D61A /* AddImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddImage.swift; sourceTree = "<group>"; };
 		2756C28A247F2BCA0070D61A /* NewLocationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewLocationController.swift; sourceTree = "<group>"; };
 		275AD146248180F100EE3DBA /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
@@ -110,6 +124,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		27407AD524C4BF0D00AE7AAF /* New Group */ = {
+			isa = PBXGroup;
+			children = (
+				2756C28A247F2BCA0070D61A /* NewLocationController.swift */,
+				274B052924C3C8AD00747D25 /* NewLocationCollectionViewCell.swift */,
+			);
+			path = "New Group";
+			sourceTree = "<group>";
+		};
 		274386002478925D0029F00F = {
 			isa = PBXGroup;
 			children = (
@@ -131,6 +154,8 @@
 		2743860B2478925D0029F00F /* Picnic */ = {
 			isa = PBXGroup;
 			children = (
+				274B052B24C3FB6A00747D25 /* Detail View */,
+				274B052424C39EA100747D25 /* Misc */,
 				275AD145248180BD00EE3DBA /* Map */,
 				2756C286247D83EA0070D61A /* Add Image */,
 				27B072ED247CCC70009974BD /* Tab Controller */,
@@ -156,10 +181,33 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		274B052424C39EA100747D25 /* Misc */ = {
+			isa = PBXGroup;
+			children = (
+				27BFC4192486E7FB00A3C968 /* Rating.swift */,
+				2739E8CF24915BDB009AD607 /* StarButton.swift */,
+				27BFC411248317C300A3C968 /* Helpers.swift */,
+				274B052524C39ECC00747D25 /* ZoomableImage.swift */,
+			);
+			path = Misc;
+			sourceTree = "<group>";
+		};
+		274B052B24C3FB6A00747D25 /* Detail View */ = {
+			isa = PBXGroup;
+			children = (
+				274B052C24C3FB9100747D25 /* PicnicDetailViewController.swift */,
+			);
+			path = "Detail View";
+			sourceTree = "<group>";
+		};
 		2756C286247D83EA0070D61A /* Add Image */ = {
 			isa = PBXGroup;
 			children = (
 				2756C287247D84080070D61A /* AddImage.swift */,
+				274B051E24AD308900747D25 /* CustomImagePickerController.swift */,
+				274B052024BF928100747D25 /* ImageCell.swift */,
+				274B052224BF9B5100747D25 /* CustomPickerFlowLayout.swift */,
+				27407AD324C4004F00AE7AAF /* FloatingMenu.swift */,
 			);
 			path = "Add Image";
 			sourceTree = "<group>";
@@ -198,11 +246,9 @@
 				27EB2DC22478CA4E0093362C /* FeaturedCell.swift */,
 				27B072E7247CC66B009974BD /* Featured.swift */,
 				27B072E9247CC7BB009974BD /* CustomFlowLayout.swift */,
-				2756C28A247F2BCA0070D61A /* NewLocationController.swift */,
+				27407AD524C4BF0D00AE7AAF /* New Group */,
 				275AD1482481BCAB00EE3DBA /* LocationPopover.swift */,
 				275AD14A2482CAE300EE3DBA /* LocationLabel.swift */,
-				27BFC4192486E7FB00A3C968 /* Rating.swift */,
-				2739E8CF24915BDB009AD607 /* StarButton.swift */,
 			);
 			path = Featured;
 			sourceTree = "<group>";
@@ -212,7 +258,6 @@
 			children = (
 				27EB2DC52478CC1D0093362C /* Picnic.swift */,
 				27EB2DD42478CE730093362C /* LoadData.swift */,
-				27BFC411248317C300A3C968 /* Helpers.swift */,
 				27BFC4152485980100A3C968 /* DatabaseManager.swift */,
 			);
 			path = Models;
@@ -389,13 +434,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				2756C288247D84080070D61A /* AddImage.swift in Sources */,
+				274B052624C39ECC00747D25 /* ZoomableImage.swift in Sources */,
 				275AD147248180F100EE3DBA /* MapView.swift in Sources */,
 				274386122478925D0029F00F /* Picnic.xcdatamodeld in Sources */,
 				275AD1492481BCAB00EE3DBA /* LocationPopover.swift in Sources */,
 				27BFC4162485980100A3C968 /* DatabaseManager.swift in Sources */,
+				274B052D24C3FB9100747D25 /* PicnicDetailViewController.swift in Sources */,
 				27B072EF247CCC94009974BD /* TabController.swift in Sources */,
+				274B052324BF9B5100747D25 /* CustomPickerFlowLayout.swift in Sources */,
+				274B052A24C3C8AD00747D25 /* NewLocationCollectionViewCell.swift in Sources */,
+				27407AD424C4004F00AE7AAF /* FloatingMenu.swift in Sources */,
 				2716B5B22491A83A0092A622 /* MapSearchResultsController.swift in Sources */,
 				27BFC41A2486E7FB00A3C968 /* Rating.swift in Sources */,
+				274B051F24AD308900747D25 /* CustomImagePickerController.swift in Sources */,
 				27EB2DD52478CE730093362C /* LoadData.swift in Sources */,
 				27B072EA247CC7BB009974BD /* CustomFlowLayout.swift in Sources */,
 				2739E8D024915BDB009AD607 /* StarButton.swift in Sources */,
@@ -406,6 +457,7 @@
 				2743860F2478925D0029F00F /* SceneDelegate.swift in Sources */,
 				2756C28B247F2BCA0070D61A /* NewLocationController.swift in Sources */,
 				27B072E8247CC66B009974BD /* Featured.swift in Sources */,
+				274B052124BF928100747D25 /* ImageCell.swift in Sources */,
 				27BFC412248317C300A3C968 /* Helpers.swift in Sources */,
 				27EB2DC32478CA4E0093362C /* FeaturedCell.swift in Sources */,
 				27BFC414248318E200A3C968 /* MapIcon.swift in Sources */,

@@ -17,40 +17,87 @@ class DatabaseManager {
         self.storagePathURL = storagePathURL
     }
     
-    func image(for title: String, completion: @escaping (UIImage?, Error?) -> ()) {
-        let imageRef = storage.reference(forURL: storagePathURL + title + ".jpg")
-//        let imageRef = storage.reference().child("images/" + title + ".jpg")
+    func store(picnic: Picnic, images: [UIImage], picnicCompletion: @escaping (Picnic, DatabaseReference) -> () = {_,_ in}, imageCompletion: @escaping () -> () = {}, completion: @escaping () -> () = {} ) {
+        
+        let taskGroup = DispatchGroup()
+        // store picnic
+        taskGroup.enter()
+        storePicnic(picnic: picnic) { picnic, ref in
+            picnicCompletion(picnic, ref)
+            taskGroup.leave()
+        }
+        
+        // store images for picnic
+        taskGroup.enter()
+        storeBatchImages(path: picnic.id, idList: picnic.imageNames, images: images) {
+            imageCompletion()
+            taskGroup.leave()
+        }
+        
+        taskGroup.notify(queue: .main) {
+            completion()
+        }
+    }
+    
+    func storeBatchImages(path: String, idList: [String], images: [UIImage], completion: @escaping () -> () = { } ) {
+        let taskGroup = DispatchGroup()
+        
+        for (index, image) in images.enumerated() {
+            taskGroup.enter()
+            storeImage(for: path + "/\(idList[index])", image: image) { metadata, error in
+                taskGroup.leave()
+            }
+        }
+        taskGroup.notify(queue: .main) {
+            completion()
+        }
+    }
+    func image(forPicnic: Picnic, index: Int = 0, maxSize: Int64 = 2 * 1024 * 1024, completion: @escaping (UIImage?, Error?) -> () = {_,_ in}) {
+        let imageRef = storage.reference(forURL: storagePathURL + forPicnic.id + "/\(forPicnic.imageNames[index])")
+        
+        imageRef.getData(maxSize: maxSize) { data, error in
+            if let error = error {
+                print("Error: DatabaseManager: image forPicnic: could not load image from firebase storage: \(error.localizedDescription)")
+                return
+            }
+            guard let data = data else { return }
+            completion(UIImage(data: data), error)
+        }
+    }
+    
+    func image(forPath: String, completion: @escaping (UIImage?, Error?) -> () = {_, _ in}) {
+        let imageRef = storage.reference(forURL: storagePathURL + forPath)
+        
         imageRef.getData(maxSize: 2 * 1024 * 1024) { data, error in
             if let error = error {
-                print("Error: DatabaseManager: image: could not load image from firebase storage: \(error.localizedDescription)")
+                print("Error: DatabaseManager: image forPath: could not load image from firebase storage: \(error.localizedDescription)")
                 return
             }
             completion(UIImage(data: data!), error)
         }
     }
-    func storeImage(for title: String, image: UIImage, completion: @escaping () -> ()) {
+    func storeImage(for path: String, image: UIImage, completion: @escaping (StorageMetadata?, Error?) -> () = {_, _ in}) {
         guard let data = image.jpegData(compressionQuality: 0.7) else {
-            print("Error: DatabaseManager: storeImage: could not extract png data from image \"\(title)\"")
+            print("Error: DatabaseManager: storeImage: could not extract png data from image \"\(path)\"")
             return
         }
         let metadata = StorageMetadata()
         metadata.contentType = "image/jpeg"
-        let imageRef = storage.reference().child("images/" + title + ".jpg")
+        let imageRef = storage.reference().child("images/" + path)
         let _ = imageRef.putData(data, metadata: metadata) { metadata, error in
             guard let _ = metadata else {
                 print("Error: DatabaseManager: storeImage: metadata nil")
                 return
             }
-            
-            completion()
+            completion(metadata, error)
         }
         
     }
     
-    func deleteImage(for title: String, completion: @escaping () -> ()) {
-        storage.reference().child("images/" + title + ".jpg").delete { error in
+    func deleteImage(for path: String, completion: @escaping () -> ()) {
+        storage.reference().child("images/" + path).delete { error in
             if let _ = error {
-                print("Error: DatabaseManager: Could not delete image \(title)")
+                print("Error: DatabaseManager: Could not delete image \(path)")
                 return
             }
             completion()
@@ -69,7 +116,7 @@ class DatabaseManager {
             "state": picnic.state,
             "latitude": picnic.location.latitude,
             "longitude": picnic.location.longitude,
-            "imageName": picnic.imageName,
+            "imageNames": picnic.imageNames,
             "rating": picnic.rating
             ]
         
@@ -82,7 +129,6 @@ class DatabaseManager {
         })
     }
     
-    // will need rework.. definitely
     func picnic(completion: @escaping ([Picnic]) -> ()) {
         db.child("Picnics").queryLimited(toFirst: 100).observeSingleEvent(of: .value, with: { snapshot in
             guard let objects = snapshot.children.allObjects as? [DataSnapshot] else {

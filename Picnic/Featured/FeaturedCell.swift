@@ -47,7 +47,7 @@ class FeaturedCell: UICollectionViewCell {
         imageView.contentMode = .scaleAspectFit
         imageView.layer.cornerRadius = 25
         imageView.clipsToBounds = true
-        contentView.addSubview(imageView!)
+        contentView.addSubview(imageView)
         
         // configure title
         title = UILabel(frame: frame)
@@ -91,8 +91,10 @@ class FeaturedCell: UICollectionViewCell {
     }
     
     func configure(parent: Featured, picnic: Picnic, imageViewSize: CGSize, rating: Rating) {
-        dbManager.image(for: picnic.imageName) { image, error in
+        self.imageView.image = UIImage(named: "loading.jpg")
+        dbManager.image(forPicnic: picnic) { image, error in
             if let _ = error {
+                self.imageView.image = UIImage(named: "loading.jpg")
                 return
             } else {
                 self.imageView.image = image
@@ -106,7 +108,7 @@ class FeaturedCell: UICollectionViewCell {
         self.rating = rating
         self.rating.translatesAutoresizingMaskIntoConstraints = false
         self.contentView.addSubview(self.rating)
-        // constraints
+        // MARK: Constraints
         NSLayoutConstraint.activate([
             // supplied
             self.contentView.topAnchor.constraint(equalTo: self.topAnchor),

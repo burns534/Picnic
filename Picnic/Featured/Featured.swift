@@ -17,6 +17,8 @@ class Featured: UICollectionViewController {
     
     var locations = [Picnic]()
     
+    private let refreshController = UIRefreshControl()
+    
     override init(collectionViewLayout layout: UICollectionViewLayout) {
         super.init(collectionViewLayout: layout)
         title = "Featured"
@@ -32,10 +34,11 @@ class Featured: UICollectionViewController {
         configure()
     }
     
-    func refresh() {
+    func refresh(completion: @escaping ([Picnic]) -> () = {_ in}) {
         dbManager.picnic { data in
             self.locations = data
             self.collectionView.reloadData()
+            completion(data)
         }
     }
     
@@ -50,12 +53,23 @@ class Featured: UICollectionViewController {
         collectionView.backgroundColor = .white
         collectionView.alwaysBounceVertical = true
         
+        collectionView.refreshControl = self.refreshController
+        self.refreshController.addTarget(self, action: #selector(pullDown), for: .valueChanged)
+        
         self.collectionView!.register(FeaturedCell.self, forCellWithReuseIdentifier: reuseIdentifier)
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus.square"), style: .plain, target: self, action: #selector(rightBarButton))
         navigationItem.rightBarButtonItem?.tintColor = .black
         
         navigationController?.title = "Featured"
+    }
+    
+    
+    
+    @objc func pullDown(_ sender: Any) {
+        refresh { picnic in
+            self.refreshController.endRefreshing()
+        }
     }
     
     @objc func rightBarButton() {

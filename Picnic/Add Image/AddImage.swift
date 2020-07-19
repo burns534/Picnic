@@ -8,9 +8,20 @@
 
 import UIKit
 
+#if targetEnvironment(simulator)
+    let cameraBlock = true
+#else
+    let cameraBlock = false
+#endif
+
+fileprivate let imageSize: CGSize = CGSize(width: 102, height: 102)
+
 class AddImage: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     var vc: UIImagePickerController!
+    
+    let customPickerFlowLayout = CustomPickerFlowLayout(itemSize: imageSize, scrollDirection: .vertical, minimumLineSpacing: 1, sectionInset: .zero, minimumInteritemSpacing: 0)
+    var customPicker: CustomImagePickerController
     
     var camera: UIButton!
     
@@ -20,7 +31,9 @@ class AddImage: UIViewController, UIImagePickerControllerDelegate, UINavigationC
     
     init(sender: NewLocationController) {
         self.sender = sender
+        customPicker = CustomImagePickerController(collectionViewLayout: customPickerFlowLayout)
         super.init(nibName: nil, bundle: nil)
+        customPicker.destination = sender
         title = "Add Photos"
         tabBarItem.image = UIImage(systemName: "camera")
     }
@@ -56,14 +69,18 @@ class AddImage: UIViewController, UIImagePickerControllerDelegate, UINavigationC
     }
     
     @objc func cameraPress(_ sender: UIButton) {
-        vc.sourceType = .camera
-        vc.cameraDevice = .rear
-        present(vc, animated: true, completion: nil)
+        if !cameraBlock {
+            vc.sourceType = .camera
+            vc.cameraDevice = .rear
+            present(vc, animated: true, completion: nil)
+        } else {
+            print("Error: AddImage: cameraPress: Cannot access camera in simulator/debug mode")
+        }
     }
     
     @objc func photoLibPress(_ sender: UIButton) {
         vc.sourceType = .photoLibrary
-        present(vc, animated: true, completion: nil)
+        present(customPicker, animated: true, completion: nil)
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
@@ -73,7 +90,7 @@ class AddImage: UIViewController, UIImagePickerControllerDelegate, UINavigationC
             print("Error: Could not load image")
             return
         }
-        sender.image = image
+        sender.images.append(image)
         navigationController?.popViewController(animated: true)
     }
     
