@@ -7,12 +7,13 @@
 //
 
 import UIKit
-
-func buttonShadow(view: UIView, radius: CGFloat, color: CGColor?, opacity: Float = 1.0, offset: CGSize = .zero) {
-     view.layer.shadowRadius = radius
-     view.layer.shadowColor = color
-     view.layer.shadowOffset = offset
-     view.layer.shadowOpacity = opacity
+extension UIView {
+    func setShadow(radius: CGFloat, color: CGColor?, opacity: Float = 1.0, offset: CGSize = .zero) {
+         layer.shadowRadius = radius
+         layer.shadowColor = color
+         layer.shadowOffset = offset
+         layer.shadowOpacity = opacity
+    }
 }
 
 extension CGSize {
@@ -31,7 +32,7 @@ extension CGSize {
     }
 }
 
-// someone else's code
+// Not mine
 extension UIColor {
   public convenience init(rgba: String) {
     var red:   CGFloat = 0.0

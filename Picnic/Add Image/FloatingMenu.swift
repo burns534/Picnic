@@ -96,6 +96,8 @@ extension FloatingMenu: UIImagePickerControllerDelegate {
         }
         
         dest.images.append(image)
-        dest.dismiss(animated: true, completion: nil)
+        self.sender.dismiss(animated: true, completion: nil)
+        self.sender.navigationController?.popViewController(animated: false)
+        dest.collectionView.reloadData()
     }
 }

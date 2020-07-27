@@ -8,17 +8,13 @@
 
 import UIKit
 
+fileprivate var imageViewSize: CGSize = CGSize(width: cellSize.width, height: 200)
+
 class FeaturedCell: UICollectionViewCell {
     
     var imageView: UIImageView!
-    
     var title: UILabel!
-    var userDescription: UITextView!
-    var state: UILabel!
     var rating: Rating!
-    var deleteButton: UIButton!
-    var parent: Featured!
-    
     var picnic: Picnic!
     
     override init(frame: CGRect) {
@@ -30,122 +26,77 @@ class FeaturedCell: UICollectionViewCell {
         fatalError("NSCoding not supported")
     }
     
-    func setupShadow(cellSize: CGSize) {
-        // configure cell
-        self.layer.cornerRadius = 30
-        self.layer.shadowPath = UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width: cellSize.width, height: cellSize.height), cornerRadius: 30).cgPath
-        buttonShadow(view: self, radius: 10, color: UIColor.darkGray.cgColor, opacity: 0.9, offset: CGSize(width: 0, height: 5))
-    }
-    
     func setup() {
         self.backgroundColor = .white
-        //self.translatesAutoresizingMaskIntoConstraints = false
         self.contentView.translatesAutoresizingMaskIntoConstraints = false
         // configure image
         imageView = UIImageView(frame: frame)
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .scaleAspectFit
-        imageView.layer.cornerRadius = 25
+        imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 10
+        imageView.layer.maskedCorners = CACornerMask(arrayLiteral: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
         imageView.clipsToBounds = true
         contentView.addSubview(imageView)
         
         // configure title
         title = UILabel(frame: frame)
-        title.textAlignment = .center
+        title.textAlignment = .left
         title.translatesAutoresizingMaskIntoConstraints = false
-        title.numberOfLines = 3
         contentView.addSubview(title)
         
-        userDescription = UITextView(frame: frame)
-        userDescription.isUserInteractionEnabled = false
-        userDescription.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(userDescription)
-        
-        state = UILabel(frame: frame)
-        state.translatesAutoresizingMaskIntoConstraints = false
-        state.numberOfLines = 1
-        contentView.addSubview(state)
-        
-        deleteButton = UIButton(frame: .zero)
-        deleteButton.translatesAutoresizingMaskIntoConstraints = false
-        deleteButton.addTarget(self, action: #selector(deletePress), for: .touchUpInside)
-        deleteButton.setTitle("delete", for: .normal)
-        deleteButton.setTitleColor(.black, for: .normal)
-        contentView.addSubview(deleteButton)
+        rating = Rating()
+        rating.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(rating)
     }
     
-    /* mostly works.... the collection view bug is pretty much irrelevant though
-     it really doesn't even make sense to have a delete button at all... not sure what I was thinking. */
-    @objc func deletePress(_ sender: UIButton) {
-        print("deletePress called")
-        let index = parent.collectionView.indexPath(for: self)!
-        dbManager.deletePicnic(picnic: self.picnic) {
-            print("deletePicnic completion")
-            dbManager.deleteImage(for: self.picnic.name) {
-                print("deleteImage completion")
-                self.parent.locations.remove(at: index.item)
-                self.parent.collectionView.deleteItems(at: [index])
-            }
-        }
-        
+    override func prepareForReuse() {
+        imageView.image = nil
+        title.text = nil
     }
     
-    func configure(parent: Featured, picnic: Picnic, imageViewSize: CGSize, rating: Rating) {
+    func configure(picnic: Picnic) {
+// MARK: change this to loading wheel
         self.imageView.image = UIImage(named: "loading.jpg")
         dbManager.image(forPicnic: picnic) { image, error in
-            if let _ = error {
+            if let error = error {
                 self.imageView.image = UIImage(named: "loading.jpg")
+                print(error.localizedDescription)
                 return
             } else {
                 self.imageView.image = image
             }
         }
-        self.parent = parent
+// apply shadow to cell
+        layer.cornerRadius = 10
+        layer.shadowPath = UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width: cellSize.width, height: cellSize.height), cornerRadius: 10).cgPath
+        setShadow(radius: 10, color: UIColor.darkGray.cgColor, opacity: 0.6, offset: CGSize(width: 0, height: 5))
+        
+        rating.configureFloat(rating: CGFloat(picnic.rating))
         self.picnic = picnic
         self.title.text = picnic.name
-        self.userDescription.text = picnic.userDescription
-        self.state.text = picnic.state
-        self.rating = rating
-        self.rating.translatesAutoresizingMaskIntoConstraints = false
-        self.contentView.addSubview(self.rating)
-        // MARK: Constraints
+// MARK: Constraints
         NSLayoutConstraint.activate([
             // supplied
-            self.contentView.topAnchor.constraint(equalTo: self.topAnchor),
-            self.contentView.leftAnchor.constraint(equalTo: self.leftAnchor),
-            self.contentView.heightAnchor.constraint(equalTo: self.heightAnchor),
-            self.contentView.widthAnchor.constraint(equalTo: self.widthAnchor),
+            self.contentView.topAnchor.constraint(equalTo: topAnchor),
+            self.contentView.leftAnchor.constraint(equalTo: leftAnchor),
+            self.contentView.heightAnchor.constraint(equalTo: heightAnchor),
+            self.contentView.widthAnchor.constraint(equalTo: widthAnchor),
             
-            self.imageView.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 5),
-            self.imageView.leftAnchor.constraint(equalTo: self.contentView.leftAnchor, constant: 5),
-            self.imageView.widthAnchor.constraint(equalToConstant: imageViewSize.width),
-            self.imageView.heightAnchor.constraint(equalToConstant: imageViewSize.width),
+            imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            imageView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
+            imageView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            imageView.widthAnchor.constraint(equalTo: contentView.widthAnchor),
+            imageView.heightAnchor.constraint(equalToConstant: imageViewSize.height),
             
-            self.title.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 10),
-            self.title.leftAnchor.constraint(equalTo: self.imageView.rightAnchor, constant: 10),
-            self.title.widthAnchor.constraint(equalToConstant: 100),
+            self.title.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10),
+            self.title.leftAnchor.constraint(equalTo: self.imageView.leftAnchor, constant: 10),
+            self.title.widthAnchor.constraint(equalToConstant: 200),
             self.title.heightAnchor.constraint(equalToConstant: 20),
             
-            self.rating.topAnchor.constraint(equalTo: self.imageView.bottomAnchor, constant: 5),
-            self.rating.centerXAnchor.constraint(equalTo: self.imageView.centerXAnchor),
+            self.rating.topAnchor.constraint(equalTo: self.imageView.bottomAnchor, constant: 10),
+            self.rating.leftAnchor.constraint(equalTo: self.title.rightAnchor, constant: 50),
             self.rating.widthAnchor.constraint(equalToConstant: self.rating.width),
             self.rating.heightAnchor.constraint(equalToConstant: self.rating.starSize.height),
-            
-            // Slight issue with text alignment here
-            self.userDescription.topAnchor.constraint(equalTo: self.rating.bottomAnchor, constant: 5),
-            self.userDescription.leftAnchor.constraint(equalTo: self.imageView.leftAnchor),
-            self.userDescription.widthAnchor.constraint(equalToConstant: 250),
-            self.userDescription.heightAnchor.constraint(equalToConstant: 60),
-            
-            self.state.topAnchor.constraint(equalTo: self.userDescription.bottomAnchor, constant: 5),
-            self.state.widthAnchor.constraint(equalToConstant: 200),
-            self.state.heightAnchor.constraint(equalToConstant: 20),
-            self.state.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor),
-            
-            self.deleteButton.topAnchor.constraint(equalTo: self.title.bottomAnchor, constant: 10),
-            self.deleteButton.leftAnchor.constraint(equalTo: self.imageView.rightAnchor, constant: 10),
-            self.deleteButton.heightAnchor.constraint(equalToConstant: 30),
-            self.deleteButton.widthAnchor.constraint(equalToConstant: 100)
         ])
     }
 }

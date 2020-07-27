@@ -10,6 +10,7 @@ import UIKit
 import Photos
 
 private let reuseIdentifier = "Cell"
+fileprivate let previewFrame: CGRect = CGRect(x: 0, y: 0, width: 414, height: 400)
 
 class CustomImagePickerController: UICollectionViewController {
     
@@ -20,6 +21,7 @@ class CustomImagePickerController: UICollectionViewController {
     var sourceButton: UIButton!
     var destination: UIViewController!
     var menu: FloatingMenu!
+    var counter: Int16 = 0
     
     fileprivate let imageManager = PHCachingImageManager()
     fileprivate let previewManager = PHImageManager()
@@ -78,17 +80,15 @@ class CustomImagePickerController: UICollectionViewController {
         view.backgroundColor = .white
         
         let asset = fetchResult.object(at: 0)
-        preview = ZoomableImage()
+        preview = ZoomableImage(frame: previewFrame)
         previewManager.requestImage(for: asset, targetSize: CGSize(width: 1200, height: 1800), contentMode: .aspectFit, options: nil) { image, _ in
             if let _ = image {
-                self.preview.imageView.image = image
+                self.preview.image = image
             }
         }
         
         preview.translatesAutoresizingMaskIntoConstraints = false
-        preview.imageView.contentMode = .scaleAspectFill
-        preview.imageView.clipsToBounds = true
-        preview.delegate = self
+//        preview.clipsToBounds = true
         view.addSubview(preview)
         
         sourceButton = UIButton()
@@ -239,14 +239,18 @@ class CustomImagePickerController: UICollectionViewController {
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let cell = collectionView.cellForItem(at: indexPath) as! ImageCell
         let asset = fetchResult.object(at: indexPath.item)
-        
         cell.toggleSelectionImage()
+        counter = 0
         if cell.toggle {
-            selectedImages.append(cell.imageView.image!)
             if indexPath != previousPreviewIndexPath {
                 previewManager.requestImage(for: asset, targetSize: CGSize(width: 1200, height: 1800), contentMode: .aspectFit, options: nil) { image, _ in
-                    if let _ = image {
-                        self.preview.imageView.image = image
+                    if let image = image {
+                        self.preview.image = image
+                        if self.counter == 1 {
+                            self.selectedImages.removeLast()
+                        }
+                        self.selectedImages.append(image)
+                        self.counter += 1
                     }
                 }
                 previousPreviewIndexPath = indexPath
@@ -262,57 +266,9 @@ class CustomImagePickerController: UICollectionViewController {
         navigationController?.popViewController(animated: true)
         vc.collectionView.reloadData()
     }
-    
-    override func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        return preview.imageView
-    }
-    
-    override func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
-//        NSLayoutConstraint.activate([
-//            preview.imageView.centerXAnchor.constraint(equalTo: preview.centerXAnchor),
-//            preview.imageView.centerYAnchor.constraint(equalTo: preview.centerYAnchor)
-//        ])
-    }
-    
-//    override func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-//        let cell = collectionView.cellForItem(at: indexPath) as! ImageCell
-//
-//        cell.toggleSelectionImage()
-//    }
-
-    // MARK: UICollectionViewDelegate
-
-    /*
-    // Uncomment this method to specify if the specified item should be highlighted during tracking
-    override func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    */
-
-    /*
-    // Uncomment this method to specify if the specified item should be selected
-    override func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    */
-
-    /*
-    // Uncomment these methods to specify if an action menu should be displayed for the specified item, and react to actions performed on the item
-    override func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
-        return false
-    }
-
-    override func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
-        return false
-    }
-
-    override func collectionView(_ collectionView: UICollectionView, performAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) {
-    
-    }
-    */
-
 }
 
+// MARK: Need to finish this
 extension CustomImagePickerController: PHPhotoLibraryChangeObserver {
     func photoLibraryDidChange(_ changeInstance: PHChange) {
         //

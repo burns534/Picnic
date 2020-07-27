@@ -23,9 +23,12 @@
 		274B052624C39ECC00747D25 /* ZoomableImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274B052524C39ECC00747D25 /* ZoomableImage.swift */; };
 		274B052A24C3C8AD00747D25 /* NewLocationCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274B052924C3C8AD00747D25 /* NewLocationCollectionViewCell.swift */; };
 		274B052D24C3FB9100747D25 /* PicnicDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274B052C24C3FB9100747D25 /* PicnicDetailViewController.swift */; };
+		2752092324C4EF12002E8761 /* SpinnerWheel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2752092224C4EF12002E8761 /* SpinnerWheel.swift */; };
+		2752092524C53BED002E8761 /* ImageScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2752092424C53BED002E8761 /* ImageScrollView.swift */; };
+		2752092724CF494B002E8761 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2752092624CF494B002E8761 /* LocationManager.swift */; };
 		2756C288247D84080070D61A /* AddImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2756C287247D84080070D61A /* AddImage.swift */; };
 		2756C28B247F2BCA0070D61A /* NewLocationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2756C28A247F2BCA0070D61A /* NewLocationController.swift */; };
-		275AD147248180F100EE3DBA /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275AD146248180F100EE3DBA /* MapView.swift */; };
+		275AD147248180F100EE3DBA /* LocationSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275AD146248180F100EE3DBA /* LocationSelector.swift */; };
 		275AD1492481BCAB00EE3DBA /* LocationPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275AD1482481BCAB00EE3DBA /* LocationPopover.swift */; };
 		275AD14B2482CAE300EE3DBA /* LocationLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275AD14A2482CAE300EE3DBA /* LocationLabel.swift */; };
 		27B072E6247C4724009974BD /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 27B072E5247C4724009974BD /* GoogleService-Info.plist */; };
@@ -76,9 +79,12 @@
 		274B052524C39ECC00747D25 /* ZoomableImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableImage.swift; sourceTree = "<group>"; };
 		274B052924C3C8AD00747D25 /* NewLocationCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewLocationCollectionViewCell.swift; sourceTree = "<group>"; };
 		274B052C24C3FB9100747D25 /* PicnicDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PicnicDetailViewController.swift; sourceTree = "<group>"; };
+		2752092224C4EF12002E8761 /* SpinnerWheel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerWheel.swift; sourceTree = "<group>"; };
+		2752092424C53BED002E8761 /* ImageScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageScrollView.swift; sourceTree = "<group>"; };
+		2752092624CF494B002E8761 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		2756C287247D84080070D61A /* AddImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddImage.swift; sourceTree = "<group>"; };
 		2756C28A247F2BCA0070D61A /* NewLocationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewLocationController.swift; sourceTree = "<group>"; };
-		275AD146248180F100EE3DBA /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
+		275AD146248180F100EE3DBA /* LocationSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSelector.swift; sourceTree = "<group>"; };
 		275AD1482481BCAB00EE3DBA /* LocationPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPopover.swift; sourceTree = "<group>"; };
 		275AD14A2482CAE300EE3DBA /* LocationLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationLabel.swift; sourceTree = "<group>"; };
 		27B072E5247C4724009974BD /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -188,6 +194,9 @@
 				2739E8CF24915BDB009AD607 /* StarButton.swift */,
 				27BFC411248317C300A3C968 /* Helpers.swift */,
 				274B052524C39ECC00747D25 /* ZoomableImage.swift */,
+				2752092224C4EF12002E8761 /* SpinnerWheel.swift */,
+				2752092424C53BED002E8761 /* ImageScrollView.swift */,
+				2752092624CF494B002E8761 /* LocationManager.swift */,
 			);
 			path = Misc;
 			sourceTree = "<group>";
@@ -224,7 +233,7 @@
 		275AD145248180BD00EE3DBA /* Map */ = {
 			isa = PBXGroup;
 			children = (
-				275AD146248180F100EE3DBA /* MapView.swift */,
+				275AD146248180F100EE3DBA /* LocationSelector.swift */,
 				27BFC413248318E200A3C968 /* MapIcon.swift */,
 				2716B5AF249186E80092A622 /* PlaceAnnotation.swift */,
 				2716B5B12491A83A0092A622 /* MapSearchResultsController.swift */,
@@ -435,16 +444,18 @@
 			files = (
 				2756C288247D84080070D61A /* AddImage.swift in Sources */,
 				274B052624C39ECC00747D25 /* ZoomableImage.swift in Sources */,
-				275AD147248180F100EE3DBA /* MapView.swift in Sources */,
+				275AD147248180F100EE3DBA /* LocationSelector.swift in Sources */,
 				274386122478925D0029F00F /* Picnic.xcdatamodeld in Sources */,
 				275AD1492481BCAB00EE3DBA /* LocationPopover.swift in Sources */,
 				27BFC4162485980100A3C968 /* DatabaseManager.swift in Sources */,
 				274B052D24C3FB9100747D25 /* PicnicDetailViewController.swift in Sources */,
+				2752092724CF494B002E8761 /* LocationManager.swift in Sources */,
 				27B072EF247CCC94009974BD /* TabController.swift in Sources */,
 				274B052324BF9B5100747D25 /* CustomPickerFlowLayout.swift in Sources */,
 				274B052A24C3C8AD00747D25 /* NewLocationCollectionViewCell.swift in Sources */,
 				27407AD424C4004F00AE7AAF /* FloatingMenu.swift in Sources */,
 				2716B5B22491A83A0092A622 /* MapSearchResultsController.swift in Sources */,
+				2752092324C4EF12002E8761 /* SpinnerWheel.swift in Sources */,
 				27BFC41A2486E7FB00A3C968 /* Rating.swift in Sources */,
 				274B051F24AD308900747D25 /* CustomImagePickerController.swift in Sources */,
 				27EB2DD52478CE730093362C /* LoadData.swift in Sources */,
@@ -457,6 +468,7 @@
 				2743860F2478925D0029F00F /* SceneDelegate.swift in Sources */,
 				2756C28B247F2BCA0070D61A /* NewLocationController.swift in Sources */,
 				27B072E8247CC66B009974BD /* Featured.swift in Sources */,
+				2752092524C53BED002E8761 /* ImageScrollView.swift in Sources */,
 				274B052124BF928100747D25 /* ImageCell.swift in Sources */,
 				27BFC412248317C300A3C968 /* Helpers.swift in Sources */,
 				27EB2DC32478CA4E0093362C /* FeaturedCell.swift in Sources */,

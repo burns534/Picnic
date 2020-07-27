@@ -108,6 +108,10 @@ class DatabaseManager {
         db.child("Picnics").child(picnic.id).removeAllObservers()
     }
     
+    func createChild(path: String, value: Any) {
+        db.child(path).setValue(value)
+    }
+    
     func storePicnic(picnic: Picnic, completion: @escaping (Picnic, DatabaseReference) -> ()) {
         let value : [String: Any] = [
             "name": picnic.name,
@@ -162,7 +166,9 @@ class DatabaseManager {
             completion()
         }
     }
+    
 }
 
 let dbManager = DatabaseManager(storagePathURL: "gs://picnic-1c64f.appspot.com/images/")
 
+let locationManager = LocationManager()

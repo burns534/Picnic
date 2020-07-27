@@ -10,126 +10,85 @@ import MapKit
 
 let tags = ["river", "park", "trail", "playground", "shaded"]
 
-// will deal with this later
-var startCoordinate = CLLocationCoordinate2D(latitude: 35.095136, longitude: -92.453771)
-
+// this is bad
 fileprivate let imageSize: CGSize = CGSize(width: 102, height: 102)
 
 class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
     
+    var map: MapIcon!
     var name: UITextField!
     var userDescription: UITextField!
     var category: UITextField!
-    var state: UITextField!
     var images = [UIImage]()
-    
-    var addPhotos: UIButton!
-    var interactiveRating: Rating
-    
+    var addImages: UIButton!
+    var interactiveRating: Rating!
     var collectionView: UICollectionView!
-    
-    var map: MapIcon!
-    
-    
-    private var locatedUser: Bool = false
+    var region: MKCoordinateRegion!
     
     let frame = CGRect(x: 0, y: 0, width: 300, height: 50)
-    var coordinates: CLLocationCoordinate2D!
-    
-    let locationManager = CLLocationManager()
-// MARK: Initializers
-    init(rating: Rating) {
-        self.interactiveRating = rating
-        super.init(nibName: nil, bundle: nil)
-        title = "Create Picnic"
-        locationManager.requestAlwaysAuthorization()
-        locationManager.startUpdatingLocation()
-        locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("NSCoding not supported")
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        // have to get access to user location. This is ridiculous
-    }
-    
+    var coordinate: CLLocationCoordinate2D!
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        title = "Create Picnic"
         view.backgroundColor = .white
         view.isUserInteractionEnabled = true
         
-        configureMap()
-        configureStackView()
+        configure()
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(save))
-        navigationItem.rightBarButtonItem?.tintColor = .systemBlue
-        
-    }
-    
-// MARK: Map
-    
-    func configureMap() {
-        map = MapIcon(frame: .init(x: 0, y: 0, width: 200, height: 200))
-        map.translatesAutoresizingMaskIntoConstraints = false
-        map.configureMap(startCoordinate: (locationManager.location?.coordinate) ?? startCoordinate)
-
-        let mapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.handleMapGesture))
-        map.mapView.addGestureRecognizer(mapGestureRecognizer)
-        view.addSubview(map)
-        
-        NSLayoutConstraint.activate([
-        map.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
-        map.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-        map.widthAnchor.constraint(equalToConstant: 200),
-        map.heightAnchor.constraint(equalToConstant: 200),
-        ])
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Share", style: .plain, target: self, action: #selector(save))
+        navigationItem.rightBarButtonItem?.tintColor = .toggle
     }
     
 // MARK: Configure
-    func configureStackView() {
+    
+    func configure() {
+        
+// MARK: Map
+        map = MapIcon()
+        map.configure()
+        let mapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(mapTap))
+        map.translatesAutoresizingMaskIntoConstraints = false
+        map.addGestureRecognizer(mapGestureRecognizer)
+        view.addSubview(map)
+// MARK: Name
         name = UITextField(frame: .zero)
         name.translatesAutoresizingMaskIntoConstraints = false
         name.placeholder = "name"
         name.delegate = self
         view.addSubview(name)
-        
+// MARK: User Description
         userDescription = UITextField(frame: .zero)
         userDescription.translatesAutoresizingMaskIntoConstraints = false
         userDescription.placeholder = "Enter a description"
         userDescription.delegate = self
         view.addSubview(userDescription)
-
+// MARK: Category
         category = UITextField(frame: .zero)
         category.translatesAutoresizingMaskIntoConstraints = false
         category.placeholder = "tag"    // will need rework for tagging system
         category.delegate = self
         view.addSubview(category)
-        
-        state = UITextField(frame: .zero)
-        state.translatesAutoresizingMaskIntoConstraints = false
-        state.placeholder = "state"
-        state.delegate = self
-        view.addSubview(state)
-        
-        addPhotos = UIButton(frame: .zero)
-        addPhotos.translatesAutoresizingMaskIntoConstraints = false
-        addPhotos.setTitle("Add Photos", for: .normal)
-        addPhotos.setTitleColor(.systemBlue, for: .normal)
-        addPhotos.addTarget(self, action: #selector(presentImagePicker), for: .touchUpInside)
-        view.addSubview(addPhotos)
-        
+
+// MARK: Add Photos Button
+        addImages = UIButton(frame: .zero)
+        addImages.translatesAutoresizingMaskIntoConstraints = false
+        addImages.setTitle("Add Images", for: .normal)
+        addImages.setTitleColor(.systemBlue, for: .normal)
+        addImages.addTarget(self, action: #selector(presentImagePicker), for: .touchUpInside)
+        view.addSubview(addImages)
+// MARK: Interactive Rating
+        interactiveRating = Rating(frame: .zero, starSize: CGSize(width: 30, height: 30), spacing: 1, rating: 0)
         interactiveRating.translatesAutoresizingMaskIntoConstraints = false
         interactiveRating.isUserInteractionEnabled = true
         view.addSubview(interactiveRating)
         
+// MARK: Selected Images
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 100, height: 100)
         layout.minimumLineSpacing = 1
         layout.minimumInteritemSpacing = 1
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.dataSource = self
@@ -137,9 +96,15 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
         collectionView.isScrollEnabled = false
         collectionView.backgroundColor = .white
         view.addSubview(collectionView)
-    // MARK: Constraints
+        
+// MARK: Constraints
         NSLayoutConstraint.activate([
-            name.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            map.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -20),
+            map.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            map.widthAnchor.constraint(equalToConstant: 200),
+            map.heightAnchor.constraint(equalToConstant: 200),
+            
+            name.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             name.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
             name.rightAnchor.constraint(lessThanOrEqualTo: map.leftAnchor),
             
@@ -150,16 +115,12 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
             category.topAnchor.constraint(equalTo: userDescription.bottomAnchor, constant: 5),
             category.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
             category.rightAnchor.constraint(lessThanOrEqualTo: map.leftAnchor),
+
+            addImages.topAnchor.constraint(equalTo: category.bottomAnchor, constant: 5),
+            addImages.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
+            addImages.rightAnchor.constraint(lessThanOrEqualTo: map.leftAnchor),
             
-            state.topAnchor.constraint(equalTo: category.bottomAnchor, constant: 5),
-            state.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
-            state.rightAnchor.constraint(lessThanOrEqualTo: map.leftAnchor),
-            
-            addPhotos.topAnchor.constraint(equalTo: state.bottomAnchor, constant: 5),
-            addPhotos.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
-            addPhotos.rightAnchor.constraint(lessThanOrEqualTo: map.leftAnchor),
-            
-            interactiveRating.topAnchor.constraint(equalTo: addPhotos.bottomAnchor, constant: 5),
+            interactiveRating.topAnchor.constraint(equalTo: addImages.bottomAnchor, constant: 5),
             interactiveRating.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
             interactiveRating.rightAnchor.constraint(lessThanOrEqualTo: map.leftAnchor),
             interactiveRating.widthAnchor.constraint(equalToConstant: interactiveRating.width),
@@ -172,9 +133,9 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
         ])
     }
     
-    // MARK: Obj-C functions
+// MARK: Obj-C functions
     @objc func save(_ sender: UIBarButtonItem) {
-         guard let _ = self.coordinates else { return }
+         guard let _ = self.coordinate else { return }
          // need to provide user with feedback here
          guard let safelyUnwrappedName = name.text else {
              print("Error: name field cannot be empty")
@@ -184,7 +145,8 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
          let idList = self.images.map { image in
              return UUID().uuidString
          }
-         let newPicnic: Picnic = Picnic(name: safelyUnwrappedName, userDescription: userDescription.text ?? "", category: category.text ?? "", state: state.text ?? "", coordinates: .init(latitude: coordinates.latitude, longitude: coordinates.longitude), isFeatured: false, isLiked: false, isFavorite: false, park: "none", imageNames: idList, rating: Float(interactiveRating.rating))
+// MARK: - FIX!!!!!!! state: "fixMe"
+         let newPicnic: Picnic = Picnic(name: safelyUnwrappedName, userDescription: userDescription.text ?? "", category: category.text ?? "", state: "fixMe", coordinates: .init(latitude: coordinate.latitude, longitude: coordinate.longitude), isFeatured: false, isLiked: false, isFavorite: false, park: "none", imageNames: idList, rating: Float(interactiveRating.rating))
          
          // add to collection view datasource
          locations.append(newPicnic)
@@ -197,8 +159,10 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
          
      }
      
-     @objc func handleMapGesture(_ gesture: UITapGestureRecognizer) {
-         navigationController?.pushViewController(MapView(sender: self), animated: true)
+     @objc func mapTap(_ gesture: UITapGestureRecognizer) {
+        region = map.mapView.region
+        print(region.center.latitude)
+        navigationController?.pushViewController(LocationSelector(sender: self), animated: true)
      }
      
      @objc func presentImagePicker(_ sender: UIButton) {
@@ -217,10 +181,6 @@ extension NewLocationController: UITextFieldDelegate {
         case userDescription:
             resignFirstResponder()
             category.becomeFirstResponder()
-            return true
-        case category:
-            resignFirstResponder()
-            state.becomeFirstResponder()
             return true
         default:
             return true

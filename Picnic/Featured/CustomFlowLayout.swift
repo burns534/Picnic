@@ -15,7 +15,7 @@ class CustomFlowLayout: UICollectionViewFlowLayout {
         self.scrollDirection = .vertical
         self.itemSize = CGSize(width: cellSize.width, height: cellSize.height)
         self.minimumLineSpacing = 25
-        self.sectionInset = UIEdgeInsets(top: 25, left: 25, bottom: 25, right: 25)
+        sectionInset = UIEdgeInsets(top: 25, left: 0, bottom: 0, right: 0)
     }
     
     required init?(coder: NSCoder) {

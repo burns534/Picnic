@@ -8,18 +8,16 @@
 
 import UIKit
 
+fileprivate let defaultStarSize: CGSize = CGSize(width: 20, height: 20)
 // will display rating and number of ratings with stars
 class Rating: UIView {
 
-    var overlay: UIStackView!
-    var underlay: UIStackView!
     var stars = [StarButton]()
     
     var starSize: CGSize
-    var spacing: CGFloat
-    var rating: CGFloat
-    
-    var width: CGFloat
+    var spacing: CGFloat = 1
+    var rating: CGFloat = 0
+    var width: CGFloat = 0
     
     init(frame: CGRect, starSize: CGSize, spacing: CGFloat, rating: CGFloat) {
         self.starSize = starSize
@@ -30,20 +28,30 @@ class Rating: UIView {
         setup()
         configureFloat(rating: rating)
     }
+// MARK: Default
+    init(picnic: Picnic) {
+        starSize = defaultStarSize
+        rating = CGFloat(picnic.rating)
+        width = 5.0 * starSize.width + 4.0 * spacing
+        super.init(frame: .zero)
+        setup()
+        configureFloat(rating: rating)
+    }
+    
+    init() {
+        starSize = defaultStarSize
+        width = 5.0 * starSize.width + 4.0 * spacing
+        super.init(frame: .zero)
+        setup()
+    }
     
     required init?(coder: NSCoder) {
         fatalError("NSCoding not supported")
     }
     
-    @objc func starPress(_ sender: UIButton) {
-        self.rating = CGFloat(sender.tag + 1)
-        refresh(rating: self.rating)
-    }
-    
     func setup() {
-        
         self.isUserInteractionEnabled = false
-
+        
         for i in 0..<5 {
 
             let starButton = StarButton(frame: .zero, starSize: self.starSize, color: .systemYellow)
@@ -51,7 +59,6 @@ class Rating: UIView {
             starButton.addTarget(self, action: #selector(starPress), for: .touchUpInside)
             starButton.tag = i
             stars.append(starButton)
-
             addSubview(starButton)
 
             NSLayoutConstraint.activate([
@@ -73,6 +80,7 @@ class Rating: UIView {
             }
         }
     }
+    
     // for use with floating point rating
     func configureFloat(rating: CGFloat) {
         self.rating = rating
@@ -82,12 +90,17 @@ class Rating: UIView {
                 stars[i].fillStar()
                 // partial fill case
             } else if CGFloat(i + 1) > rating && CGFloat(i) < rating {
-                /* the star imageView is width 15 but the actual width of the star is approximately 10, centered at 7.5. The mask also is applied backwards hence the 1 - (i + 1 - rating)*/
-                let maskWidth = starSize.width * (CGFloat(1 - CGFloat(i + 1) + rating) * 0.66667 + 0.3333)
-                stars[i].addMask(maskWidth: maskWidth)
+                /* star symbol does not go edge to edge in the image. The image leaves a small amount on the left and right of the star. Additionally, the the very corners of the stars are imperceptible when applying a small mask. Accounting for these two things, approximately a translation of approximately 1/6 the image size is needed to create correct star behavior.*/
+                let mask = starSize.width * CGFloat(rating.truncatingRemainder(dividingBy: 1.0) * 0.62 + 0.15)
+                stars[i].addMask(maskWidth: mask)
             } else {
                 stars[i].emptyStar()
             }
         }
+    }
+// MARK: Obj-C functions
+    @objc func starPress(_ sender: UIButton) {
+        self.rating = CGFloat(sender.tag + 1)
+        refresh(rating: self.rating)
     }
 }

@@ -9,7 +9,6 @@
 import UIKit
 import CoreData
 import Firebase
-import CoreLocation
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -34,7 +33,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
-
+    
+    // MARK: - Background location services
+    
+//    func scheduleRefresh() {
+//        let request = BGAppRefreshTaskRequest(identifier: "refresh")
+//        // 15 minutes
+//        request.earliestBeginDate = Date(timeIntervalSinceNow: 15 * 60)
+//        do {
+//            try BGTaskScheduler.shared.submit(request)
+//        } catch {
+//            print("Could not schedule app refresh: \(error.localizedDescription)")
+//        }
+//    }
+//
+//    func refreshHandler(task: BGAppRefreshTask) {
+//        print("refreshHandler called")
+//        scheduleRefresh()
+//
+//        let queue = OperationQueue()
+//        queue.maxConcurrentOperationCount = 1
+//
+//
+//    }
+    
     // MARK: - Core Data stack
 
     lazy var persistentContainer: NSPersistentCloudKitContainer = {

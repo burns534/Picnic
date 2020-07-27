@@ -11,7 +11,7 @@ import FirebaseDatabase
 
 private let reuseIdentifier = "Cell"
 
-let cellSize = CGSize(width: 350, height: 300)
+let cellSize = CGSize(width: 400, height: 300)
 
 class Featured: UICollectionViewController {
     
@@ -42,18 +42,15 @@ class Featured: UICollectionViewController {
         }
     }
     
-    func refresh(picnic: Picnic, dbRef: DatabaseReference) {
-        self.locations.append(picnic)
-        self.collectionView.insertItems(at: [.init(item: self.locations.count - 1, section: 0)])
-    }
-    
     func configure() {
         refresh()
         
         collectionView.backgroundColor = .white
         collectionView.alwaysBounceVertical = true
-        
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.showsHorizontalScrollIndicator = false
         collectionView.refreshControl = self.refreshController
+        
         self.refreshController.addTarget(self, action: #selector(pullDown), for: .valueChanged)
         
         self.collectionView!.register(FeaturedCell.self, forCellWithReuseIdentifier: reuseIdentifier)
@@ -74,7 +71,7 @@ class Featured: UICollectionViewController {
     
     @objc func rightBarButton() {
         
-        navigationController?.pushViewController(NewLocationController(rating: .init(frame: .zero, starSize: .init(width: 30, height: 30), spacing: 1, rating: 0)), animated: true)
+        navigationController?.pushViewController(NewLocationController(), animated: true)
     }
 
     // MARK: UICollectionViewDataSource
@@ -96,41 +93,19 @@ class Featured: UICollectionViewController {
             return UICollectionViewCell()
         }
         let picnic = locations[indexPath.item]
-        cell.setupShadow(cellSize: cellSize)
-        cell.configure(parent: self, picnic: picnic, imageViewSize: cellSize / 2, rating: Rating(frame: .zero, starSize: .init(width: 20, height: 20), spacing: 1, rating: CGFloat(picnic.rating)))
+        cell.configure(picnic: picnic)
         
         return cell
     }
 
     // MARK: UICollectionViewDelegate
 
-    /*
-    // Uncomment this method to specify if the specified item should be highlighted during tracking
-    override func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
-        return true
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? FeaturedCell else {
+            print("Error: Featured: didSelectItemAt: Could not cast")
+            return
+        }
+        navigationController?.pushViewController(PicnicDetailViewController(picnic: cell.picnic), animated: true)
     }
-    */
-
-    /*
-    // Uncomment this method to specify if the specified item should be selected
-    override func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    */
-
-    /*
-    // Uncomment these methods to specify if an action menu should be displayed for the specified item, and react to actions performed on the item
-    override func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
-        return false
-    }
-
-    override func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
-        return false
-    }
-
-    override func collectionView(_ collectionView: UICollectionView, performAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) {
-    
-    }
-    */
 
 }

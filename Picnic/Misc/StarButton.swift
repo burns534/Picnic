@@ -15,9 +15,10 @@ class StarButton: UIButton {
     var starSize: CGSize
     
     init(frame: CGRect, starSize: CGSize, color: UIColor) {
-        let emptyStar = UIImage(systemName: "star")!.withTintColor(color, renderingMode: .alwaysOriginal)
+        let config = UIImage.SymbolConfiguration(scale: .large)
+        let emptyStar = UIImage(systemName: "star", withConfiguration: config)!.withTintColor(color, renderingMode: .alwaysOriginal)
         
-        let fullStar = UIImage(systemName: "star.fill")!.withTintColor(color, renderingMode: .alwaysOriginal)
+        let fullStar = UIImage(systemName: "star.fill", withConfiguration: config)!.withTintColor(color, renderingMode: .alwaysOriginal).withAlignmentRectInsets(.zero)
         
         self.empty = UIImageView(image: emptyStar)
         empty.translatesAutoresizingMaskIntoConstraints = false
@@ -28,13 +29,17 @@ class StarButton: UIButton {
         self.starSize = starSize
         super.init(frame: frame)
         
-        self.addSubview(full)
-        self.addSubview(empty)
+        addSubview(full)
+        addSubview(empty)
         
         NSLayoutConstraint.activate([
+            empty.centerXAnchor.constraint(equalTo: centerXAnchor),
+            empty.centerYAnchor.constraint(equalTo: centerYAnchor),
             empty.widthAnchor.constraint(equalToConstant: starSize.width),
             empty.heightAnchor.constraint(equalToConstant: starSize.height),
             
+            full.centerXAnchor.constraint(equalTo: centerXAnchor),
+            full.centerYAnchor.constraint(equalTo: centerYAnchor),
             full.widthAnchor.constraint(equalToConstant: starSize.width),
             full.heightAnchor.constraint(equalToConstant: starSize.height)
         ])
@@ -50,6 +55,7 @@ class StarButton: UIButton {
         
         let maskLayer = CALayer()
         maskLayer.frame = .init(x: 0, y: 0, width: maskWidth, height: starSize.height)
+        // black mask color is odd but necessary
         maskLayer.backgroundColor = UIColor.black.cgColor
         self.full.layer.mask = maskLayer
     }
