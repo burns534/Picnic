@@ -135,27 +135,31 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
     
 // MARK: Obj-C functions
     @objc func save(_ sender: UIBarButtonItem) {
-         guard let _ = self.coordinate else { return }
-         // need to provide user with feedback here
-         guard let safelyUnwrappedName = name.text else {
-             print("Error: name field cannot be empty")
-             return
-         }
-         
-         let idList = self.images.map { image in
-             return UUID().uuidString
-         }
-// MARK: - FIX!!!!!!! state: "fixMe"
-         let newPicnic: Picnic = Picnic(name: safelyUnwrappedName, userDescription: userDescription.text ?? "", category: category.text ?? "", state: "fixMe", coordinates: .init(latitude: coordinate.latitude, longitude: coordinate.longitude), isFeatured: false, isLiked: false, isFavorite: false, park: "none", imageNames: idList, rating: Float(interactiveRating.rating))
-         
-         // add to collection view datasource
-         locations.append(newPicnic)
-         
-         // store picnic data
-         dbManager.store(picnic: newPicnic, images: self.images) {
-             print("successfully saved picnic with name \(newPicnic.name)")
-             self.navigationController?.popViewController(animated: true)
-         }
+        guard let loc = coordinate else { return }
+        
+// MARK: provide feedback
+        guard let safelyUnwrappedName = name.text else {
+            print("Error: name field cannot be empty")
+            return
+        }
+
+        let idList = self.images.map { _ in UUID().uuidString }
+        // MARK: - FIX!!!!!!! state: "fixMe"
+        
+        coordinate.getPlacemark { placemark in
+            
+            let state = placemark.administrativeArea ?? ""
+
+            let newPicnic: Picnic = Picnic(name: safelyUnwrappedName, userDescription: self.userDescription.text ?? "", category: self.category.text ?? "", state: state, coordinates: loc, isFeatured: false, isLiked: false, isFavorite: false, park: "none", imageNames: idList, rating: Float(self.interactiveRating.rating))
+
+            // add to collection view datasource
+            locations.append(newPicnic)
+
+            // store picnic data
+            dbManager.store(picnic: newPicnic, images: self.images) {
+                self.navigationController?.popViewController(animated: true)
+            }
+        }
          
      }
      

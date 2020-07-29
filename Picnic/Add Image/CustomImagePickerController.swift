@@ -12,6 +12,8 @@ import Photos
 private let reuseIdentifier = "Cell"
 fileprivate let previewFrame: CGRect = CGRect(x: 0, y: 0, width: 414, height: 400)
 
+// MARK: There is a bug with previews being blurry - not loading the requested image, only the cached image
+
 class CustomImagePickerController: UICollectionViewController {
     
     var fetchResult: PHFetchResult<PHAsset>!

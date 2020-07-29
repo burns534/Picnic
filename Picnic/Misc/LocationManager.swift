@@ -21,3 +21,32 @@ class LocationManager: CLLocationManager {
     }
 }
 
+extension CLLocationCoordinate2D {
+    func getPlacemark(completion: @escaping (CLPlacemark) -> ()) {
+        let loc = CLLocation(latitude: latitude, longitude: longitude)
+        CLGeocoder().reverseGeocodeLocation(loc) { placemark, error in
+            if let err = error {
+                print("Error: CLLocationCoordinate2D: getPlacemark: \(err.localizedDescription)")
+                return
+            }
+            if let location = placemark?.first {
+                completion(location)
+            }
+        }
+    }
+}
+
+extension CLLocation {
+    func getPlacemark(completion: @escaping(CLPlacemark) ->()) {
+        CLGeocoder().reverseGeocodeLocation(self) { placemark, error in
+            if let err = error {
+                print("Error: CLLocationCoordinate2D: getPlacemark: \(err.localizedDescription)")
+                return
+            }
+            if let location = placemark?.first {
+                completion(location)
+            }
+        }
+    }
+}
+

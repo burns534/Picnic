@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		2716B5B0249186E80092A622 /* PlaceAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2716B5AF249186E80092A622 /* PlaceAnnotation.swift */; };
 		2716B5B22491A83A0092A622 /* MapSearchResultsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2716B5B12491A83A0092A622 /* MapSearchResultsController.swift */; };
+		2725763424D0F1EB008916B7 /* Geohash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2725763324D0F1EB008916B7 /* Geohash.swift */; };
 		2739E8D024915BDB009AD607 /* StarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2739E8CF24915BDB009AD607 /* StarButton.swift */; };
 		27407AD424C4004F00AE7AAF /* FloatingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27407AD324C4004F00AE7AAF /* FloatingMenu.swift */; };
 		2743860D2478925D0029F00F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2743860C2478925D0029F00F /* AppDelegate.swift */; };
@@ -63,6 +64,7 @@
 /* Begin PBXFileReference section */
 		2716B5AF249186E80092A622 /* PlaceAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceAnnotation.swift; sourceTree = "<group>"; };
 		2716B5B12491A83A0092A622 /* MapSearchResultsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSearchResultsController.swift; sourceTree = "<group>"; };
+		2725763324D0F1EB008916B7 /* Geohash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geohash.swift; sourceTree = "<group>"; };
 		2739E8CF24915BDB009AD607 /* StarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarButton.swift; sourceTree = "<group>"; };
 		27407AD324C4004F00AE7AAF /* FloatingMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingMenu.swift; sourceTree = "<group>"; };
 		274386092478925D0029F00F /* Picnic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Picnic.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -197,6 +199,7 @@
 				2752092224C4EF12002E8761 /* SpinnerWheel.swift */,
 				2752092424C53BED002E8761 /* ImageScrollView.swift */,
 				2752092624CF494B002E8761 /* LocationManager.swift */,
+				2725763324D0F1EB008916B7 /* Geohash.swift */,
 			);
 			path = Misc;
 			sourceTree = "<group>";
@@ -449,6 +452,7 @@
 				275AD1492481BCAB00EE3DBA /* LocationPopover.swift in Sources */,
 				27BFC4162485980100A3C968 /* DatabaseManager.swift in Sources */,
 				274B052D24C3FB9100747D25 /* PicnicDetailViewController.swift in Sources */,
+				2725763424D0F1EB008916B7 /* Geohash.swift in Sources */,
 				2752092724CF494B002E8761 /* LocationManager.swift in Sources */,
 				27B072EF247CCC94009974BD /* TabController.swift in Sources */,
 				274B052324BF9B5100747D25 /* CustomPickerFlowLayout.swift in Sources */,

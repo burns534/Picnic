@@ -32,31 +32,29 @@ struct Picnic: Identifiable, Codable {
     }
     
     init(fromDictionary dict: [String: Any]) {
-        let safeName = dict["name"] as? String ?? ""
-        let safeUserDescription = dict["userDescription"] as? String ?? ""
-        let safeCategory = dict["category"] as? String ?? ""
-        let safeState = dict["state"] as? String ?? ""
+        name = dict["name"] as? String ?? ""
+        userDescription = dict["userDescription"] as? String ?? ""
+        category = dict["category"] as? String ?? ""
+        state = dict["state"] as? String ?? ""
+        imageNames = dict["imageNames"] as? [String] ?? ["loading"]
+        id = dict["key"] as? String ?? ""
+        rating = (dict["rating"] as? NSNumber)?.floatValue ?? 0.0
         let safeLat = dict["latitude"] as? Double ?? 0.0
         let safeLong = dict["longitude"] as? Double ?? 0.0
-        let safeImageNames = dict["imageNames"] as? [String] ?? ["loading"]
-        let id = dict["key"] as? String ?? ""
-        let safeRating = (dict["rating"] as? NSNumber)?.floatValue ?? 0.0
-        
-        let safeCoordinates = Coordinates(latitude: safeLat, longitude: safeLong)
-        self.init(name: safeName, userDescription: safeUserDescription, category: safeCategory, state: safeState, coordinates: safeCoordinates, isFeatured: false, isLiked: false, isFavorite: false, park: "", imageNames: safeImageNames, rating: safeRating, id: id)
+        coordinates = Coordinates(latitude: safeLat, longitude: safeLong)
+        isFeatured = false
+        isLiked = false
+        isFavorite = false
+        park = ""
     }
     
-    init(name: String, userDescription: String, category: String, state: String, coordinates: Coordinates, isFeatured: Bool, isLiked: Bool, isFavorite: Bool, park: String, imageNames: [String], rating: Float, id: String? = nil) {
+    init(name: String, userDescription: String, category: String, state: String, coordinates: CLLocationCoordinate2D, isFeatured: Bool, isLiked: Bool, isFavorite: Bool, park: String, imageNames: [String], rating: Float, id: String = UUID().uuidString) {
         self.name = name
         self.userDescription = userDescription
         self.category = category
         self.state = state
-        self.coordinates = coordinates
-        if let id = id {
-            self.id = id
-        } else {
-            self.id = UUID().uuidString
-        }
+        self.coordinates = Coordinates(latitude: coordinates.latitude, longitude: coordinates.longitude)
+        self.id = id
         self.isFeatured = isFeatured
         self.isLiked = isLiked
         self.isFavorite = isFavorite

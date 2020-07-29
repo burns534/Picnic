@@ -35,10 +35,14 @@ class Featured: UICollectionViewController {
     }
     
     func refresh(completion: @escaping ([Picnic]) -> () = {_ in}) {
-        dbManager.picnic { data in
-            self.locations = data
+        guard let loc = locationManager.location else {
+            print("Error: Featured: refresh: found nil for location")
+            return
+        }
+        dbManager.query(byLocation: loc, queryLimit: 5, precision: 3) { picnics in
+            self.locations = picnics
             self.collectionView.reloadData()
-            completion(data)
+            completion(picnics)
         }
     }
     
@@ -70,7 +74,6 @@ class Featured: UICollectionViewController {
     }
     
     @objc func rightBarButton() {
-        
         navigationController?.pushViewController(NewLocationController(), animated: true)
     }
 
@@ -82,7 +85,6 @@ class Featured: UICollectionViewController {
 
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of items
         return locations.count
     }
 

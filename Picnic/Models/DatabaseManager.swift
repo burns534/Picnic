@@ -8,6 +8,9 @@
 
 import FirebaseStorage
 import FirebaseDatabase
+import MapKit
+
+fileprivate let defaultPrecision: Int = 7
 
 class DatabaseManager {
     private let storage = Storage.storage()
@@ -113,6 +116,7 @@ class DatabaseManager {
     }
     
     func storePicnic(picnic: Picnic, completion: @escaping (Picnic, DatabaseReference) -> ()) {
+        let hash = Region(latitude: picnic.location.latitude, longitude: picnic.location.longitude, precision: 9).hash
         let value : [String: Any] = [
             "name": picnic.name,
             "userDescription": picnic.userDescription,
@@ -121,7 +125,8 @@ class DatabaseManager {
             "latitude": picnic.location.latitude,
             "longitude": picnic.location.longitude,
             "imageNames": picnic.imageNames,
-            "rating": picnic.rating
+            "rating": picnic.rating,
+            "hash": hash
             ]
         
         db.child("Picnics").child(picnic.id).setValue(value, withCompletionBlock: { error, ref in
@@ -133,7 +138,7 @@ class DatabaseManager {
         })
     }
     
-    func picnic(completion: @escaping ([Picnic]) -> ()) {
+    func picnicQuery(queryLimit: UInt, byKey: String, completion: @escaping ([Picnic]) -> ()) {
         db.child("Picnics").queryLimited(toFirst: 100).observeSingleEvent(of: .value, with: { snapshot in
             guard let objects = snapshot.children.allObjects as? [DataSnapshot] else {
                 print("Error: DatabaseManager: picnic: Could not download objects from child \"Picnics\"")
@@ -166,7 +171,51 @@ class DatabaseManager {
             completion()
         }
     }
+// MARK: query by location
+
+    func query(byLocation loc: CLLocation, queryLimit: UInt, precision: Int, completion: @escaping ([Picnic]) -> ()) {
+        let hash = Region(latitude: loc.coordinate.latitude, longitude: loc.coordinate.longitude, precision: defaultPrecision).hash
+        // idk
+        let offset: String = String("000000000".dropLast(precision))
+        let start = hash.dropLast(defaultPrecision - precision) + offset
+        let criticalChar = (hash[precision - 1].cString(using: .ascii)?.first!)! + 1
+        let modifiedChar = String(bytes: [UInt8(criticalChar)], encoding: .ascii)
+        let end = hash.dropLast(defaultPrecision - precision + 1) + modifiedChar! + offset
+        self.db.child("Picnics").queryOrdered(byChild: "hash").queryStarting(atValue: start).queryEnding(atValue: end).queryLimited(toFirst: queryLimit).observeSingleEvent(of: .value) { snapshot in
+            guard let result = snapshot.children.allObjects as? [DataSnapshot] else {
+                print("Error: DatabaseManager: query byLocation: Cast failure, possibly no children")
+                return
+            }
+            let picnics: [Picnic] = result.map { snapshot in
+                guard var temp = snapshot.value as? [String: Any] else {
+                    print("Error: DatabaseManager: query byLocation: Could not cast snapshot")
+                    return Picnic()
+                }
+                temp["key"] = snapshot.key
+                return Picnic(fromDictionary: temp)
+            }
+            completion(picnics)
+        }
+    }
     
+    func query(byCoordinates loc: CLLocationCoordinate2D, queryLimit: Int, completion: @escaping ([Picnic]) -> ()) {
+        loc.getPlacemark { placemark in
+            self.db.child("Picnics").queryOrdered(byChild: "state").queryEqual(toValue: "AR").observeSingleEvent(of: .value) { snapshot in
+                guard let result = snapshot.children.allObjects as? [DataSnapshot] else {
+                    print("Error: DatabaseManager: query byLocation: Cast failure, possibly no children")
+                    return
+                }
+                let picnics: [Picnic] = result.map { snapshot in
+                    guard let temp = snapshot.value as? [String: Any] else {
+                        print("Error: DatabaseManager: query byLocation: Could not cast snapshot")
+                        return Picnic()
+                    }
+                    return Picnic(fromDictionary: temp)
+                }
+                completion(picnics)
+            }
+        }
+    }
 }
 
 let dbManager = DatabaseManager(storagePathURL: "gs://picnic-1c64f.appspot.com/images/")

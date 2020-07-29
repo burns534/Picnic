@@ -93,8 +93,8 @@ class FeaturedCell: UICollectionViewCell {
             self.title.widthAnchor.constraint(equalToConstant: 200),
             self.title.heightAnchor.constraint(equalToConstant: 20),
             
-            self.rating.topAnchor.constraint(equalTo: self.imageView.bottomAnchor, constant: 10),
-            self.rating.leftAnchor.constraint(equalTo: self.title.rightAnchor, constant: 50),
+            self.rating.topAnchor.constraint(equalTo: self.imageView.bottomAnchor, constant: -30),
+            self.rating.leftAnchor.constraint(equalTo: self.imageView.leftAnchor, constant: 10),
             self.rating.widthAnchor.constraint(equalToConstant: self.rating.width),
             self.rating.heightAnchor.constraint(equalToConstant: self.rating.starSize.height),
         ])

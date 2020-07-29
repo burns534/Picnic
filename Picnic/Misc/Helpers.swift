@@ -15,6 +15,12 @@ extension UIView {
          layer.shadowOpacity = opacity
     }
 }
+// from paul hudson
+extension String {
+    subscript(i: Int) -> String {
+        return String(self[index(startIndex, offsetBy: i)])
+    }
+}
 
 extension CGSize {
     static func +(left: CGSize, right: CGSize) -> CGSize {
