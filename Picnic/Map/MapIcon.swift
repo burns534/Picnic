@@ -52,7 +52,7 @@ class MapIcon: UIView {
     }
     
     func configure() {
-        guard let location = locationManager.location else {
+        guard let location = Shared.shared.locationManager.location else {
             mapView.setRegion(MKCoordinateRegion(), animated: true)
             return
         }

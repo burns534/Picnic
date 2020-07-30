@@ -35,11 +35,11 @@ class Featured: UICollectionViewController {
     }
     
     func refresh(completion: @escaping ([Picnic]) -> () = {_ in}) {
-        guard let loc = locationManager.location else {
+        guard let loc = Shared.shared.locationManager.location else {
             print("Error: Featured: refresh: found nil for location")
             return
         }
-        dbManager.query(byLocation: loc, queryLimit: 5, precision: 3) { picnics in
+        Shared.shared.databaseManager.query(byLocation: loc, queryLimit: 5, precision: 3) { picnics in
             self.locations = picnics
             self.collectionView.reloadData()
             completion(picnics)

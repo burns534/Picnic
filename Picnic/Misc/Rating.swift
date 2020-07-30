@@ -50,8 +50,6 @@ class Rating: UIView {
     }
     
     func setup() {
-        self.isUserInteractionEnabled = false
-        
         for i in 0..<5 {
 
             let starButton = StarButton(frame: .zero, starSize: self.starSize, color: .systemYellow)
@@ -98,9 +96,13 @@ class Rating: UIView {
             }
         }
     }
+    
 // MARK: Obj-C functions
     @objc func starPress(_ sender: UIButton) {
-        self.rating = CGFloat(sender.tag + 1)
-        refresh(rating: self.rating)
+        rating = CGFloat(sender.tag + 1)
+        refresh(rating: rating)
+        if let sv = superview?.superview as? FeaturedCell {
+            sv.acceptRating(rating: rating)
+        }
     }
 }

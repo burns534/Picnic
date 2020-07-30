@@ -7,32 +7,42 @@
 //
 
 import UIKit
+import FirebaseUI
 
 class TabController: UITabBarController {
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let controllers = [Featured(collectionViewLayout: CustomFlowLayout())]
+        tabBar.tintColor = .green
+        tabBar.isTranslucent = false
+        
+        let controllers = [Featured(collectionViewLayout: CustomFlowLayout()), SettingsController()]
         
         viewControllers = controllers.map {
             UINavigationController(rootViewController: $0)
         }
         
         selectedIndex = 0
-        // Do any additional setup after loading the view.
     }
-    
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    // Must be presented in viewDidAppear because window hierarchy is established between viewWillAppear and viewDidAppear.
+    // This probably shouldn't be here
+    override func viewDidAppear(_ animated: Bool) {
+        guard let vc = Shared.shared.authManager.authUI?.authViewController() else {
+            print("Error: TabController: viewDidAppear: viewController nil")
+            return
+        }
+        vc.isModalInPresentation = true
+        
+        if let loginStatus = UserDefaults.standard.value(forKey: "isLoggedIn") as? Bool {
+            if loginStatus == false {
+                present(vc, animated: true)
+            } else {
+                return
+            }
+        } else {
+            present(vc, animated: true)
+        }
     }
-    */
-
 }
+

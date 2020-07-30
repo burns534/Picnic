@@ -10,5 +10,6 @@ target 'Picnic' do
   pod 'Firebase/Analytics'
   pod 'Firebase/Storage'
   pod 'Firebase/Database'
+  pod 'FirebaseUI'
   
 end

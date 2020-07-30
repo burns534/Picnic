@@ -17,18 +17,16 @@ struct Picnic: Identifiable, Codable {
     var state: String
     var imageNames: [String]
     var rating: Float
+    var ratingCount: Int
     var id: String
-    var isFeatured: Bool
-    var isLiked: Bool
-    var isFavorite: Bool
-    var park: String
+    var park: String!
     var location: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: coordinates.latitude, longitude: coordinates.longitude)
     }
     fileprivate var coordinates: Coordinates
     
     init() {
-        self.init(name: "loading", userDescription: "", category: "", state: "", coordinates: .init(latitude: 0, longitude: 0), isFeatured: false, isLiked: false, isFavorite: false, park: "", imageNames: ["loading"], rating: 5.0)
+        self.init(name: "loading", userDescription: "", category: "", state: "", coordinates: .init(latitude: 0, longitude: 0), isFeatured: false, isLiked: false, isFavorite: false, park: "", imageNames: ["loading"], rating: 5.0, ratingCount: 0)
     }
     
     init(fromDictionary dict: [String: Any]) {
@@ -39,28 +37,24 @@ struct Picnic: Identifiable, Codable {
         imageNames = dict["imageNames"] as? [String] ?? ["loading"]
         id = dict["key"] as? String ?? ""
         rating = (dict["rating"] as? NSNumber)?.floatValue ?? 0.0
+        ratingCount = dict["ratingCount"] as? Int ?? 0
         let safeLat = dict["latitude"] as? Double ?? 0.0
         let safeLong = dict["longitude"] as? Double ?? 0.0
         coordinates = Coordinates(latitude: safeLat, longitude: safeLong)
-        isFeatured = false
-        isLiked = false
-        isFavorite = false
         park = ""
     }
     
-    init(name: String, userDescription: String, category: String, state: String, coordinates: CLLocationCoordinate2D, isFeatured: Bool, isLiked: Bool, isFavorite: Bool, park: String, imageNames: [String], rating: Float, id: String = UUID().uuidString) {
+    init(name: String, userDescription: String, category: String, state: String, coordinates: CLLocationCoordinate2D, isFeatured: Bool, isLiked: Bool, isFavorite: Bool, park: String, imageNames: [String], rating: Float, ratingCount: Int, id: String = UUID().uuidString) {
         self.name = name
         self.userDescription = userDescription
         self.category = category
         self.state = state
         self.coordinates = Coordinates(latitude: coordinates.latitude, longitude: coordinates.longitude)
         self.id = id
-        self.isFeatured = isFeatured
-        self.isLiked = isLiked
-        self.isFavorite = isFavorite
         self.park = park
         self.imageNames = imageNames
         self.rating = rating
+        self.ratingCount = ratingCount
     }
 }
 

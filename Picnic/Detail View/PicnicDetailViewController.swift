@@ -31,7 +31,7 @@ class PicnicDetailViewController: UIViewController {
         preview.translatesAutoresizingMaskIntoConstraints = false
         preview.contentMode = .scaleAspectFit
         preview.clipsToBounds = true
-        dbManager.image(forPicnic: picnic) { image, error in
+        Shared.shared.databaseManager.image(forPicnic: picnic) { image, error in
             if let error = error {
                 self.preview.image = UIImage(named: "loading.jpg")
                 print(error.localizedDescription)

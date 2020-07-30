@@ -77,6 +77,7 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
         addImages.setTitleColor(.systemBlue, for: .normal)
         addImages.addTarget(self, action: #selector(presentImagePicker), for: .touchUpInside)
         view.addSubview(addImages)
+        
 // MARK: Interactive Rating
         interactiveRating = Rating(frame: .zero, starSize: CGSize(width: 30, height: 30), spacing: 1, rating: 0)
         interactiveRating.translatesAutoresizingMaskIntoConstraints = false
@@ -150,13 +151,13 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
             
             let state = placemark.administrativeArea ?? ""
 
-            let newPicnic: Picnic = Picnic(name: safelyUnwrappedName, userDescription: self.userDescription.text ?? "", category: self.category.text ?? "", state: state, coordinates: loc, isFeatured: false, isLiked: false, isFavorite: false, park: "none", imageNames: idList, rating: Float(self.interactiveRating.rating))
+            let newPicnic: Picnic = Picnic(name: safelyUnwrappedName, userDescription: self.userDescription.text ?? "", category: self.category.text ?? "", state: state, coordinates: loc, isFeatured: false, isLiked: false, isFavorite: false, park: "none", imageNames: idList, rating: Float(self.interactiveRating.rating), ratingCount: 1)
 
             // add to collection view datasource
             locations.append(newPicnic)
 
             // store picnic data
-            dbManager.store(picnic: newPicnic, images: self.images) {
+            Shared.shared.databaseManager.store(picnic: newPicnic, images: self.images) {
                 self.navigationController?.popViewController(animated: true)
             }
         }

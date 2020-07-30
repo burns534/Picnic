@@ -7,12 +7,21 @@
 //
 
 import UIKit
+extension CALayer {
+    func setShadow(radius: CGFloat, color: CGColor?, opacity: Float = 1.0, offset: CGSize = .zero) {
+        masksToBounds = false
+        shadowRadius = radius
+        shadowColor = color
+        shadowOffset = offset
+        shadowOpacity = opacity
+    }
+}
 extension UIView {
     func setShadow(radius: CGFloat, color: CGColor?, opacity: Float = 1.0, offset: CGSize = .zero) {
-         layer.shadowRadius = radius
-         layer.shadowColor = color
-         layer.shadowOffset = offset
-         layer.shadowOpacity = opacity
+        layer.shadowRadius = radius
+        layer.shadowColor = color
+        layer.shadowOffset = offset
+        layer.shadowOpacity = opacity
     }
 }
 // from paul hudson

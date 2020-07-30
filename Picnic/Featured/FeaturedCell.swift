@@ -26,6 +26,12 @@ class FeaturedCell: UICollectionViewCell {
         fatalError("NSCoding not supported")
     }
     
+    func acceptRating(rating: CGFloat) {
+        Shared.shared.databaseManager.updateRating(picnic: picnic, rating: Float(rating)) {
+            print("done")
+        }
+    }
+    
     func setup() {
         self.backgroundColor = .white
         self.contentView.translatesAutoresizingMaskIntoConstraints = false
@@ -57,7 +63,7 @@ class FeaturedCell: UICollectionViewCell {
     func configure(picnic: Picnic) {
 // MARK: change this to loading wheel
         self.imageView.image = UIImage(named: "loading.jpg")
-        dbManager.image(forPicnic: picnic) { image, error in
+        Shared.shared.databaseManager.image(forPicnic: picnic) { image, error in
             if let error = error {
                 self.imageView.image = UIImage(named: "loading.jpg")
                 print(error.localizedDescription)

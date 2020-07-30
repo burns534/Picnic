@@ -10,6 +10,7 @@
 		2716B5B0249186E80092A622 /* PlaceAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2716B5AF249186E80092A622 /* PlaceAnnotation.swift */; };
 		2716B5B22491A83A0092A622 /* MapSearchResultsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2716B5B12491A83A0092A622 /* MapSearchResultsController.swift */; };
 		2725763424D0F1EB008916B7 /* Geohash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2725763324D0F1EB008916B7 /* Geohash.swift */; };
+		2725763724D1F492008916B7 /* AuthPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2725763624D1F492008916B7 /* AuthPicker.swift */; };
 		2739E8D024915BDB009AD607 /* StarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2739E8CF24915BDB009AD607 /* StarButton.swift */; };
 		27407AD424C4004F00AE7AAF /* FloatingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27407AD324C4004F00AE7AAF /* FloatingMenu.swift */; };
 		2743860D2478925D0029F00F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2743860C2478925D0029F00F /* AppDelegate.swift */; };
@@ -32,6 +33,13 @@
 		275AD147248180F100EE3DBA /* LocationSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275AD146248180F100EE3DBA /* LocationSelector.swift */; };
 		275AD1492481BCAB00EE3DBA /* LocationPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275AD1482481BCAB00EE3DBA /* LocationPopover.swift */; };
 		275AD14B2482CAE300EE3DBA /* LocationLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275AD14A2482CAE300EE3DBA /* LocationLabel.swift */; };
+		279A268624D25BA700D71FD1 /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279A268524D25BA700D71FD1 /* SettingsController.swift */; };
+		279A268824D3295300D71FD1 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279A268724D3295300D71FD1 /* User.swift */; };
+		279A268A24D34AED00D71FD1 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279A268924D34AED00D71FD1 /* Colors.swift */; };
+		279A268C24D34BFB00D71FD1 /* SignInButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279A268B24D34BFB00D71FD1 /* SignInButton.swift */; };
+		279A268E24D350A200D71FD1 /* Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279A268D24D350A200D71FD1 /* Shared.swift */; };
+		279A269024D35C6B00D71FD1 /* ButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279A268F24D35C6B00D71FD1 /* ButtonView.swift */; };
+		279A269224D3633600D71FD1 /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279A269124D3633600D71FD1 /* AuthManager.swift */; };
 		27B072E6247C4724009974BD /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 27B072E5247C4724009974BD /* GoogleService-Info.plist */; };
 		27B072E8247CC66B009974BD /* Featured.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B072E7247CC66B009974BD /* Featured.swift */; };
 		27B072EA247CC7BB009974BD /* CustomFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B072E9247CC7BB009974BD /* CustomFlowLayout.swift */; };
@@ -65,6 +73,7 @@
 		2716B5AF249186E80092A622 /* PlaceAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceAnnotation.swift; sourceTree = "<group>"; };
 		2716B5B12491A83A0092A622 /* MapSearchResultsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSearchResultsController.swift; sourceTree = "<group>"; };
 		2725763324D0F1EB008916B7 /* Geohash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geohash.swift; sourceTree = "<group>"; };
+		2725763624D1F492008916B7 /* AuthPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthPicker.swift; sourceTree = "<group>"; };
 		2739E8CF24915BDB009AD607 /* StarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarButton.swift; sourceTree = "<group>"; };
 		27407AD324C4004F00AE7AAF /* FloatingMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingMenu.swift; sourceTree = "<group>"; };
 		274386092478925D0029F00F /* Picnic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Picnic.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -89,6 +98,13 @@
 		275AD146248180F100EE3DBA /* LocationSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSelector.swift; sourceTree = "<group>"; };
 		275AD1482481BCAB00EE3DBA /* LocationPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPopover.swift; sourceTree = "<group>"; };
 		275AD14A2482CAE300EE3DBA /* LocationLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationLabel.swift; sourceTree = "<group>"; };
+		279A268524D25BA700D71FD1 /* SettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
+		279A268724D3295300D71FD1 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		279A268924D34AED00D71FD1 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		279A268B24D34BFB00D71FD1 /* SignInButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInButton.swift; sourceTree = "<group>"; };
+		279A268D24D350A200D71FD1 /* Shared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared.swift; sourceTree = "<group>"; };
+		279A268F24D35C6B00D71FD1 /* ButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonView.swift; sourceTree = "<group>"; };
+		279A269124D3633600D71FD1 /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		27B072E5247C4724009974BD /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		27B072E7247CC66B009974BD /* Featured.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Featured.swift; sourceTree = "<group>"; };
 		27B072E9247CC7BB009974BD /* CustomFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomFlowLayout.swift; sourceTree = "<group>"; };
@@ -132,6 +148,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2725763524D1F484008916B7 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				2725763624D1F492008916B7 /* AuthPicker.swift */,
+				279A268B24D34BFB00D71FD1 /* SignInButton.swift */,
+				279A268F24D35C6B00D71FD1 /* ButtonView.swift */,
+				279A269124D3633600D71FD1 /* AuthManager.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
 		27407AD524C4BF0D00AE7AAF /* New Group */ = {
 			isa = PBXGroup;
 			children = (
@@ -162,6 +189,8 @@
 		2743860B2478925D0029F00F /* Picnic */ = {
 			isa = PBXGroup;
 			children = (
+				279A268424D25B8200D71FD1 /* Settings */,
+				2725763524D1F484008916B7 /* Auth */,
 				274B052B24C3FB6A00747D25 /* Detail View */,
 				274B052424C39EA100747D25 /* Misc */,
 				275AD145248180BD00EE3DBA /* Map */,
@@ -200,6 +229,8 @@
 				2752092424C53BED002E8761 /* ImageScrollView.swift */,
 				2752092624CF494B002E8761 /* LocationManager.swift */,
 				2725763324D0F1EB008916B7 /* Geohash.swift */,
+				279A268924D34AED00D71FD1 /* Colors.swift */,
+				279A268D24D350A200D71FD1 /* Shared.swift */,
 			);
 			path = Misc;
 			sourceTree = "<group>";
@@ -244,6 +275,14 @@
 			path = Map;
 			sourceTree = "<group>";
 		};
+		279A268424D25B8200D71FD1 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				279A268524D25BA700D71FD1 /* SettingsController.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
 		27B072ED247CCC70009974BD /* Tab Controller */ = {
 			isa = PBXGroup;
 			children = (
@@ -271,6 +310,7 @@
 				27EB2DC52478CC1D0093362C /* Picnic.swift */,
 				27EB2DD42478CE730093362C /* LoadData.swift */,
 				27BFC4152485980100A3C968 /* DatabaseManager.swift */,
+				279A268724D3295300D71FD1 /* User.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -326,6 +366,7 @@
 				274386062478925D0029F00F /* Frameworks */,
 				274386072478925D0029F00F /* Resources */,
 				C7BBD89EF26609B2D513EEFF /* [CP] Embed Pods Frameworks */,
+				6DDE1D7361189CE35E799A4C /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -421,6 +462,23 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		6DDE1D7361189CE35E799A4C /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Picnic/Pods-Picnic-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Picnic/Pods-Picnic-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Picnic/Pods-Picnic-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		C7BBD89EF26609B2D513EEFF /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -446,6 +504,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2756C288247D84080070D61A /* AddImage.swift in Sources */,
+				279A268A24D34AED00D71FD1 /* Colors.swift in Sources */,
 				274B052624C39ECC00747D25 /* ZoomableImage.swift in Sources */,
 				275AD147248180F100EE3DBA /* LocationSelector.swift in Sources */,
 				274386122478925D0029F00F /* Picnic.xcdatamodeld in Sources */,
@@ -453,27 +512,34 @@
 				27BFC4162485980100A3C968 /* DatabaseManager.swift in Sources */,
 				274B052D24C3FB9100747D25 /* PicnicDetailViewController.swift in Sources */,
 				2725763424D0F1EB008916B7 /* Geohash.swift in Sources */,
+				279A269224D3633600D71FD1 /* AuthManager.swift in Sources */,
 				2752092724CF494B002E8761 /* LocationManager.swift in Sources */,
 				27B072EF247CCC94009974BD /* TabController.swift in Sources */,
 				274B052324BF9B5100747D25 /* CustomPickerFlowLayout.swift in Sources */,
 				274B052A24C3C8AD00747D25 /* NewLocationCollectionViewCell.swift in Sources */,
 				27407AD424C4004F00AE7AAF /* FloatingMenu.swift in Sources */,
+				279A268824D3295300D71FD1 /* User.swift in Sources */,
 				2716B5B22491A83A0092A622 /* MapSearchResultsController.swift in Sources */,
 				2752092324C4EF12002E8761 /* SpinnerWheel.swift in Sources */,
 				27BFC41A2486E7FB00A3C968 /* Rating.swift in Sources */,
+				2725763724D1F492008916B7 /* AuthPicker.swift in Sources */,
 				274B051F24AD308900747D25 /* CustomImagePickerController.swift in Sources */,
 				27EB2DD52478CE730093362C /* LoadData.swift in Sources */,
 				27B072EA247CC7BB009974BD /* CustomFlowLayout.swift in Sources */,
+				279A268624D25BA700D71FD1 /* SettingsController.swift in Sources */,
 				2739E8D024915BDB009AD607 /* StarButton.swift in Sources */,
+				279A268E24D350A200D71FD1 /* Shared.swift in Sources */,
 				275AD14B2482CAE300EE3DBA /* LocationLabel.swift in Sources */,
 				2743860D2478925D0029F00F /* AppDelegate.swift in Sources */,
 				2716B5B0249186E80092A622 /* PlaceAnnotation.swift in Sources */,
 				27EB2DC62478CC1D0093362C /* Picnic.swift in Sources */,
 				2743860F2478925D0029F00F /* SceneDelegate.swift in Sources */,
 				2756C28B247F2BCA0070D61A /* NewLocationController.swift in Sources */,
+				279A268C24D34BFB00D71FD1 /* SignInButton.swift in Sources */,
 				27B072E8247CC66B009974BD /* Featured.swift in Sources */,
 				2752092524C53BED002E8761 /* ImageScrollView.swift in Sources */,
 				274B052124BF928100747D25 /* ImageCell.swift in Sources */,
+				279A269024D35C6B00D71FD1 /* ButtonView.swift in Sources */,
 				27BFC412248317C300A3C968 /* Helpers.swift in Sources */,
 				27EB2DC32478CA4E0093362C /* FeaturedCell.swift in Sources */,
 				27BFC414248318E200A3C968 /* MapIcon.swift in Sources */,
