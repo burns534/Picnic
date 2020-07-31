@@ -37,7 +37,7 @@ class NewLocationController: UIViewController, UIGestureRecognizerDelegate {
         configure()
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Share", style: .plain, target: self, action: #selector(save))
-        navigationItem.rightBarButtonItem?.tintColor = .toggle
+        navigationItem.rightBarButtonItem?.tintColor = .lime
     }
     
 // MARK: Configure

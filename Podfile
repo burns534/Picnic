@@ -11,5 +11,6 @@ target 'Picnic' do
   pod 'Firebase/Storage'
   pod 'Firebase/Database'
   pod 'FirebaseUI'
+  pod 'GoogleSignIn'
   
 end

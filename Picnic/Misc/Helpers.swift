@@ -15,6 +15,20 @@ extension CALayer {
         shadowOffset = offset
         shadowOpacity = opacity
     }
+    
+    func prepareSublayersForShadow() {
+        sublayers?.filter{ $0.frame.equalTo(self.bounds) }
+            .forEach{ $0.cornerRadius = cornerRadius }
+        if let contents = self.contents {
+            self.contents = nil
+            let contentLayer = CALayer()
+            contentLayer.contents = contents
+            contentLayer.frame = bounds
+            contentLayer.cornerRadius = cornerRadius
+            contentLayer.masksToBounds = true
+            insertSublayer(contentLayer, at: 0)
+        }
+    }
 }
 extension UIView {
     func setShadow(radius: CGFloat, color: CGColor?, opacity: Float = 1.0, offset: CGSize = .zero) {

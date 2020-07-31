@@ -12,26 +12,24 @@ import Photos
 private let reuseIdentifier = "Cell"
 fileprivate let previewFrame: CGRect = CGRect(x: 0, y: 0, width: 414, height: 400)
 
-// MARK: There is a bug with previews being blurry - not loading the requested image, only the cached image
-
 class CustomImagePickerController: UICollectionViewController {
     
     var fetchResult: PHFetchResult<PHAsset>!
     var assetCollection: PHAssetCollection!
     var preview: ZoomableImage!
-    var selectedImages = [UIImage]()
+    var selectedImages = [Int: UIImage]()
     var sourceButton: UIButton!
     var destination: UIViewController!
     var menu: FloatingMenu!
     var counter: Int16 = 0
-    
-    fileprivate let imageManager = PHCachingImageManager()
-    fileprivate let previewManager = PHImageManager()
-    
     var availableWidth: CGFloat = 0
+    let limitView = UILabel()
+    
     fileprivate var thumbnailSize: CGSize!
     fileprivate var previousPreheatRect: CGRect = .zero
-    private var previousPreviewIndexPath: IndexPath = .init(item: 0, section: 0)
+    
+    private var imageManager = PHCachingImageManager()
+    private var previousSelectedIndexPath: IndexPath = IndexPath()
     
     convenience init(collectionViewLayout layout: UICollectionViewLayout, destination: UIViewController) {
         self.init(collectionViewLayout: layout)
@@ -47,30 +45,18 @@ class CustomImagePickerController: UICollectionViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Register cell classes
         self.collectionView!.register(ImageCell.self, forCellWithReuseIdentifier: reuseIdentifier)
-        // Do any additional setup after loading the view.
         configurePhotos()
         setup()
     }
-
-    // MARK: This will be used in a parent tableView controller to send the fetch
+    
     func configurePhotos() {
         let allPhotosOptions = PHFetchOptions()
         allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-        
+        let predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+        allPhotosOptions.predicate = predicate
         fetchResult = PHAsset.fetchAssets(with: allPhotosOptions)
         PHPhotoLibrary.shared().register(self)
-        
-        if self.fetchResult == nil {
-            let allPhotosOptions = PHFetchOptions()
-            allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-            self.fetchResult = PHAsset.fetchAssets(with: allPhotosOptions)
-        }
     }
     
     func setup() {
@@ -83,9 +69,11 @@ class CustomImagePickerController: UICollectionViewController {
         
         let asset = fetchResult.object(at: 0)
         preview = ZoomableImage(frame: previewFrame)
-        previewManager.requestImage(for: asset, targetSize: CGSize(width: 1200, height: 1800), contentMode: .aspectFit, options: nil) { image, _ in
-            if let _ = image {
+        PHImageManager.default().requestImage(for: asset, targetSize: CGSize(width: 800, height: 1200), contentMode: .aspectFit, options: nil) { image, _ in
+            if image != nil {
                 self.preview.image = image
+            } else {
+                print("Error: CustomImagePickerController: setup: PHImageManager returned nil for preview Image")
             }
         }
         
@@ -105,6 +93,14 @@ class CustomImagePickerController: UICollectionViewController {
         menu.clipsToBounds = true
         view.addSubview(menu)
         
+        limitView.translatesAutoresizingMaskIntoConstraints = false
+        limitView.backgroundColor = .white
+        limitView.text = "There is a limit of 5 photos per picnic"
+        limitView.textColor = .black
+        limitView.textAlignment = .center
+        limitView.isHidden = true
+        view.addSubview(limitView)
+        
         NSLayoutConstraint.activate([
             preview.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             preview.heightAnchor.constraint(equalToConstant: 400),
@@ -119,7 +115,12 @@ class CustomImagePickerController: UICollectionViewController {
             menu.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
             menu.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
             menu.widthAnchor.constraint(equalToConstant: 200),
-            menu.heightAnchor.constraint(equalToConstant: 50)
+            menu.heightAnchor.constraint(equalToConstant: 50),
+            
+            limitView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            limitView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            limitView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            limitView.heightAnchor.constraint(equalToConstant: 50)
         ])
     }
 
@@ -135,8 +136,6 @@ class CustomImagePickerController: UICollectionViewController {
         super.viewDidAppear(animated)
         updateCachedAssets()
     }
-    
-    // need segue handler
     
     deinit {
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
@@ -241,30 +240,62 @@ class CustomImagePickerController: UICollectionViewController {
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let cell = collectionView.cellForItem(at: indexPath) as! ImageCell
         let asset = fetchResult.object(at: indexPath.item)
-        cell.toggleSelectionImage()
-        counter = 0
-        if cell.toggle {
-            if indexPath != previousPreviewIndexPath {
-                previewManager.requestImage(for: asset, targetSize: CGSize(width: 1200, height: 1800), contentMode: .aspectFit, options: nil) { image, _ in
-                    if let image = image {
-                        self.preview.image = image
-                        if self.counter == 1 {
-                            self.selectedImages.removeLast()
+// case: is current preview
+        if previousSelectedIndexPath == indexPath {
+            if cell.hasActiveSelection {
+                if selectedImages.count >= 5 {
+                    limitView.isHidden = true
+                }
+                selectedImages.removeValue(forKey: indexPath.item)
+                cell.toggleSelectionState()
+            } else if selectedImages.count < 5 {
+                let options = PHImageRequestOptions()
+                options.isSynchronous = true
+                options.resizeMode = .fast
+                PHImageManager.default().requestImage(for: asset, targetSize: CGSize(width: 800, height: 1200), contentMode: .aspectFit, options: options) { image, _ in
+                    if image != nil {
+                        self.selectedImages[indexPath.item] = image
+                        if self.selectedImages.count >= 5 {
+                            self.limitView.isHidden = false
                         }
-                        self.selectedImages.append(image)
-                        self.counter += 1
+                    } else {
+                        print("Error: CustomImagePickerController: didSelectItemAt: PHImageManager returned nil for image at cell \(indexPath.item)")
                     }
                 }
-                previousPreviewIndexPath = indexPath
+                cell.toggleSelectionState()
             }
+// case: is not current preview - only case that changes index path
         } else {
-            selectedImages.removeAll(where: { $0 == cell.imageView.image! })
+            if cell.hasActiveSelection {
+                if selectedImages.count >= 5 {
+                    limitView.isHidden = true
+                }
+                selectedImages.removeValue(forKey: indexPath.item)
+                cell.toggleSelectionState()
+            } else if selectedImages.count < 5 {
+                let options = PHImageRequestOptions()
+                options.isSynchronous = true
+                options.resizeMode = .fast
+                PHImageManager.default().requestImage(for: asset, targetSize: CGSize(width: 800, height: 1200), contentMode: .aspectFit, options: options) { image, _ in
+                    if let image = image {
+                        self.preview.image = image
+                        self.selectedImages[indexPath.item] = image
+                        if self.selectedImages.count >= 5 {
+                            self.limitView.isHidden = false
+                        }
+                    } else {
+                        print("Error: CustomImagePickerController: didSelectItemAt: PHImageManager returned nil for image at cell \(indexPath.item)")
+                    }
+                }
+                previousSelectedIndexPath = indexPath
+                cell.toggleSelectionState()
+            }
         }
     }
     
     @objc func confirmPhotos(_ sender: UIButton) {
         guard let vc = destination as? NewLocationController else { return }
-        vc.images = selectedImages
+        vc.images = Array(selectedImages.values)
         navigationController?.popViewController(animated: true)
         vc.collectionView.reloadData()
     }

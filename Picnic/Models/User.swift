@@ -7,27 +7,28 @@
 //
 
 import Foundation
+import FirebaseDatabase
 
-struct User: Codable, Hashable {
-    var uid: String
-    var posts: [String]
-    var ratedPosts: [String]
-    var wouldVisit: [String]
-    var haveVisited: [String]
+final class User: NSObject {
     
-    init() {
-        uid = ""
-        posts = []
-        ratedPosts = []
-        wouldVisit = []
-        haveVisited = []
+    private let database = Database.database().reference()
+    private var ref: DatabaseReference!
+    
+// MARK: User Data
+    var uid: String!
+    var posts: [String]! // probably fine
+    var isAnonymous: Bool!
+    
+    func configureUser(uid: String, isAnonymous: Bool) {
+        self.uid = uid
+        self.isAnonymous = isAnonymous
+        ref = database.child("Users").child(uid)
     }
     
-    init(uid: String, posts: [String], ratedPosts: [String], wouldVisit: [String], haveVisited: [String]) {
-        self.uid = uid
-        self.posts = posts
-        self.ratedPosts = ratedPosts
-        self.wouldVisit = wouldVisit
-        self.haveVisited = haveVisited
+    func likePost(id: String, completion: @escaping (Error?) -> () = {_ in}) {
+        guard let _ = ref else { return }
+        ref.child("likedPosts").updateChildValues([id: true]) { error, _ in
+            completion(error)
+        }
     }
 }

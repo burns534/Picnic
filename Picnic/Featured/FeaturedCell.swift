@@ -16,6 +16,7 @@ class FeaturedCell: UICollectionViewCell {
     var title: UILabel!
     var rating: Rating!
     var picnic: Picnic!
+    var like: UIButton!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -24,12 +25,6 @@ class FeaturedCell: UICollectionViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("NSCoding not supported")
-    }
-    
-    func acceptRating(rating: CGFloat) {
-        Shared.shared.databaseManager.updateRating(picnic: picnic, rating: Float(rating)) {
-            print("done")
-        }
     }
     
     func setup() {
@@ -50,9 +45,10 @@ class FeaturedCell: UICollectionViewCell {
         title.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(title)
         
-        rating = Rating()
-        rating.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(rating)
+        like = HeartButton(isLiked: false, frame: .zero)
+        like.addTarget(self, action: #selector(likePress), for: .touchDown)
+        like.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(like)
     }
     
     override func prepareForReuse() {
@@ -60,33 +56,44 @@ class FeaturedCell: UICollectionViewCell {
         title.text = nil
     }
     
+    @objc func likePress(_ sender: UIButton) {
+        guard let s = sender as? HeartButton else { return }
+        s.toggle()
+        Shared.shared.user.likePost(id: picnic.id)
+    }
+    
     func configure(picnic: Picnic) {
+        rating = Rating(picnic: picnic)
+        rating.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(rating)
+        
 // MARK: change this to loading wheel
         self.imageView.image = UIImage(named: "loading.jpg")
         Shared.shared.databaseManager.image(forPicnic: picnic) { image, error in
             if let error = error {
                 self.imageView.image = UIImage(named: "loading.jpg")
-                print(error.localizedDescription)
+                print("Error: FeaturedCell: configure: \(error.localizedDescription)")
                 return
             } else {
                 self.imageView.image = image
             }
         }
+        
 // apply shadow to cell
         layer.cornerRadius = 10
-        layer.shadowPath = UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width: cellSize.width, height: cellSize.height), cornerRadius: 10).cgPath
         setShadow(radius: 10, color: UIColor.darkGray.cgColor, opacity: 0.6, offset: CGSize(width: 0, height: 5))
         
         rating.configureFloat(rating: CGFloat(picnic.rating))
         self.picnic = picnic
         self.title.text = picnic.name
+        
 // MARK: Constraints
         NSLayoutConstraint.activate([
             // supplied
-            self.contentView.topAnchor.constraint(equalTo: topAnchor),
-            self.contentView.leftAnchor.constraint(equalTo: leftAnchor),
-            self.contentView.heightAnchor.constraint(equalTo: heightAnchor),
-            self.contentView.widthAnchor.constraint(equalTo: widthAnchor),
+            contentView.topAnchor.constraint(equalTo: topAnchor),
+            contentView.leftAnchor.constraint(equalTo: leftAnchor),
+            contentView.heightAnchor.constraint(equalTo: heightAnchor),
+            contentView.widthAnchor.constraint(equalTo: widthAnchor),
             
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
             imageView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
@@ -99,10 +106,15 @@ class FeaturedCell: UICollectionViewCell {
             self.title.widthAnchor.constraint(equalToConstant: 200),
             self.title.heightAnchor.constraint(equalToConstant: 20),
             
-            self.rating.topAnchor.constraint(equalTo: self.imageView.bottomAnchor, constant: -30),
-            self.rating.leftAnchor.constraint(equalTo: self.imageView.leftAnchor, constant: 10),
-            self.rating.widthAnchor.constraint(equalToConstant: self.rating.width),
-            self.rating.heightAnchor.constraint(equalToConstant: self.rating.starSize.height),
+            rating.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -30),
+            rating.leftAnchor.constraint(equalTo: imageView.leftAnchor, constant: 10),
+            rating.widthAnchor.constraint(equalToConstant: rating.width),
+            rating.heightAnchor.constraint(equalToConstant: rating.starSize.height),
+            
+            like.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
+            like.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15),
+            like.widthAnchor.constraint(equalToConstant: 50),
+            like.heightAnchor.constraint(equalToConstant: 45),
         ])
     }
 }

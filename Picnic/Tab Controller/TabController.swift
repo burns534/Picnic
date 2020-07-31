@@ -8,22 +8,23 @@
 
 import UIKit
 import FirebaseUI
+import GoogleSignIn
 
 class TabController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        tabBar.tintColor = .green
         tabBar.isTranslucent = false
         
-        let controllers = [Featured(collectionViewLayout: CustomFlowLayout()), SettingsController()]
+        let controllers = [Featured(collectionViewLayout: CustomFlowLayout()), Profile(), SettingsController()]
         
         viewControllers = controllers.map {
             UINavigationController(rootViewController: $0)
         }
         
         selectedIndex = 0
+        
+        GIDSignIn.sharedInstance()?.presentingViewController = self
     }
     // Must be presented in viewDidAppear because window hierarchy is established between viewWillAppear and viewDidAppear.
     // This probably shouldn't be here

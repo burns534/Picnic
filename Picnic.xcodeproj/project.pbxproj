@@ -37,9 +37,11 @@
 		279A268824D3295300D71FD1 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279A268724D3295300D71FD1 /* User.swift */; };
 		279A268A24D34AED00D71FD1 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279A268924D34AED00D71FD1 /* Colors.swift */; };
 		279A268C24D34BFB00D71FD1 /* SignInButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279A268B24D34BFB00D71FD1 /* SignInButton.swift */; };
-		279A268E24D350A200D71FD1 /* Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279A268D24D350A200D71FD1 /* Shared.swift */; };
 		279A269024D35C6B00D71FD1 /* ButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279A268F24D35C6B00D71FD1 /* ButtonView.swift */; };
 		279A269224D3633600D71FD1 /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279A269124D3633600D71FD1 /* AuthManager.swift */; };
+		279A269424D4897D00D71FD1 /* Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279A269324D4897D00D71FD1 /* Shared.swift */; };
+		279A269624D4ADF000D71FD1 /* HeartButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279A269524D4ADF000D71FD1 /* HeartButton.swift */; };
+		279A269824D4BE2700D71FD1 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279A269724D4BE2700D71FD1 /* Profile.swift */; };
 		27B072E6247C4724009974BD /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 27B072E5247C4724009974BD /* GoogleService-Info.plist */; };
 		27B072E8247CC66B009974BD /* Featured.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B072E7247CC66B009974BD /* Featured.swift */; };
 		27B072EA247CC7BB009974BD /* CustomFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B072E9247CC7BB009974BD /* CustomFlowLayout.swift */; };
@@ -102,9 +104,11 @@
 		279A268724D3295300D71FD1 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		279A268924D34AED00D71FD1 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		279A268B24D34BFB00D71FD1 /* SignInButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInButton.swift; sourceTree = "<group>"; };
-		279A268D24D350A200D71FD1 /* Shared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared.swift; sourceTree = "<group>"; };
 		279A268F24D35C6B00D71FD1 /* ButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonView.swift; sourceTree = "<group>"; };
 		279A269124D3633600D71FD1 /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
+		279A269324D4897D00D71FD1 /* Shared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared.swift; sourceTree = "<group>"; };
+		279A269524D4ADF000D71FD1 /* HeartButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartButton.swift; sourceTree = "<group>"; };
+		279A269724D4BE2700D71FD1 /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
 		27B072E5247C4724009974BD /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		27B072E7247CC66B009974BD /* Featured.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Featured.swift; sourceTree = "<group>"; };
 		27B072E9247CC7BB009974BD /* CustomFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomFlowLayout.swift; sourceTree = "<group>"; };
@@ -189,6 +193,7 @@
 		2743860B2478925D0029F00F /* Picnic */ = {
 			isa = PBXGroup;
 			children = (
+				279A269924D4BE3300D71FD1 /* Profile */,
 				279A268424D25B8200D71FD1 /* Settings */,
 				2725763524D1F484008916B7 /* Auth */,
 				274B052B24C3FB6A00747D25 /* Detail View */,
@@ -230,7 +235,7 @@
 				2752092624CF494B002E8761 /* LocationManager.swift */,
 				2725763324D0F1EB008916B7 /* Geohash.swift */,
 				279A268924D34AED00D71FD1 /* Colors.swift */,
-				279A268D24D350A200D71FD1 /* Shared.swift */,
+				279A269524D4ADF000D71FD1 /* HeartButton.swift */,
 			);
 			path = Misc;
 			sourceTree = "<group>";
@@ -283,6 +288,14 @@
 			path = Settings;
 			sourceTree = "<group>";
 		};
+		279A269924D4BE3300D71FD1 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				279A269724D4BE2700D71FD1 /* Profile.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
 		27B072ED247CCC70009974BD /* Tab Controller */ = {
 			isa = PBXGroup;
 			children = (
@@ -311,6 +324,7 @@
 				27EB2DD42478CE730093362C /* LoadData.swift */,
 				27BFC4152485980100A3C968 /* DatabaseManager.swift */,
 				279A268724D3295300D71FD1 /* User.swift */,
+				279A269324D4897D00D71FD1 /* Shared.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -503,6 +517,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				279A269624D4ADF000D71FD1 /* HeartButton.swift in Sources */,
 				2756C288247D84080070D61A /* AddImage.swift in Sources */,
 				279A268A24D34AED00D71FD1 /* Colors.swift in Sources */,
 				274B052624C39ECC00747D25 /* ZoomableImage.swift in Sources */,
@@ -517,6 +532,7 @@
 				27B072EF247CCC94009974BD /* TabController.swift in Sources */,
 				274B052324BF9B5100747D25 /* CustomPickerFlowLayout.swift in Sources */,
 				274B052A24C3C8AD00747D25 /* NewLocationCollectionViewCell.swift in Sources */,
+				279A269424D4897D00D71FD1 /* Shared.swift in Sources */,
 				27407AD424C4004F00AE7AAF /* FloatingMenu.swift in Sources */,
 				279A268824D3295300D71FD1 /* User.swift in Sources */,
 				2716B5B22491A83A0092A622 /* MapSearchResultsController.swift in Sources */,
@@ -528,11 +544,11 @@
 				27B072EA247CC7BB009974BD /* CustomFlowLayout.swift in Sources */,
 				279A268624D25BA700D71FD1 /* SettingsController.swift in Sources */,
 				2739E8D024915BDB009AD607 /* StarButton.swift in Sources */,
-				279A268E24D350A200D71FD1 /* Shared.swift in Sources */,
 				275AD14B2482CAE300EE3DBA /* LocationLabel.swift in Sources */,
 				2743860D2478925D0029F00F /* AppDelegate.swift in Sources */,
 				2716B5B0249186E80092A622 /* PlaceAnnotation.swift in Sources */,
 				27EB2DC62478CC1D0093362C /* Picnic.swift in Sources */,
+				279A269824D4BE2700D71FD1 /* Profile.swift in Sources */,
 				2743860F2478925D0029F00F /* SceneDelegate.swift in Sources */,
 				2756C28B247F2BCA0070D61A /* NewLocationController.swift in Sources */,
 				279A268C24D34BFB00D71FD1 /* SignInButton.swift in Sources */,

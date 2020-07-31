@@ -12,7 +12,7 @@ import MapKit
 
 fileprivate let defaultPrecision: Int = 7
 
-class DatabaseManager {
+final class DatabaseManager: NSObject {
     private static let storage = Storage.storage()
     private var storagePathURL: String
     private let ref = Database.database().reference()
@@ -55,6 +55,7 @@ class DatabaseManager {
             completion()
         }
     }
+    
     func image(forPicnic: Picnic, index: Int = 0, maxSize: Int64 = 2 * 1024 * 1024, completion: @escaping (UIImage?, Error?) -> () = {_,_ in}) {
         let imageRef = DatabaseManager.storage.reference(forURL: storagePathURL + forPicnic.id + "/\(forPicnic.imageNames[index])")
         
@@ -79,6 +80,7 @@ class DatabaseManager {
             completion(UIImage(data: data!), error)
         }
     }
+    
     func storeImage(for path: String, image: UIImage, completion: @escaping (StorageMetadata?, Error?) -> () = {_, _ in}) {
         guard let data = image.jpegData(compressionQuality: 0.7) else {
             print("Error: DatabaseManager: storeImage: could not extract png data from image \"\(path)\"")
@@ -247,12 +249,5 @@ class DatabaseManager {
             }
         }
     }
-    
-    func addUser(uid: String) {
-        ref.child("Users").child(uid).setValue(["posts": 0])
-    }
 }
 
-//let dbManager = DatabaseManager(storagePathURL: "gs://picnic-1c64f.appspot.com/images/")
-
-//let locationManager = LocationManager()

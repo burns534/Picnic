@@ -18,7 +18,8 @@ class Rating: UIView {
     var spacing: CGFloat = 1
     var rating: CGFloat = 0
     var width: CGFloat = 0
-    
+    var picnic: Picnic!
+// MARK: For rating
     init(frame: CGRect, starSize: CGSize, spacing: CGFloat, rating: CGFloat) {
         self.starSize = starSize
         self.spacing = spacing
@@ -28,21 +29,15 @@ class Rating: UIView {
         setup()
         configureFloat(rating: rating)
     }
-// MARK: Default
+// MARK: For Display
     init(picnic: Picnic) {
         starSize = defaultStarSize
         rating = CGFloat(picnic.rating)
         width = 5.0 * starSize.width + 4.0 * spacing
         super.init(frame: .zero)
+        self.picnic = picnic
         setup()
         configureFloat(rating: rating)
-    }
-    
-    init() {
-        starSize = defaultStarSize
-        width = 5.0 * starSize.width + 4.0 * spacing
-        super.init(frame: .zero)
-        setup()
     }
     
     required init?(coder: NSCoder) {
@@ -50,8 +45,9 @@ class Rating: UIView {
     }
     
     func setup() {
+        isUserInteractionEnabled = false
+        
         for i in 0..<5 {
-
             let starButton = StarButton(frame: .zero, starSize: self.starSize, color: .systemYellow)
             starButton.translatesAutoresizingMaskIntoConstraints = false
             starButton.addTarget(self, action: #selector(starPress), for: .touchUpInside)
@@ -101,8 +97,9 @@ class Rating: UIView {
     @objc func starPress(_ sender: UIButton) {
         rating = CGFloat(sender.tag + 1)
         refresh(rating: rating)
-        if let sv = superview?.superview as? FeaturedCell {
-            sv.acceptRating(rating: rating)
+// MARK: need to verify here if user has rated this picnic already
+        Shared.shared.databaseManager.updateRating(picnic: picnic, rating: Float(rating)) {
+            
         }
     }
 }

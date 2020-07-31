@@ -7,6 +7,7 @@
 //
 
 import FirebaseUI
+import GoogleSignIn
 
 
 class AuthManager: NSObject {
@@ -18,7 +19,9 @@ class AuthManager: NSObject {
         let providers: [FUIAuthProvider] = [
             FUIEmailAuth(),
             FUIPhoneAuth(authUI: authUI!),
-            FUIAnonymousAuth(authUI: authUI!)
+            FUIAnonymousAuth(authUI: authUI!),
+            FUIGoogleAuth()
+            
         ]
         authUI?.delegate = self
         authUI?.providers = providers
@@ -33,8 +36,12 @@ extension AuthManager: FUIAuthDelegate {
             return
         }
         if let data = authDataResult {
+            if data.user.isAnonymous {
+                Shared.shared.user.configureUser(uid: data.user.uid, isAnonymous: data.user.isAnonymous)
+                return
+            }
             if let _ = data.additionalUserInfo?.isNewUser {
-                Shared.shared.databaseManager.addUser(uid: data.user.uid)
+                Shared.shared.user.configureUser(uid: data.user.uid, isAnonymous: data.user.isAnonymous)
             }
         }
         UserDefaults.standard.setValue(true, forKey: "isLoggedIn")

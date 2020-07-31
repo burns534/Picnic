@@ -8,16 +8,12 @@
 
 import UIKit
 
-extension UIColor {
-    static let toggle = UIColor(red: 0.5, green: 0.9, blue: 0.1, alpha: 1.0)
-}
-
 class ImageCell: UICollectionViewCell {
     
     var imageView: UIImageView!
     var representedAssetIdentifier: String!
     var selectionImage: UIImageView!
-    var toggle: Bool = false
+    var hasActiveSelection: Bool = false
     
     private let toggleColor: UIColor = .systemBlue
     
@@ -67,10 +63,10 @@ class ImageCell: UICollectionViewCell {
         ])
     }
     
-    func toggleSelectionImage() {
-        toggle.toggle()
-        if toggle {
-            let largeCircleFillCircle = UIImage(systemName: "largecircle.fill.circle")?.withTintColor(.toggle, renderingMode: .alwaysOriginal)
+    func toggleSelectionState() {
+        hasActiveSelection.toggle()
+        if hasActiveSelection {
+            let largeCircleFillCircle = UIImage(systemName: "largecircle.fill.circle")?.withTintColor(.lime, renderingMode: .alwaysOriginal)
             selectionImage.image = largeCircleFillCircle
         } else {
             let circle = UIImage(systemName: "circle")?.withTintColor(.lightGray, renderingMode: .alwaysOriginal)
