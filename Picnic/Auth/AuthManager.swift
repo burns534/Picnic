@@ -10,23 +10,27 @@ import FirebaseUI
 import GoogleSignIn
 
 
-class AuthManager: NSObject {
+protocol AuthManagerDelegate: AnyObject {
+    func didSignIn()
+}
+
+final class AuthManager: NSObject {
     
     let authUI = FUIAuth.defaultAuthUI()
+    
+    weak var delegate: AuthManagerDelegate?
     
     override init() {
         super.init()
         let providers: [FUIAuthProvider] = [
             FUIEmailAuth(),
             FUIPhoneAuth(authUI: authUI!),
-            FUIAnonymousAuth(authUI: authUI!),
             FUIGoogleAuth()
-            
         ]
         authUI?.delegate = self
         authUI?.providers = providers
-        authUI?.shouldHideCancelButton = true
     }
+    
 }
 
 extension AuthManager: FUIAuthDelegate {
@@ -36,15 +40,12 @@ extension AuthManager: FUIAuthDelegate {
             return
         }
         if let data = authDataResult {
-            if data.user.isAnonymous {
-                Shared.shared.user.configureUser(uid: data.user.uid, isAnonymous: data.user.isAnonymous)
-                return
-            }
-            if let _ = data.additionalUserInfo?.isNewUser {
-                Shared.shared.user.configureUser(uid: data.user.uid, isAnonymous: data.user.isAnonymous)
+            if data.additionalUserInfo?.isNewUser != nil {
+                Shared.shared.user.configureUser(uid: data.user.uid, isAnonymous: false)
             }
         }
         UserDefaults.standard.setValue(true, forKey: "isLoggedIn")
+        delegate?.didSignIn()
     }
     
     func authPickerViewController(forAuthUI authUI: FUIAuth) -> FUIAuthPickerViewController {

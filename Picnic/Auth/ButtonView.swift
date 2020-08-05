@@ -21,7 +21,7 @@ let kSignInButtonHeight: CGFloat = 40.0
 /** @var kSignInButtonVerticalMargin
     @brief The vertical margin between sign in buttons.
  */
-fileprivate let kSignInButtonVerticalMargin: CGFloat = 24.0
+let kSignInButtonVerticalMargin: CGFloat = 24.0
 
 /** @var kButtonContainerBottomMargin
     @brief The magin between sign in buttons and the bottom of the content view.
@@ -67,7 +67,7 @@ class ButtonView: UIView {
     }
     
     @objc func didTapSignInButton(_ sender: SignInButton) {
-        Shared.shared.authManager.authUI!.signIn(withProviderUI: sender.provider, presenting: self.sender, defaultValue: nil)
+        Shared.shared.authManager.authUI?.signIn(withProviderUI: sender.provider, presenting: self.sender, defaultValue: nil)
     }
 }
 

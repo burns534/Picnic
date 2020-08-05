@@ -140,7 +140,7 @@ final class DatabaseManager: NSObject {
         })
     }
     
-    func updateRating(picnic: Picnic, rating: Float, completion: @escaping ()->()) {
+    func updateRating(picnic: Picnic, rating: Float, increment: Bool, completion: @escaping () -> () = {}) {
         let pRef = ref.child("Picnics").child(picnic.id)
         pRef.observeSingleEvent(of: .value) { snapshot in
             guard let data = snapshot.value as? [String: Any] else {
@@ -155,11 +155,14 @@ final class DatabaseManager: NSObject {
                 print("Error: DatabaseManager: updateRating: Could not retrieve ratingCount from \(picnic.id)")
                 return
             }
-            let newRating = (cRating * Float(cCount) + rating) / Float(cCount + 1)
+            let inc = increment ? 1 : 0
+            let adjustment = increment ? 0 : cRating
+            let newRating = (cRating * Float(cCount) + rating - adjustment) / Float(cCount + inc)
             pRef.updateChildValues([
                 "rating": newRating,
-                "ratingCount": cRating + 1
+                "ratingCount": cCount + inc
             ])
+            completion()
         }
     }
     

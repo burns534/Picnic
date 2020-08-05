@@ -62,16 +62,16 @@ class SignInButton: UIButton {
         addTarget(target, action: action, for: event)
         
         layer.cornerRadius = kCornerRadius
-        layer.setShadow(radius: kDropShadowRadius, color: UIColor.black.cgColor, opacity: kDropShadowAlpha, offset: CGSize(width: 0, height: kDropShadowYOffset))
+        layer.setShadow(radius: kDropShadowRadius, color: .black, opacity: kDropShadowAlpha, offset: CGSize(width: 0, height: kDropShadowYOffset))
         
         NSLayoutConstraint.activate([
-            icon.leftAnchor.constraint(equalTo: leftAnchor, constant: 8),
+            icon.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
             icon.widthAnchor.constraint(equalToConstant: 2 * kFontSize),
             icon.centerYAnchor.constraint(equalTo: centerYAnchor),
             
-            label.leftAnchor.constraint(equalTo: icon.rightAnchor, constant: 10),
+            label.leadingAnchor.constraint(equalTo: icon.trailingAnchor, constant: 10),
             label.centerYAnchor.constraint(equalTo: centerYAnchor),
-            label.rightAnchor.constraint(equalTo: rightAnchor, constant: -5),
+            label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -5),
             label.heightAnchor.constraint(equalTo: heightAnchor)
         ])
     }

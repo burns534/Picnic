@@ -10,31 +10,50 @@ import UIKit
 
 class HeartButton: UIButton {
     
-    var isLiked: Bool
+    var isLiked: Bool = false
     let config = UIImage.SymbolConfiguration(weight: .light)
+    var uid: String!
     
-    init(isLiked: Bool, frame: CGRect) {
-        self.isLiked = isLiked
-        super.init(frame: frame)
-        let heart = UIImage(systemName: isLiked ? "heart.fill" : "heart", withConfiguration: config)?.withTintColor(isLiked ? .red : .lightGray, renderingMode: .alwaysOriginal)
+    func configure(id: String) {
+        uid = id
+        addTarget(self, action: #selector(likePress), for: .touchDown)
+        Shared.shared.user.isLiked(post: uid) {
+            self.isLiked = $0
+            let heart = UIImage(systemName: $0 ? "heart.fill" : "heart", withConfiguration: self.config)?.withTintColor($0 ? .red : .white, renderingMode: .alwaysOriginal)
+            self.setImage(heart, for: .normal)
+            self.imageView!.translatesAutoresizingMaskIntoConstraints = false
+            
+            NSLayoutConstraint.activate([
+                self.imageView!.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+                self.imageView!.centerYAnchor.constraint(equalTo: self.centerYAnchor),
+                self.imageView!.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 0.8),
+                self.imageView!.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: 0.8)
+            ])
+        }
+    }
+
+    func update() {
+        guard let id = uid else { return }
+        Shared.shared.user.isLiked(post: id) { value in
+            self.isLiked = value
+            let heart = UIImage(systemName: value ? "heart.fill" : "heart", withConfiguration: self.config)?.withTintColor(value ? .red : .white, renderingMode: .alwaysOriginal)
+            self.setImage(heart, for: .normal)
+        }
+    }
+    
+    func like() {
+        guard let id = uid else { return }
+        isLiked = true
+        let heart = UIImage(systemName: "heart.fill", withConfiguration: config)?.withTintColor(.red, renderingMode: .alwaysOriginal)
         setImage(heart, for: .normal)
-        imageView!.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            imageView!.centerXAnchor.constraint(equalTo: centerXAnchor),
-            imageView!.centerYAnchor.constraint(equalTo: centerYAnchor),
-            imageView!.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.8),
-            imageView!.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.8)
-        ])
+        Shared.shared.user.likePost(id: id, value: true)
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("NSCoding not supported")
-    }
-    
-    func toggle() {
+    @objc func likePress(_ sender: UIButton) {
+        guard let id = uid else { return }
         isLiked.toggle()
-        let heart = UIImage(systemName: isLiked ? "heart.fill" : "heart", withConfiguration: config)?.withTintColor(isLiked ? .red : .lightGray, renderingMode: .alwaysOriginal)
+        let heart = UIImage(systemName: isLiked ? "heart.fill" : "heart", withConfiguration: config)?.withTintColor(isLiked ? .red : .white, renderingMode: .alwaysOriginal)
         setImage(heart, for: .normal)
+        Shared.shared.user.likePost(id: id, value: isLiked)
     }
 }

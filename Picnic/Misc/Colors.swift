@@ -26,3 +26,9 @@ extension UIColor {
 extension UIColor {
     static let sand = UIColor(red: 237.0 / 255.0, green: 224.0 / 255.0, blue: 178.0 / 255.0, alpha: 1.0)
 }
+
+extension UIColor {
+    static let lightBlue = UIColor(red: 3.0 / 255.0, green: 211.0 / 255.0, blue: 252.0 / 255.0, alpha: 1.0)
+}
+
+

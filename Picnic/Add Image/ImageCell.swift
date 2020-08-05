@@ -47,17 +47,17 @@ class ImageCell: UICollectionViewCell {
     func configure() {
         NSLayoutConstraint.activate([
             contentView.topAnchor.constraint(equalTo: topAnchor),
-            contentView.leftAnchor.constraint(equalTo: leftAnchor),
+            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
             contentView.heightAnchor.constraint(equalTo: heightAnchor),
             contentView.widthAnchor.constraint(equalTo: widthAnchor),
             
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            imageView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
+            imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             imageView.heightAnchor.constraint(equalTo: contentView.heightAnchor),
             imageView.widthAnchor.constraint(equalTo: contentView.widthAnchor),
             
             selectionImage.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5),
-            selectionImage.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -5),
+            selectionImage.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
             selectionImage.widthAnchor.constraint(equalToConstant: 20),
             selectionImage.heightAnchor.constraint(equalToConstant: 20)
         ])

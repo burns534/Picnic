@@ -39,7 +39,7 @@ class MapIcon: UIView {
         mapView.showsUserLocation = true
         mapView.layer.cornerRadius = 10
         
-        setShadow(radius: 5, color: UIColor.darkGray.cgColor, opacity: 0.9, offset: .init(width: 0, height: 2))
+        setShadow(radius: 5, color: .darkGray, opacity: 0.9, offset: .init(width: 0, height: 2))
         addSubview(mapView)
         
         NSLayoutConstraint.activate([

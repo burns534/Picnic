@@ -10,20 +10,34 @@ import UIKit
 import Photos
 
 private let reuseIdentifier = "Cell"
-fileprivate let previewFrame: CGRect = CGRect(x: 0, y: 0, width: 414, height: 400)
+private let kPreviewFrameWidth = 414
+private let kPreviewFrameHeight = 400
+
+#if targetEnvironment(simulator)
+    let cameraBlock = true
+#else
+    let cameraBlock = false
+#endif
+
+protocol CustomImagePickerControllerDelegate: AnyObject {
+    func refreshImageSource(images: [UIImage])
+}
 
 class CustomImagePickerController: UICollectionViewController {
     
     var fetchResult: PHFetchResult<PHAsset>!
     var assetCollection: PHAssetCollection!
-    var preview: ZoomableImage!
+    var preview: UIImageView!
     var selectedImages = [Int: UIImage]()
     var sourceButton: UIButton!
-    var destination: UIViewController!
     var menu: FloatingMenu!
     var counter: Int16 = 0
     var availableWidth: CGFloat = 0
     let limitView = UILabel()
+    var navigationBar: NavigationBar!
+    var imagePickerController: UIImagePickerController!
+    
+    let previewFrame = CGRect(x: 0, y: 0, width: kPreviewFrameWidth, height: kPreviewFrameHeight)
     
     fileprivate var thumbnailSize: CGSize!
     fileprivate var previousPreheatRect: CGRect = .zero
@@ -31,17 +45,7 @@ class CustomImagePickerController: UICollectionViewController {
     private var imageManager = PHCachingImageManager()
     private var previousSelectedIndexPath: IndexPath = IndexPath()
     
-    convenience init(collectionViewLayout layout: UICollectionViewLayout, destination: UIViewController) {
-        self.init(collectionViewLayout: layout)
-        self.destination = destination
-    }
-    
-    override init(collectionViewLayout layout: UICollectionViewLayout) {
-        super.init(collectionViewLayout: layout)
-    }
-    required init?(coder: NSCoder) {
-        fatalError("NSCoding not supported")
-    }
+    weak var delegate: CustomImagePickerControllerDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -64,11 +68,12 @@ class CustomImagePickerController: UICollectionViewController {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.delegate = self
         collectionView.backgroundColor = .white
-        
         view.backgroundColor = .white
         
         let asset = fetchResult.object(at: 0)
-        preview = ZoomableImage(frame: previewFrame)
+        preview = UIImageView()
+        preview.contentMode = .scaleAspectFit
+        view.addSubview(preview)
         PHImageManager.default().requestImage(for: asset, targetSize: CGSize(width: 800, height: 1200), contentMode: .aspectFit, options: nil) { image, _ in
             if image != nil {
                 self.preview.image = image
@@ -77,23 +82,17 @@ class CustomImagePickerController: UICollectionViewController {
             }
         }
         
-        preview.translatesAutoresizingMaskIntoConstraints = false
-//        preview.clipsToBounds = true
-        view.addSubview(preview)
+        imagePickerController = UIImagePickerController()
+        imagePickerController.allowsEditing = true
+        imagePickerController.delegate = self
+        imagePickerController.sourceType = .camera
+        imagePickerController.cameraDevice = .rear
         
-        sourceButton = UIButton()
-        sourceButton.setTitle("Recents", for: .normal)
-        
-        navigationItem.titleView = sourceButton
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(confirmPhotos))
-        
-        menu = FloatingMenu(sender: self)
-        menu.translatesAutoresizingMaskIntoConstraints = false
+        menu = FloatingMenu()
         menu.layer.cornerRadius = 20
         menu.clipsToBounds = true
         view.addSubview(menu)
         
-        limitView.translatesAutoresizingMaskIntoConstraints = false
         limitView.backgroundColor = .white
         limitView.text = "There is a limit of 5 photos per picnic"
         limitView.textColor = .black
@@ -101,14 +100,33 @@ class CustomImagePickerController: UICollectionViewController {
         limitView.isHidden = true
         view.addSubview(limitView)
         
+        navigationBar = NavigationBar()
+        navigationBar.setLeftBarButton(title: "Cancel", target: self, action: #selector(cancelButtonHandler))
+        navigationBar.setLeftButtonPadding(amount: 10)
+        navigationBar.leftBarButton?.setTitleColor(.olive, for: .normal)
+        navigationBar.leftBarButton?.titleLabel?.font = UIFont.systemFont(ofSize: 25, weight: .light)
+        navigationBar.setRightBarButton(title: "Confirm", target: self, action: #selector(confirmPhotos))
+        navigationBar.rightBarButton?.setTitleColor(.olive, for: .normal)
+        navigationBar.rightBarButton?.titleLabel?.font = UIFont.systemFont(ofSize: 25, weight: .light)
+        navigationBar.setRightButtonPadding(amount: 10)
+        view.addSubview(navigationBar)
+        
+        view.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+        
         NSLayoutConstraint.activate([
-            preview.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            
+            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            navigationBar.widthAnchor.constraint(equalTo: view.widthAnchor),
+            navigationBar.heightAnchor.constraint(equalToConstant: 40),
+            
+            preview.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
             preview.heightAnchor.constraint(equalToConstant: 400),
-            preview.leftAnchor.constraint(equalTo: view.leftAnchor),
-            preview.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor),
+            preview.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            preview.widthAnchor.constraint(equalTo: view.widthAnchor),
             
             collectionView.topAnchor.constraint(equalTo: preview.bottomAnchor),
-            collectionView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             collectionView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor),
             
@@ -117,9 +135,9 @@ class CustomImagePickerController: UICollectionViewController {
             menu.widthAnchor.constraint(equalToConstant: 200),
             menu.heightAnchor.constraint(equalToConstant: 50),
             
-            limitView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            limitView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            limitView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            limitView.bottomAnchor.constraint(equalTo: preview.bottomAnchor),
+            limitView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            limitView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             limitView.heightAnchor.constraint(equalToConstant: 50)
         ])
     }
@@ -238,6 +256,8 @@ class CustomImagePickerController: UICollectionViewController {
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        limitView.text = "There is a limit of 5 photos per picnic"
+        if selectedImages.count < 5 { limitView.isHidden = true }
         let cell = collectionView.cellForItem(at: indexPath) as! ImageCell
         let asset = fetchResult.object(at: indexPath.item)
 // case: is current preview
@@ -280,7 +300,7 @@ class CustomImagePickerController: UICollectionViewController {
                     if let image = image {
                         self.preview.image = image
                         self.selectedImages[indexPath.item] = image
-                        if self.selectedImages.count >= 5 {
+                        if self.selectedImages.count > 5 {
                             self.limitView.isHidden = false
                         }
                     } else {
@@ -292,18 +312,48 @@ class CustomImagePickerController: UICollectionViewController {
             }
         }
     }
+// MARK: Objective C Functions
+    
+    @objc func cancelButtonHandler(_ sender: UIButton) {
+        navigationController?.popViewController(animated: true)
+    }
     
     @objc func confirmPhotos(_ sender: UIButton) {
-        guard let vc = destination as? NewLocationController else { return }
-        vc.images = Array(selectedImages.values)
+        if selectedImages.count == 0 {
+            limitView.text = "No images selected"
+            limitView.isHidden = false
+            return
+        }
         navigationController?.popViewController(animated: true)
-        vc.collectionView.reloadData()
+        delegate?.refreshImageSource(images: Array(selectedImages.values))
     }
+    
+    @objc func cameraPress(_ sender: UIButton) {
+        if !cameraBlock {
+            present(imagePickerController, animated: true, completion: nil)
+        } else {
+            print("Error: Floating Menu: cameraPress: Cannot access camera")
+        }
+    }
+    
 }
 
 // MARK: Need to finish this
 extension CustomImagePickerController: PHPhotoLibraryChangeObserver {
     func photoLibraryDidChange(_ changeInstance: PHChange) {
         //
+    }
+}
+
+extension CustomImagePickerController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        guard let image = info[.editedImage] as? UIImage else {
+            print("Error: Floating Menu: didFinishPickingMediaWithInfo: Could not load image")
+            return
+        }
+        delegate?.refreshImageSource(images: [image])
+        dismiss(animated: true)
+        navigationController?.popViewController(animated: false)
     }
 }

@@ -19,29 +19,70 @@ class Rating: UIView {
     var rating: CGFloat = 0
     var width: CGFloat = 0
     var picnic: Picnic!
+    var ratingCountLabel: UILabel!
+    var ratingCount: Int = 0
+    
+    var isRatingCountHidden: Bool = true {
+        didSet {
+            if let r = ratingCountLabel {
+                r.isHidden = isRatingCountHidden
+            } else if !isRatingCountHidden {
+                configureRatingCount()
+            }
+        }
+    }
 // MARK: For rating
-    init(frame: CGRect, starSize: CGSize, spacing: CGFloat, rating: CGFloat) {
+    init(starSize: CGSize, spacing: CGFloat = 1, rating: CGFloat = 0) {
         self.starSize = starSize
         self.spacing = spacing
         self.rating = rating
         self.width = 5 * starSize.width + 4 * spacing
-        super.init(frame: frame)
+        super.init(frame: .zero)
         setup()
-        configureFloat(rating: rating)
+        refresh()
     }
-// MARK: For Display
-    init(picnic: Picnic) {
+    
+    init() {
         starSize = defaultStarSize
-        rating = CGFloat(picnic.rating)
         width = 5.0 * starSize.width + 4.0 * spacing
         super.init(frame: .zero)
-        self.picnic = picnic
         setup()
-        configureFloat(rating: rating)
+        refresh()
     }
     
     required init?(coder: NSCoder) {
         fatalError("NSCoding not supported")
+    }
+    
+    func configure(picnic: Picnic) {
+        self.picnic = picnic
+        rating = CGFloat(picnic.rating)
+        ratingCount = picnic.ratingCount
+    }
+    
+    func configureRatingCount() {
+        guard let p = picnic else { return }
+        ratingCountLabel = UILabel()
+        var ratingString: String
+        if p.ratingCount > 1000 {
+            let reduced: Float = Float(p.ratingCount) / 1000.0
+            ratingString = String(format: "%.1fk", reduced)
+        } else {
+            ratingString = "\(p.ratingCount)"
+        }
+        ratingCountLabel.text = "(" + ratingString + ")"
+        let length = ratingCountLabel.text!.count * 8
+        ratingCountLabel.translatesAutoresizingMaskIntoConstraints = false
+        // probably
+        ratingCountLabel.textAlignment = .center
+        ratingCountLabel.textColor = .white
+        addSubview(ratingCountLabel)
+        NSLayoutConstraint.activate([
+            ratingCountLabel.leadingAnchor.constraint(equalTo: stars.last!.trailingAnchor, constant: 5),
+            ratingCountLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
+            ratingCountLabel.widthAnchor.constraint(equalToConstant: CGFloat(length)),
+            ratingCountLabel.heightAnchor.constraint(equalToConstant: 30)
+        ])
     }
     
     func setup() {
@@ -58,13 +99,23 @@ class Rating: UIView {
             NSLayoutConstraint.activate([
                 starButton.widthAnchor.constraint(equalToConstant: starSize.width),
                 starButton.heightAnchor.constraint(equalToConstant: starSize.height),
-                starButton.leftAnchor.constraint(equalTo: self.leftAnchor, constant: (starSize.width + spacing) * CGFloat(i)),
+                starButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: (starSize.width + spacing) * CGFloat(i)),
                 starButton.topAnchor.constraint(equalTo: self.topAnchor)
             ])
         }
     }
     
-    func refresh(rating: CGFloat) {
+    func refresh() {
+        for i in 0..<5 {
+            if CGFloat(i) < rating {
+                stars[i].fillStar()
+            } else {
+                stars[i].emptyStar()
+            }
+        }
+    }
+    
+    func update(rating: CGFloat) {
         self.rating = rating
         for i in 0..<5 {
             if CGFloat(i) < rating {
@@ -76,8 +127,7 @@ class Rating: UIView {
     }
     
     // for use with floating point rating
-    func configureFloat(rating: CGFloat) {
-        self.rating = rating
+    func configureFloat() {
         for i in 0..<5 {
             // automatically show filled stars
             if CGFloat(i + 1) <= rating {
@@ -96,10 +146,23 @@ class Rating: UIView {
 // MARK: Obj-C functions
     @objc func starPress(_ sender: UIButton) {
         rating = CGFloat(sender.tag + 1)
-        refresh(rating: rating)
+        update(rating: rating)
+        
 // MARK: need to verify here if user has rated this picnic already
-        Shared.shared.databaseManager.updateRating(picnic: picnic, rating: Float(rating)) {
-            
+        guard let p = picnic else { return }
+        Shared.shared.user.isRated(post: p.id) { value in
+            print(p.id)
+            if value {
+                Shared.shared.databaseManager.updateRating(picnic: p, rating: Float(self.rating), increment: false)
+            } else {
+                Shared.shared.databaseManager.updateRating(picnic: p, rating: Float(self.rating), increment: true) {
+                    Shared.shared.user.ratePost(id: p.id) { err in
+                        if let err = err {
+                            print("Error: \(err.localizedDescription)")
+                        }
+                    }
+                }
+            }
         }
     }
 }

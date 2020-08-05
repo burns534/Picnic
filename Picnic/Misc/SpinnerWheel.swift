@@ -1,39 +1,30 @@
 //
 //  SpinnerView.swift
 //  Picnic
-//
-//  Created by Kyle Burns on 7/19/20.
-//  Copyright © 2020 Kyle Burns. All rights reserved.
-//
 
 import UIKit
 
-class SpinnerView : UIView {
+// can't figure this out
 
-    override var layer: CAShapeLayer {
-        get {
-            return super.layer as! CAShapeLayer
-        }
+class SpinnerView : UIImageView {
+    
+    open var radius: CGFloat = 25
+    
+    private var spinLayer: CAShapeLayer!
+
+    func prepareForAnimation() {
     }
-
-    override class var layerClass: AnyClass {
-        return CAShapeLayer.self
-    }
-
+    
     override func layoutSubviews() {
-        super.layoutSubviews()
-        layer.fillColor = nil
-        layer.strokeColor = UIColor.black.cgColor
-        layer.lineWidth = 3
-        setPath()
-    }
-
-    override func didMoveToWindow() {
+        spinLayer = CAShapeLayer()
+        spinLayer.bounds = layer.bounds
+        spinLayer.fillColor = nil
+        spinLayer.strokeColor = UIColor.black.cgColor
+        spinLayer.lineWidth = 3
+        let arcCenter = CGPoint(x: bounds.midX, y: bounds.midY)
+        spinLayer.path = UIBezierPath(arcCenter: arcCenter, radius: radius, startAngle: 0, endAngle: CGFloat(2 * Float.pi), clockwise: true).cgPath
+        layer.addSublayer(spinLayer)
         animate()
-    }
-
-    private func setPath() {
-        layer.path = UIBezierPath(ovalIn: bounds.insetBy(dx: layer.lineWidth / 2, dy: layer.lineWidth / 2)).cgPath
     }
 
     struct Pose {
@@ -86,7 +77,6 @@ class SpinnerView : UIView {
 
         animateKeyPath(keyPath: "strokeEnd", duration: totalSeconds, times: times, values: strokeEnds)
         animateKeyPath(keyPath: "transform.rotation", duration: totalSeconds, times: times, values: rotations)
-
         animateStrokeHueWithDuration(duration: totalSeconds * 5)
     }
 
@@ -97,7 +87,7 @@ class SpinnerView : UIView {
         animation.calculationMode = .linear
         animation.duration = duration
         animation.repeatCount = Float.infinity
-        layer.add(animation, forKey: animation.keyPath)
+        spinLayer.add(animation, forKey: animation.keyPath)
     }
 
     func animateStrokeHueWithDuration(duration: CFTimeInterval) {
@@ -110,7 +100,7 @@ class SpinnerView : UIView {
         animation.duration = duration
         animation.calculationMode = .linear
         animation.repeatCount = Float.infinity
-        layer.add(animation, forKey: animation.keyPath)
+        spinLayer.add(animation, forKey: animation.keyPath)
     }
 
 }

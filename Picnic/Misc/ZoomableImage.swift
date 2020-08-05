@@ -8,32 +8,6 @@
 
 import UIKit
 
-extension UIImageView{
-    func sizeForImageInImageViewAspectFit() -> CGSize
-    {
-        if let img = self.image {
-            let imageRatio = img.size.width / img.size.height;
-
-            let viewRatio = self.frame.size.width / self.frame.size.height;
-
-            if (imageRatio < viewRatio) {
-                let scale = self.frame.size.height / img.size.height
-
-                let width = scale * img.size.width
-
-                return CGSize(width: width, height: frame.size.height)
-            } else {
-                let scale = self.frame.size.width / img.size.width
-
-                let height = scale * img.size.height
-
-                return CGSize(width: frame.size.width, height: height);
-            }
-        }
-        return .zero
-    }
-}
-
 class ZoomableImage: UIView {
     
     let pinchGestureRecognizer = UIPinchGestureRecognizer()
@@ -81,7 +55,7 @@ class ZoomableImage: UIView {
         isUserInteractionEnabled = true
         backgroundColor = .clear
         zoomView.isUserInteractionEnabled = true
-        zoomView.contentMode = .scaleAspectFit
+        zoomView.contentMode = .scaleAspectFill
         
         let dotPath = UIBezierPath(ovalIn: CGRect(x: 204, y: 197, width: 6, height: 6))
         self.kLayer = CAShapeLayer()

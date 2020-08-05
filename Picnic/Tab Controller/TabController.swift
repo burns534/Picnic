@@ -27,7 +27,6 @@ class TabController: UITabBarController {
         GIDSignIn.sharedInstance()?.presentingViewController = self
     }
     // Must be presented in viewDidAppear because window hierarchy is established between viewWillAppear and viewDidAppear.
-    // This probably shouldn't be here
     override func viewDidAppear(_ animated: Bool) {
         guard let vc = Shared.shared.authManager.authUI?.authViewController() else {
             print("Error: TabController: viewDidAppear: viewController nil")

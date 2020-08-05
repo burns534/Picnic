@@ -49,20 +49,25 @@ class Featured: UICollectionViewController {
     func configure() {
         refresh()
         
+        navigationController?.setNavigationBarHidden(false, animated: true)
+        
         collectionView.backgroundColor = .white
         collectionView.alwaysBounceVertical = true
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
-        collectionView.refreshControl = self.refreshController
+        collectionView.refreshControl = refreshController
         
-        self.refreshController.addTarget(self, action: #selector(pullDown), for: .valueChanged)
+        refreshController.addTarget(self, action: #selector(pullDown), for: .valueChanged)
         
         self.collectionView!.register(FeaturedCell.self, forCellWithReuseIdentifier: reuseIdentifier)
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus.square"), style: .plain, target: self, action: #selector(rightBarButton))
-        navigationItem.rightBarButtonItem?.tintColor = .black
+        navigationItem.rightBarButtonItem?.tintColor = .olive
         
-        navigationController?.title = "Featured"
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Filter", style: .plain, target: self, action: #selector(filterHandler))
+        navigationItem.leftBarButtonItem?.tintColor = .olive
+        
+        Shared.shared.authManager.delegate = self
     }
     
     
@@ -74,7 +79,11 @@ class Featured: UICollectionViewController {
     }
     
     @objc func rightBarButton() {
-        navigationController?.pushViewController(NewLocationController(), animated: true)
+        navigationController?.pushViewController(LocationSelector(), animated: true)
+    }
+    
+    @objc func filterHandler(_ sender: UIBarButtonItem) {
+        
     }
 
     // MARK: UICollectionViewDataSource
@@ -107,7 +116,13 @@ class Featured: UICollectionViewController {
             print("Error: Featured: didSelectItemAt: Could not cast")
             return
         }
-        navigationController?.pushViewController(PicnicDetailViewController(picnic: cell.picnic), animated: true)
+        navigationController?.pushViewController(PicnicDetailViewController(cell: cell), animated: true)
     }
 
+}
+
+extension Featured: AuthManagerDelegate {
+    func didSignIn() {
+        collectionView.reloadData()
+    }
 }
