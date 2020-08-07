@@ -8,15 +8,16 @@
 
 import UIKit
 
-fileprivate var imageViewSize: CGSize = CGSize(width: cellSize.width, height: 200)
+fileprivate var imageViewSize: CGSize = CGSize(width: kFeaturedCellSize.width, height: 200)
 
 class FeaturedCell: UICollectionViewCell {
     
     var imageView: UIImageView!
     var title: UILabel!
-    var rating: Rating! = Rating()
+    var rating: Rating!
     var picnic: Picnic!
-    var like: HeartButton! = HeartButton()
+    var like: HeartButton!
+    var location: UILabel!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -34,24 +35,32 @@ class FeaturedCell: UICollectionViewCell {
         imageView = UIImageView(frame: frame)
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 10
-        imageView.layer.maskedCorners = CACornerMask(arrayLiteral: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
         imageView.clipsToBounds = true
         contentView.addSubview(imageView)
         
         // configure title
         title = UILabel(frame: frame)
-        title.textAlignment = .left
+        title.textColor = .white
+        title.font = UIFont.systemFont(ofSize: 25, weight: .semibold)
         contentView.addSubview(title)
-    
+        
+        rating = Rating()
         contentView.addSubview(rating)
+        like = HeartButton()
         contentView.addSubview(like)
-// MARK: FIX
+        
+        location = UILabel()
+        location.textColor = .white
+        contentView.addSubview(location)
+        
+        contentView.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false
+        }
+        
+        // MARK: FIX
         let dtgr = UITapGestureRecognizer(target: self, action: #selector(doubleTap))
         dtgr.delegate = self
         dtgr.numberOfTapsRequired = 2
         addGestureRecognizer(dtgr)
-        
-        contentView.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
     }
     
     // this isn't working
@@ -62,8 +71,7 @@ class FeaturedCell: UICollectionViewCell {
     
     func configure(picnic: Picnic) {
         rating.configure(picnic: picnic)
-        rating.configureFloat()
-        rating.isRatingCountHidden = false
+        rating.mode = .displayWithCount
         like.configure(id: picnic.id)
         
 // MARK: change this to loading wheel
@@ -80,7 +88,8 @@ class FeaturedCell: UICollectionViewCell {
         layer.cornerRadius = 10
         setShadow(radius: 10, color: .darkGray, opacity: 0.6, offset: CGSize(width: 0, height: 5))
         self.picnic = picnic
-        self.title.text = picnic.name
+        title.text = picnic.name
+        location.text = picnic.city + ", " + picnic.state
         
 // MARK: Constraints
         NSLayoutConstraint.activate([
@@ -92,24 +101,26 @@ class FeaturedCell: UICollectionViewCell {
             
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
             imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            imageView.centerXAnchor.constraint(equalTo: centerXAnchor),
             imageView.widthAnchor.constraint(equalTo: contentView.widthAnchor),
-            imageView.heightAnchor.constraint(equalToConstant: imageViewSize.height),
+            imageView.heightAnchor.constraint(equalTo: contentView.heightAnchor),
             
-            self.title.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10),
-            self.title.leadingAnchor.constraint(equalTo: self.imageView.leadingAnchor, constant: 10),
-            self.title.widthAnchor.constraint(equalToConstant: 200),
-            self.title.heightAnchor.constraint(equalToConstant: 20),
-            
-            rating.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -30),
+            rating.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -10),
             rating.leadingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: 10),
             rating.widthAnchor.constraint(equalToConstant: rating.width),
-            rating.heightAnchor.constraint(equalToConstant: rating.starSize.height),
+            rating.heightAnchor.constraint(equalToConstant: rating.starSize),
+            
+            title.bottomAnchor.constraint(equalTo: rating.topAnchor),
+            title.leadingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: 10),
+            title.widthAnchor.constraint(lessThanOrEqualTo: contentView.widthAnchor),
             
             like.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
             like.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -15),
             like.widthAnchor.constraint(equalToConstant: 50),
             like.heightAnchor.constraint(equalToConstant: 45),
+            
+            location.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -10),
+            location.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
+            location.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.centerXAnchor, constant: 5)
         ])
     }
     

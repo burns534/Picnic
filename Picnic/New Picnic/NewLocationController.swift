@@ -24,14 +24,13 @@ class NewLocationController: UIViewController {
     var category: UITextField!
     var images = [UIImage]()
     var addImages: UIButton!
-    var tapToRateLabel: UILabel!
     var interactiveRating: Rating!
     var selectedImages: MultipleSelectionIcon!
     var navigationBar: NavigationBar!
     var scrollView: UIScrollView!
-    var lineView: UIView!
     var annotation: MKPointAnnotation!
     var shortPresentationController: ShortPresentationController!
+    var requiredFieldModal: RequiredFieldModal!
     
     weak var delegate: NewLocationControllerDelegate?
     
@@ -43,21 +42,16 @@ class NewLocationController: UIViewController {
     
         annotation = delegate?.requestAnnotation()
         configure()
-// make this an instance variable
-        let vc = RequiredFieldModal()
-        vc.modalOffsetY = modalOffsetY
-        vc.delegate = self
-        vc.transitioningDelegate = self
-        vc.modalPresentationStyle = .custom
-        navigationController?.present(vc, animated: true)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        navigationController?.setToolbarHidden(false, animated: true)
+        
+        requiredFieldModal = RequiredFieldModal()
+        requiredFieldModal.modalOffsetY = modalOffsetY
+        requiredFieldModal.delegate = self
+        requiredFieldModal.transitioningDelegate = self
+        requiredFieldModal.modalPresentationStyle = .custom
+        navigationController?.present(requiredFieldModal, animated: true)
     }
     
 // MARK: Configure
-    
     func configure() {
         view.backgroundColor = .white
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapToEndEditing))
@@ -104,24 +98,10 @@ class NewLocationController: UIViewController {
         category.layer.cornerRadius = kTextBoxCornerRadius
         category.delegate = self
         view.addSubview(category)
-
-// MARK: Add Photos Button
-//        let cameraButtonConfig = UIImage.SymbolConfiguration(pointSize: 35, weight: .light)
-//        let cameraIcon = UIImage(systemName: "camera.fill", withConfiguration: cameraButtonConfig)?.withTintColor(.gray, renderingMode: .alwaysOriginal)
-//        addImages = UIButton()
-//        addImages.setImage(cameraIcon, for: .normal)
-//        addImages.addTarget(self, action: #selector(presentImagePicker), for: .touchUpInside)
-//        view.addSubview(addImages)
-//
-// MARK: tapToRateLabel
-        tapToRateLabel = UILabel()
-        tapToRateLabel.text = "Tap to rate"
-        tapToRateLabel.textColor = .gray
-        view.addSubview(tapToRateLabel)
         
 // MARK: Interactive Rating
-        interactiveRating = Rating(starSize: CGSize(width: 30, height: 30))
-        interactiveRating.isUserInteractionEnabled = true
+        interactiveRating = Rating(starSize: 30)
+        interactiveRating.mode = .interactable
         view.addSubview(interactiveRating)
         
 // MARK: Selected Images
@@ -142,11 +122,6 @@ class NewLocationController: UIViewController {
         navigationBar.rightBarButton?.titleLabel?.font = UIFont.systemFont(ofSize: 25, weight: .light)
         navigationBar.setRightButtonPadding(amount: 10)
         view.addSubview(navigationBar)
-        // MARK: Line
-        lineView = UIView()
-        lineView.backgroundColor = .lightGray
-        lineView.isHidden = true
-        view.addSubview(lineView)
         
         view.subviews.forEach {$0.translatesAutoresizingMaskIntoConstraints = false}
         
@@ -156,11 +131,6 @@ class NewLocationController: UIViewController {
             navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             navigationBar.widthAnchor.constraint(equalTo: view.widthAnchor),
             navigationBar.heightAnchor.constraint(equalToConstant: 40),
-            
-            lineView.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor),
-            lineView.widthAnchor.constraint(equalTo: view.widthAnchor),
-            lineView.heightAnchor.constraint(equalToConstant: 2),
-            lineView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             
             map.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             map.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
@@ -184,13 +154,10 @@ class NewLocationController: UIViewController {
             category.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor),
             category.heightAnchor.constraint(equalToConstant: 40),
             
-            tapToRateLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 18),
-            tapToRateLabel.topAnchor.constraint(equalTo: category.bottomAnchor, constant: 15),
-            
-            interactiveRating.topAnchor.constraint(equalTo: tapToRateLabel.bottomAnchor, constant: 5),
+            interactiveRating.topAnchor.constraint(equalTo: category.bottomAnchor, constant: 5),
             interactiveRating.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15),
             interactiveRating.widthAnchor.constraint(equalToConstant: interactiveRating.width),
-            interactiveRating.heightAnchor.constraint(equalToConstant: interactiveRating.starSize.height),
+            interactiveRating.heightAnchor.constraint(equalToConstant: interactiveRating.starSize),
             
             selectedImages.topAnchor.constraint(equalTo: interactiveRating.bottomAnchor, constant: 15),
             selectedImages.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15),
@@ -212,8 +179,9 @@ class NewLocationController: UIViewController {
         annotation.coordinate.getPlacemark { placemark in
             
             let state = placemark.administrativeArea ?? ""
+            let city = placemark.locality ?? ""
 
-            let newPicnic: Picnic = Picnic(name: name, userDescription: description, category: self.category.text!, state: state, coordinates: self.annotation.coordinate, isFeatured: false, isLiked: false, isFavorite: false, park: "none", imageNames: idList, rating: Float(self.interactiveRating.rating), ratingCount: 1)
+            let newPicnic: Picnic = Picnic(name: name, userDescription: description, category: self.category.text!, state: state, coordinates: self.annotation.coordinate, isFeatured: false, isLiked: false, isFavorite: false, park: "none", imageNames: idList, rating: Float(self.interactiveRating.rating), ratingCount: 1, city: city)
 
             // add to collection view datasource
             locations.append(newPicnic)
@@ -222,6 +190,7 @@ class NewLocationController: UIViewController {
             Shared.shared.databaseManager.store(picnic: newPicnic, images: self.images) {
                 self.navigationController?.popToRootViewController(animated: true)
             }
+            Shared.shared.user.ratePost(id: newPicnic.id)
         }
          
      }

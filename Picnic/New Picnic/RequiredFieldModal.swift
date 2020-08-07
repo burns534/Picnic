@@ -105,8 +105,9 @@ class RequiredFieldModal: UIViewController {
         ratingInstructions.isHidden = true
         view.addSubview(ratingInstructions)
         
-        rating = Rating(starSize: CGSize(width: 60, height: 60))
-        rating.isUserInteractionEnabled = true
+        rating = Rating(starSize: 60)
+        rating.mode = .interactable
+        rating.style = .grayFill
         rating.delegate = self
         rating.isHidden = true
         view.addSubview(rating)
@@ -148,7 +149,7 @@ class RequiredFieldModal: UIViewController {
             rating.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             rating.topAnchor.constraint(equalTo: ratingInstructions.bottomAnchor, constant: fieldTopMargin),
             rating.widthAnchor.constraint(equalToConstant: rating.width),
-            rating.heightAnchor.constraint(equalToConstant: rating.starSize.height),
+            rating.heightAnchor.constraint(equalToConstant: rating.starSize),
             
             nameInstructions.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             nameInstructions.topAnchor.constraint(equalTo: progressIndicator.bottomAnchor, constant: labelTopMargin),

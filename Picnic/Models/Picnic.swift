@@ -14,6 +14,7 @@ struct Picnic: Identifiable, Codable {
     var name: String
     var userDescription: String
     var category: String
+    var city: String
     var state: String
     var imageNames: [String]
     var rating: Float
@@ -28,7 +29,7 @@ struct Picnic: Identifiable, Codable {
     fileprivate var coordinates: Coordinates
     
     init() {
-        self.init(name: "loading", userDescription: "", category: "", state: "", coordinates: .init(latitude: 0, longitude: 0), isFeatured: false, isLiked: false, isFavorite: false, park: "", imageNames: ["loading"], rating: 5.0, ratingCount: 0, didVisit: 0, wouldVisit: 0)
+        self.init(name: "loading", userDescription: "", category: "", state: "", coordinates: .init(latitude: 0, longitude: 0), isFeatured: false, isLiked: false, isFavorite: false, park: "", imageNames: ["loading"], rating: 5.0, ratingCount: 0, city: "", didVisit: 0, wouldVisit: 0)
     }
     
     init(fromDictionary dict: [String: Any]) {
@@ -46,9 +47,10 @@ struct Picnic: Identifiable, Codable {
         park = ""
         wouldVisit = dict["wouldVisit"] as? Int ?? 0 // probably won't use this
         didVisit = dict["didVisit"] as? Int ?? 0
+        city = dict["city"] as? String ?? ""
     }
     
-    init(name: String, userDescription: String, category: String, state: String, coordinates: CLLocationCoordinate2D, isFeatured: Bool, isLiked: Bool, isFavorite: Bool, park: String, imageNames: [String], rating: Float, ratingCount: Int, didVisit: Int = 0, wouldVisit: Int = 0, id: String = UUID().uuidString) {
+    init(name: String, userDescription: String, category: String, state: String, coordinates: CLLocationCoordinate2D, isFeatured: Bool, isLiked: Bool, isFavorite: Bool, park: String, imageNames: [String], rating: Float, ratingCount: Int, city: String, didVisit: Int = 0, wouldVisit: Int = 0, id: String = UUID().uuidString) {
         self.name = name
         self.userDescription = userDescription
         self.category = category
@@ -61,6 +63,7 @@ struct Picnic: Identifiable, Codable {
         self.ratingCount = ratingCount
         self.didVisit = didVisit
         self.wouldVisit = wouldVisit
+        self.city = city
     }
 }
 

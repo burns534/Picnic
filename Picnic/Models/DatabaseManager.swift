@@ -128,7 +128,9 @@ final class DatabaseManager: NSObject {
             "longitude": picnic.location.longitude,
             "imageNames": picnic.imageNames,
             "rating": picnic.rating,
-            "hash": hash
+            "ratingCount": 1,
+            "hash": hash,
+            "city": picnic.city
             ]
         
         ref.child("Picnics").child(picnic.id).setValue(value, withCompletionBlock: { error, ref in
@@ -144,15 +146,15 @@ final class DatabaseManager: NSObject {
         let pRef = ref.child("Picnics").child(picnic.id)
         pRef.observeSingleEvent(of: .value) { snapshot in
             guard let data = snapshot.value as? [String: Any] else {
-                print("Error: DatabaseManager: updateRating: Could not retrieve value from \(picnic.id)")
+                print("Error: DatabaseManager: updateRating: 1: Could not retrieve value from \(picnic.id)")
                 return
             }
             guard let cRating = data["rating"] as? Float else {
-                print("Error: DatabaseManager: updateRating: Could not retrieve rating from \(picnic.id)")
+                print("Error: DatabaseManager: updateRating: 2: Could not retrieve rating from \(picnic.id)")
                 return
             }
             guard let cCount = data["ratingCount"] as? Int else {
-                print("Error: DatabaseManager: updateRating: Could not retrieve ratingCount from \(picnic.id)")
+                print("Error: DatabaseManager: updateRating: 3: Could not retrieve ratingCount from \(picnic.id)")
                 return
             }
             let inc = increment ? 1 : 0

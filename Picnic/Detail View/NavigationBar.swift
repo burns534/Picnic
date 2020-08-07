@@ -49,6 +49,7 @@ class NavigationBar: UIView {
         title = UILabel()
         title!.text = text
         title!.textAlignment = .center
+        title?.translatesAutoresizingMaskIntoConstraints = false
         addSubview(title!)
         
         NSLayoutConstraint.activate([

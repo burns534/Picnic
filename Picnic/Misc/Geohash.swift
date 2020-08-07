@@ -1,10 +1,6 @@
 //
 //  Geohash.swift
 //  Picnic
-//
-//  Created by Kyle Burns on 7/28/20.
-//  Copyright © 2020 Kyle Burns. All rights reserved.
-//
 
 import CoreLocation
 

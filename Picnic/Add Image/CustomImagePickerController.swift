@@ -72,7 +72,7 @@ class CustomImagePickerController: UICollectionViewController {
         
         let asset = fetchResult.object(at: 0)
         preview = UIImageView()
-        preview.contentMode = .scaleAspectFit
+        preview.contentMode = .scaleAspectFill
         view.addSubview(preview)
         PHImageManager.default().requestImage(for: asset, targetSize: CGSize(width: 800, height: 1200), contentMode: .aspectFit, options: nil) { image, _ in
             if image != nil {
@@ -101,10 +101,9 @@ class CustomImagePickerController: UICollectionViewController {
         view.addSubview(limitView)
         
         navigationBar = NavigationBar()
-        navigationBar.setLeftBarButton(title: "Cancel", target: self, action: #selector(cancelButtonHandler))
-        navigationBar.setLeftButtonPadding(amount: 10)
-        navigationBar.leftBarButton?.setTitleColor(.olive, for: .normal)
-        navigationBar.leftBarButton?.titleLabel?.font = UIFont.systemFont(ofSize: 25, weight: .light)
+        navigationBar.setTitle(text: "Select Photos")
+        navigationBar.title?.font = UIFont.systemFont(ofSize: 25)
+        navigationBar.title?.textColor = .olive
         navigationBar.setRightBarButton(title: "Confirm", target: self, action: #selector(confirmPhotos))
         navigationBar.rightBarButton?.setTitleColor(.olive, for: .normal)
         navigationBar.rightBarButton?.titleLabel?.font = UIFont.systemFont(ofSize: 25, weight: .light)
@@ -313,11 +312,6 @@ class CustomImagePickerController: UICollectionViewController {
         }
     }
 // MARK: Objective C Functions
-    
-    @objc func cancelButtonHandler(_ sender: UIButton) {
-//        navigationController?.popViewController(animated: true)
-        dismiss(animated: true)
-    }
     
     @objc func confirmPhotos(_ sender: UIButton) {
         if selectedImages.count == 0 {

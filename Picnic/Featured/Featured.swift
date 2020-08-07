@@ -11,7 +11,7 @@ import FirebaseDatabase
 
 private let reuseIdentifier = "Cell"
 
-let cellSize = CGSize(width: 400, height: 300)
+let kFeaturedCellSize = CGSize(width: 400, height: 260)
 
 class Featured: UICollectionViewController {
     

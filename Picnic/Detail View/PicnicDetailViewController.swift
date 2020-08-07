@@ -95,8 +95,7 @@ class PicnicDetailViewController: UIViewController {
         
         rating = Rating()
         rating.configure(picnic: picnic)
-        rating.isRatingCountHidden = false
-        rating.configureFloat()
+        rating.mode = .displayWithCount
         scrollView.addSubview(rating)
         
         liked = HeartButton()
@@ -111,8 +110,9 @@ class PicnicDetailViewController: UIViewController {
         name.font = UIFont.systemFont(ofSize: 40)
         view.addSubview(name)
         
-        tapToRate = Rating()
-        tapToRate.isUserInteractionEnabled = true
+        tapToRate = Rating(starSize: 50)
+        tapToRate.mode = .interactable
+        tapToRate.style = .grayFill
         tapToRate.configure(picnic: picnic)
         scrollView.addSubview(tapToRate)
         
@@ -126,10 +126,10 @@ class PicnicDetailViewController: UIViewController {
         view.addSubview(overviewLabel)
         
         overview = UITextView()
-        overview.layer.cornerRadius = 5
+//        overview.layer.cornerRadius = 5
         overview.isEditable = false
-        overview.backgroundColor = .darkWhite
         overview.text = picnic.userDescription
+        overview.font = UIFont.systemFont(ofSize: 20, weight: .thin)
         scrollView.addSubview(overview)
         
         view.subviews.forEach {$0.translatesAutoresizingMaskIntoConstraints = false}
@@ -172,7 +172,7 @@ class PicnicDetailViewController: UIViewController {
             tapToRate.topAnchor.constraint(equalTo: tapToRateLabel.bottomAnchor),
             tapToRate.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 15),
             tapToRate.widthAnchor.constraint(equalToConstant: tapToRate.width),
-            tapToRate.heightAnchor.constraint(equalToConstant: tapToRate.starSize.height),
+            tapToRate.heightAnchor.constraint(equalToConstant: tapToRate.starSize),
             
             map.topAnchor.constraint(equalTo: tapToRate.bottomAnchor, constant: 400),
             map.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 15),
@@ -191,7 +191,7 @@ class PicnicDetailViewController: UIViewController {
             
             rating.leadingAnchor.constraint(equalTo: preview.leadingAnchor, constant: 10),
             rating.widthAnchor.constraint(equalToConstant: rating.width),
-            rating.heightAnchor.constraint(equalToConstant: rating.starSize.height),
+            rating.heightAnchor.constraint(equalToConstant: rating.starSize),
             rating.bottomAnchor.constraint(equalTo: name.topAnchor)
         ])
     }
