@@ -118,7 +118,7 @@ class CustomImagePickerController: UICollectionViewController {
             navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             navigationBar.widthAnchor.constraint(equalTo: view.widthAnchor),
-            navigationBar.heightAnchor.constraint(equalToConstant: 40),
+            navigationBar.heightAnchor.constraint(equalToConstant: 60),
             
             preview.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
             preview.heightAnchor.constraint(equalToConstant: 400),
@@ -315,7 +315,8 @@ class CustomImagePickerController: UICollectionViewController {
 // MARK: Objective C Functions
     
     @objc func cancelButtonHandler(_ sender: UIButton) {
-        navigationController?.popViewController(animated: true)
+//        navigationController?.popViewController(animated: true)
+        dismiss(animated: true)
     }
     
     @objc func confirmPhotos(_ sender: UIButton) {
@@ -324,7 +325,8 @@ class CustomImagePickerController: UICollectionViewController {
             limitView.isHidden = false
             return
         }
-        navigationController?.popViewController(animated: true)
+//        navigationController?.popViewController(animated: true)
+        dismiss(animated: true)
         delegate?.refreshImageSource(images: Array(selectedImages.values))
     }
     

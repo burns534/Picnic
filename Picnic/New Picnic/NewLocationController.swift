@@ -27,31 +27,33 @@ class NewLocationController: UIViewController {
     var tapToRateLabel: UILabel!
     var interactiveRating: Rating!
     var selectedImages: MultipleSelectionIcon!
-    var imagePicker: CustomImagePickerController!
     var navigationBar: NavigationBar!
     var scrollView: UIScrollView!
     var lineView: UIView!
     var annotation: MKPointAnnotation!
+    var shortPresentationController: ShortPresentationController!
     
     weak var delegate: NewLocationControllerDelegate?
     
-    private let modalYOffset: CGFloat = 500
+    private let modalOffsetY: CGFloat = 500
 
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-        
-        let layout = CustomPickerFlowLayout(itemSize: imageSize, scrollDirection: .vertical, minimumLineSpacing: 1, sectionInset: .zero, minimumInteritemSpacing: 0)
-        imagePicker = CustomImagePickerController(collectionViewLayout: layout)
-        imagePicker.delegate = self
+    
         annotation = delegate?.requestAnnotation()
         configure()
-        
+// make this an instance variable
         let vc = RequiredFieldModal()
+        vc.modalOffsetY = modalOffsetY
         vc.delegate = self
         vc.transitioningDelegate = self
         vc.modalPresentationStyle = .custom
         navigationController?.present(vc, animated: true)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        navigationController?.setToolbarHidden(false, animated: true)
     }
     
 // MARK: Configure
@@ -78,7 +80,7 @@ class NewLocationController: UIViewController {
 // MARK: Name
         name = UITextField(frame: .zero)
         name.placeholder = "Enter name"
-        name.setPadding(.standard)
+//        name.setPadding(.standard)
         name.backgroundColor = .darkWhite
         name.layer.cornerRadius = kTextBoxCornerRadius
         name.delegate = self
@@ -88,7 +90,7 @@ class NewLocationController: UIViewController {
         userDescription = UITextField(frame: .zero)
         userDescription.placeholder = "Enter a brief description"
         userDescription.contentVerticalAlignment = .top
-        userDescription.setPadding(.standard)
+//        userDescription.setPadding(.standard)
         userDescription.delegate = self
         userDescription.backgroundColor = .darkWhite
         userDescription.layer.cornerRadius = kTextBoxCornerRadius
@@ -97,20 +99,20 @@ class NewLocationController: UIViewController {
 // MARK: Category
         category = UITextField(frame: .zero)
         category.placeholder = "tag"
-        category.setPadding(.standard)
+//        category.setPadding(.standard)
         category.backgroundColor = .darkWhite
         category.layer.cornerRadius = kTextBoxCornerRadius
         category.delegate = self
         view.addSubview(category)
 
 // MARK: Add Photos Button
-        let cameraButtonConfig = UIImage.SymbolConfiguration(pointSize: 35, weight: .light)
-        let cameraIcon = UIImage(systemName: "camera.fill", withConfiguration: cameraButtonConfig)?.withTintColor(.gray, renderingMode: .alwaysOriginal)
-        addImages = UIButton()
-        addImages.setImage(cameraIcon, for: .normal)
-        addImages.addTarget(self, action: #selector(presentImagePicker), for: .touchUpInside)
-        view.addSubview(addImages)
-        
+//        let cameraButtonConfig = UIImage.SymbolConfiguration(pointSize: 35, weight: .light)
+//        let cameraIcon = UIImage(systemName: "camera.fill", withConfiguration: cameraButtonConfig)?.withTintColor(.gray, renderingMode: .alwaysOriginal)
+//        addImages = UIButton()
+//        addImages.setImage(cameraIcon, for: .normal)
+//        addImages.addTarget(self, action: #selector(presentImagePicker), for: .touchUpInside)
+//        view.addSubview(addImages)
+//
 // MARK: tapToRateLabel
         tapToRateLabel = UILabel()
         tapToRateLabel.text = "Tap to rate"
@@ -125,6 +127,7 @@ class NewLocationController: UIViewController {
 // MARK: Selected Images
         
         selectedImages = MultipleSelectionIcon(image: images.first)
+        selectedImages.layer.setShadow(radius: 5, color: .darkGray , opacity: 0.6, offset: CGSize(width: 0, height: 5))
         selectedImages.layer.cornerRadius = 5
         view.addSubview(selectedImages)
         
@@ -180,9 +183,6 @@ class NewLocationController: UIViewController {
             category.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15),
             category.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor),
             category.heightAnchor.constraint(equalToConstant: 40),
-
-            addImages.topAnchor.constraint(equalTo: map.bottomAnchor, constant: 15),
-            addImages.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -15),
             
             tapToRateLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 18),
             tapToRateLabel.topAnchor.constraint(equalTo: category.bottomAnchor, constant: 15),
@@ -220,16 +220,11 @@ class NewLocationController: UIViewController {
 
             // store picnic data
             Shared.shared.databaseManager.store(picnic: newPicnic, images: self.images) {
-                self.navigationController?.popViewController(animated: true)
-                self.navigationController?.popViewController(animated: true)
+                self.navigationController?.popToRootViewController(animated: true)
             }
         }
          
      }
-     
-    @objc func presentImagePicker(_ sender: UIButton) {
-        navigationController?.pushViewController(imagePicker, animated: true)
-    }
     
     @objc func backButtonTap(_ sender: UIButton) {
         navigationController?.popViewController(animated: true)
@@ -265,17 +260,10 @@ extension NewLocationController: UITextFieldDelegate {
     }
 }
 
-extension NewLocationController: CustomImagePickerControllerDelegate {
-    func refreshImageSource(images: [UIImage]) {
-        self.images = images
-        selectedImages.update(image: images.first)
-        selectedImages.isMultipleSelection = images.count > 1 ? true : false
-    }
-}
-
 extension NewLocationController: UIViewControllerTransitioningDelegate {
     func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
-        ShortPresentationController(offsetY: modalYOffset, presentedViewController: presented, presenting: presenting)
+        shortPresentationController = ShortPresentationController(offsetY: modalOffsetY, presentedViewController: presented, presenting: presenting)
+        return shortPresentationController
     }
 }
 
@@ -290,6 +278,12 @@ extension NewLocationController: RequiredFieldModalDelegate {
     
     func update(description: String) {
         self.userDescription.text = description
+    }
+    
+    func update(images: [UIImage]) {
+        self.images = images
+        selectedImages.setImage(images.first, for: .normal)
+        selectedImages.isMultipleSelection = images.count > 1 ? true : false
     }
 }
 

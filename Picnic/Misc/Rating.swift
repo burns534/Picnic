@@ -10,6 +10,10 @@ import UIKit
 
 fileprivate let defaultStarSize: CGSize = CGSize(width: 20, height: 20)
 // will display rating and number of ratings with stars
+
+protocol RatingDelegate: AnyObject {
+    func ratingDidUpdate(rating: CGFloat)
+}
 class Rating: UIView {
 
     var stars = [StarButton]()
@@ -31,6 +35,9 @@ class Rating: UIView {
             }
         }
     }
+    
+    weak var delegate: RatingDelegate?
+    
 // MARK: For rating
     init(starSize: CGSize, spacing: CGFloat = 1, rating: CGFloat = 0) {
         self.starSize = starSize
@@ -87,9 +94,8 @@ class Rating: UIView {
     
     func setup() {
         isUserInteractionEnabled = false
-        
         for i in 0..<5 {
-            let starButton = StarButton(frame: .zero, starSize: self.starSize, color: .systemYellow)
+            let starButton = StarButton(starSize: self.starSize, color: .systemYellow)
             starButton.translatesAutoresizingMaskIntoConstraints = false
             starButton.addTarget(self, action: #selector(starPress), for: .touchUpInside)
             starButton.tag = i
@@ -105,7 +111,7 @@ class Rating: UIView {
         }
     }
     
-    func refresh() {
+    private func refresh() {
         for i in 0..<5 {
             if CGFloat(i) < rating {
                 stars[i].fillStar()
@@ -117,6 +123,7 @@ class Rating: UIView {
     
     func update(rating: CGFloat) {
         self.rating = rating
+        delegate?.ratingDidUpdate(rating: rating)
         for i in 0..<5 {
             if CGFloat(i) < rating {
                 stars[i].fillStar()
@@ -143,9 +150,8 @@ class Rating: UIView {
         }
     }
     
-// MARK: Obj-C functions
     @objc func starPress(_ sender: UIButton) {
-        rating = CGFloat(sender.tag + 1)
+        let rating = CGFloat(sender.tag + 1)
         update(rating: rating)
         
 // MARK: need to verify here if user has rated this picnic already
@@ -153,9 +159,9 @@ class Rating: UIView {
         Shared.shared.user.isRated(post: p.id) { value in
             print(p.id)
             if value {
-                Shared.shared.databaseManager.updateRating(picnic: p, rating: Float(self.rating), increment: false)
+                Shared.shared.databaseManager.updateRating(picnic: p, rating: Float(rating), increment: false)
             } else {
-                Shared.shared.databaseManager.updateRating(picnic: p, rating: Float(self.rating), increment: true) {
+                Shared.shared.databaseManager.updateRating(picnic: p, rating: Float(rating), increment: true) {
                     Shared.shared.user.ratePost(id: p.id) { err in
                         if let err = err {
                             print("Error: \(err.localizedDescription)")

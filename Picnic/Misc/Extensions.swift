@@ -34,31 +34,32 @@ extension UIImageView {
     }
 }
 
-extension UITextField {
-    
-    enum Padding {
-        case standard, extra, thin, none
-    }
-    
-    func setPadding(_ padding: UITextField.Padding) {
-        var amount: CGFloat
-        switch padding {
-        case .standard:
-            amount = 10
-        case .extra:
-            amount = 20
-        case .thin:
-            amount = 5
-        case .none:
-            amount = 0
-        }
-        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: amount, height: self.frame.size.height))
-        leftView = paddingView
-        leftViewMode = .always
-        rightView = paddingView
-        rightViewMode = .always
-    }
-}
+//extension UITextField {
+//
+//    enum Padding {
+//        case standard, extra, thin, none
+//    }
+//
+//    func setPadding(_ padding: UITextField.Padding) {
+//        var amount: CGFloat
+//        switch padding {
+//        case .standard:
+//            amount = 10
+//        case .extra:
+//            amount = 20
+//        case .thin:
+//            amount = 5
+//        case .none:
+//            amount = 0
+//        }
+//        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: amount, height: self.frame.size.height))
+//        leftView = paddingView
+//        leftViewMode = .always
+//        rightView = paddingView
+//        rightViewMode = .always
+//
+//    }
+//}
 
 extension CALayer {
     func setShadow(radius: CGFloat, color: UIColor, opacity: Float = 1.0, offset: CGSize = .zero) {

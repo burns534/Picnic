@@ -11,7 +11,7 @@ import UIKit
 class ProgressIndicator: UIView {
     
     public enum State {
-        case one, two, three, done, completed
+        case one, two, three, done
     }
     
     var barOne: UIView!
@@ -60,9 +60,6 @@ class ProgressIndicator: UIView {
         case .done:
             reset()
             circleDone.tintColor = .olive
-        default:
-            reset()
-            circleOne.tintColor = .olive
         }
     }
     
@@ -96,7 +93,7 @@ class ProgressIndicator: UIView {
         circleThree = UIImageView(image: imageThree)
         addSubview(circleThree)
         
-        let imageDone = UIImage(systemName: "checkmark.circle.fill", withConfiguration: config)?.withRenderingMode(.alwaysTemplate)
+        let imageDone = UIImage(systemName: "camera.circle.fill", withConfiguration: config)?.withRenderingMode(.alwaysTemplate)
         circleDone = UIImageView(image: imageDone)
         addSubview(circleDone)
         

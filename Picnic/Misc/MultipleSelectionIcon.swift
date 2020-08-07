@@ -32,17 +32,7 @@ class MultipleSelectionIcon: UIButton {
         fatalError("NSCoding not supported")
     }
     
-    func update(image: UIImage?) {
-        if let i = imageView {
-            i.image = image
-        } else {
-            setImage(image, for: .normal)
-        }
-    }
-    
     func setup() {
-        layer.cornerRadius = 5
-        layer.setShadow(radius: 5, color: .darkGray , opacity: 0.6, offset: CGSize(width: 0, height: 5))
         iconImageView = UIImageView(image: icon)
         iconImageView.translatesAutoresizingMaskIntoConstraints = false
         iconImageView.isHidden = true

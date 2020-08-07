@@ -49,8 +49,6 @@ class Featured: UICollectionViewController {
     func configure() {
         refresh()
         
-        navigationController?.setNavigationBarHidden(false, animated: true)
-        
         collectionView.backgroundColor = .white
         collectionView.alwaysBounceVertical = true
         collectionView.showsVerticalScrollIndicator = false

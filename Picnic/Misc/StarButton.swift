@@ -10,27 +10,36 @@ import UIKit
 
 class StarButton: UIButton {
 
-    var full: UIImageView
-    var empty: UIImageView
+    var full: UIImageView!
+    var empty: UIImageView!
     var starSize: CGSize
     
-    init(frame: CGRect, starSize: CGSize, color: UIColor) {
-        let config = UIImage.SymbolConfiguration(scale: .large)
-        let emptyStar = UIImage(systemName: "star", withConfiguration: config)!.withTintColor(color, renderingMode: .alwaysOriginal)
-        
-        let fullStar = UIImage(systemName: "star.fill", withConfiguration: config)!.withTintColor(color, renderingMode: .alwaysOriginal).withAlignmentRectInsets(.zero)
-        
-        self.empty = UIImageView(image: emptyStar)
-        empty.translatesAutoresizingMaskIntoConstraints = false
-        empty.contentMode = .scaleAspectFit
-        self.full = UIImageView(image: fullStar)
-        full.translatesAutoresizingMaskIntoConstraints = false
-        full.contentMode = .scaleAspectFit
+    init(starSize: CGSize, color: UIColor) {
         self.starSize = starSize
-        super.init(frame: frame)
+        super.init(frame: .zero)
+        setup(color: color)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("NSCoding not supported")
+    }
+    
+    func setup(color: UIColor) {
         
-        addSubview(full)
+        let config = UIImage.SymbolConfiguration(weight: .light)
+        let emptyStar = UIImage(systemName: "star", withConfiguration: config)?.withRenderingMode(.alwaysTemplate)
+        
+        let fullStar = UIImage(systemName: "star.fill", withConfiguration: config)?.withRenderingMode(.alwaysTemplate)
+        
+        empty = UIImageView(image: emptyStar)
         addSubview(empty)
+        full = UIImageView(image: fullStar)
+        addSubview(full)
+        
+        subviews.forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            $0.tintColor = color
+        }
         
         NSLayoutConstraint.activate([
             empty.centerXAnchor.constraint(equalTo: centerXAnchor),
@@ -45,16 +54,12 @@ class StarButton: UIButton {
         ])
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("NSCoding not supported")
-    }
-    
     func addMask(maskWidth: CGFloat) {
         self.full.isHidden = false
         self.empty.isHidden = false
         
         let maskLayer = CALayer()
-        maskLayer.frame = .init(x: 0, y: 0, width: maskWidth, height: starSize.height)
+        maskLayer.frame = CGRect(x: 0, y: 0, width: maskWidth, height: starSize.height)
         // black mask color is odd but necessary
         maskLayer.backgroundColor = UIColor.black.cgColor
         self.full.layer.mask = maskLayer
