@@ -9,66 +9,65 @@
 import Foundation
 import MapKit
 
-// working object
-struct Picnic: Identifiable, Codable {
-    var name: String
-    var userDescription: String
-    var category: String
-    var city: String
-    var state: String
-    var imageNames: [String]
-    var rating: Float
-    var ratingCount: Int
-    var id: String
-    var park: String!
-    var wouldVisit: Int
-    var didVisit: Int
-    var location: CLLocationCoordinate2D {
-        CLLocationCoordinate2D(latitude: coordinates.latitude, longitude: coordinates.longitude)
-    }
-    fileprivate var coordinates: Coordinates
-    
-    init() {
-        self.init(name: "loading", userDescription: "", category: "", state: "", coordinates: .init(latitude: 0, longitude: 0), isFeatured: false, isLiked: false, isFavorite: false, park: "", imageNames: ["loading"], rating: 5.0, ratingCount: 0, city: "", didVisit: 0, wouldVisit: 0)
-    }
-    
+enum PicnicTag: String, Codable {
+    case empty
+}
+
+// MARK: Probably ought to store its own images.... or in a manager class
+struct Picnic: Codable {
+    var uid: String = UUID().uuidString
+    var name: String = ""
+    var userDescription: String = ""
+    var tags: [PicnicTag] = []
+    var imageNames: [String] = ["loading"]
+    var rating: Float = 0.0
+    var ratingCount: Int = 0
+    var wouldVisit: Int = 0
+    var visitCount: Int = 0
+    var locationData: LocationData?
+
     init(fromDictionary dict: [String: Any]) {
         name = dict["name"] as? String ?? ""
         userDescription = dict["userDescription"] as? String ?? ""
-        category = dict["category"] as? String ?? ""
-        state = dict["state"] as? String ?? ""
+        tags = dict["tags"] as? [PicnicTag] ?? []
         imageNames = dict["imageNames"] as? [String] ?? ["loading"]
-        id = dict["key"] as? String ?? ""
+        uid = dict["key"] as? String ?? ""
         rating = (dict["rating"] as? NSNumber)?.floatValue ?? 0.0
         ratingCount = dict["ratingCount"] as? Int ?? 0
-        let safeLat = dict["latitude"] as? Double ?? 0.0
-        let safeLong = dict["longitude"] as? Double ?? 0.0
-        coordinates = Coordinates(latitude: safeLat, longitude: safeLong)
-        park = ""
         wouldVisit = dict["wouldVisit"] as? Int ?? 0 // probably won't use this
-        didVisit = dict["didVisit"] as? Int ?? 0
-        city = dict["city"] as? String ?? ""
+        visitCount = dict["didVisit"] as? Int ?? 0
+        let city = dict["city"] as? String
+        let state = dict["state"] as? String
+        let lat = dict["latitude"] as? Double ?? 0.0
+        let long = dict["longitude"] as? Double ?? 0.0
+        locationData = LocationData(latitude: lat, longitude: long, city: city, state: state)
     }
     
-    init(name: String, userDescription: String, category: String, state: String, coordinates: CLLocationCoordinate2D, isFeatured: Bool, isLiked: Bool, isFavorite: Bool, park: String, imageNames: [String], rating: Float, ratingCount: Int, city: String, didVisit: Int = 0, wouldVisit: Int = 0, id: String = UUID().uuidString) {
+    init(uid: String, name: String, userDescription: String, tags: [PicnicTag], imageNames: [String], rating: Float, didVisit: Bool, locationData: LocationData) {
+        self.uid = uid
         self.name = name
         self.userDescription = userDescription
-        self.category = category
-        self.state = state
-        self.coordinates = Coordinates(latitude: coordinates.latitude, longitude: coordinates.longitude)
-        self.id = id
-        self.park = park
+        self.tags = tags
         self.imageNames = imageNames
         self.rating = rating
-        self.ratingCount = ratingCount
-        self.didVisit = didVisit
-        self.wouldVisit = wouldVisit
-        self.city = city
+        ratingCount = 1
+        self.visitCount = didVisit ? 1 : 0
+        self.locationData = locationData
     }
+    
+    init() {}
 }
 
-
-struct Coordinates: Hashable, Codable {
-    var latitude: Double
-    var longitude: Double
+struct LocationData: Codable {
+    var latitude: Double = 0.0
+    var longitude: Double = 0.0
+    var city: String?
+    var state: String?
+    var park: String?
+    var location: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+    }
+    var hash: String {
+        location.geohash(precision: kDefaultPrecision)
+    }
 }

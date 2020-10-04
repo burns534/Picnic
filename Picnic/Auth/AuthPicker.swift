@@ -43,19 +43,15 @@ class AuthPicker: FUIAuthPickerViewController {
         let count = CGFloat(authUI.providers.count)
         
         NSLayoutConstraint.activate([
+            buttonView.topAnchor.constraint(equalTo: view.topAnchor, constant: 100),
             buttonView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            buttonView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             buttonView.heightAnchor.constraint(lessThanOrEqualToConstant: kSignInButtonVerticalMargin * (1 + count * kSignInButtonHeight)),
             buttonView.widthAnchor.constraint(equalToConstant: kSignInButtonWidth)
         ])
     }
     
-    override func viewDidLayoutSubviews() {
-        return
-    }
-    
     @objc func skipButtonHandler(_ sender: UIBarButtonItem) {
-        Shared.shared.user.isAnonymous = true
+        Shared.shared.userManager.login(uid: nil, isAnonymous: true)
         dismiss(animated: true)
     }
 }

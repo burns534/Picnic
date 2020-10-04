@@ -19,9 +19,10 @@ protocol NewLocationControllerDelegate: AnyObject {
 class NewLocationController: UIViewController {
     
     var map: MKMapView!
-    var name: UITextField!
-    var userDescription: UITextField!
-    var category: UITextField!
+    var name: PaddedTextField!
+//    var userDescription: PaddedTextView!
+    var userDescription: PaddedTextField!
+    var category: PaddedTextField!
     var images = [UIImage]()
     var addImages: UIButton!
     var interactiveRating: Rating!
@@ -72,28 +73,25 @@ class NewLocationController: UIViewController {
         view.addSubview(map)
         
 // MARK: Name
-        name = UITextField(frame: .zero)
+        name = PaddedTextField()
         name.placeholder = "Enter name"
-//        name.setPadding(.standard)
         name.backgroundColor = .darkWhite
         name.layer.cornerRadius = kTextBoxCornerRadius
         name.delegate = self
         view.addSubview(name)
         
 // MARK: User Description
-        userDescription = UITextField(frame: .zero)
-        userDescription.placeholder = "Enter a brief description"
-        userDescription.contentVerticalAlignment = .top
-//        userDescription.setPadding(.standard)
+//        userDescription = PaddedTextView()
+        userDescription = PaddedTextField()
+        userDescription.contentMode = .top
         userDescription.delegate = self
         userDescription.backgroundColor = .darkWhite
         userDescription.layer.cornerRadius = kTextBoxCornerRadius
         view.addSubview(userDescription)
         
 // MARK: Category
-        category = UITextField(frame: .zero)
+        category = PaddedTextField()
         category.placeholder = "tag"
-//        category.setPadding(.standard)
         category.backgroundColor = .darkWhite
         category.layer.cornerRadius = kTextBoxCornerRadius
         category.delegate = self
@@ -101,6 +99,7 @@ class NewLocationController: UIViewController {
         
 // MARK: Interactive Rating
         interactiveRating = Rating(starSize: 30)
+        interactiveRating.delegate = self
         interactiveRating.mode = .interactable
         view.addSubview(interactiveRating)
         
@@ -111,27 +110,19 @@ class NewLocationController: UIViewController {
         selectedImages.layer.cornerRadius = 5
         view.addSubview(selectedImages)
         
-        navigationBar = NavigationBar()
+        view.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+        
+        navigationBar = NavigationBar(frame: kNavigationBarFrame)
         navigationBar.backgroundColor = .white
-        let backConfig = UIImage.SymbolConfiguration(pointSize: 25, weight: .light)
-        let back = UIImage(systemName: "chevron.left", withConfiguration: backConfig)?.withTintColor(.olive, renderingMode: .alwaysOriginal)
-        navigationBar.setLeftBarButton(image: back, target: self, action: #selector(backButtonTap))
+        navigationBar.leftBarButton.addTarget(self, action: #selector(backButtonTap), for: .touchUpInside)
         navigationBar.setLeftButtonPadding(amount: 10)
-        navigationBar.setRightBarButton(title: "share", target: self, action: #selector(share))
-        navigationBar.rightBarButton?.setTitleColor(.olive, for: .normal)
-        navigationBar.rightBarButton?.titleLabel?.font = UIFont.systemFont(ofSize: 25, weight: .light)
+        navigationBar.rightBarButton.setTitle("Share", for: .normal)
+        navigationBar.rightBarButton.addTarget(self, action: #selector(share), for: .touchUpInside)
         navigationBar.setRightButtonPadding(amount: 10)
         view.addSubview(navigationBar)
         
-        view.subviews.forEach {$0.translatesAutoresizingMaskIntoConstraints = false}
-        
 // MARK: Constraints
         NSLayoutConstraint.activate([
-            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            navigationBar.widthAnchor.constraint(equalTo: view.widthAnchor),
-            navigationBar.heightAnchor.constraint(equalToConstant: 40),
-            
             map.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             map.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
             map.widthAnchor.constraint(equalTo: view.widthAnchor),
@@ -169,19 +160,22 @@ class NewLocationController: UIViewController {
 // MARK: Obj-C functions
     
     @objc func share(_ sender: UIButton) {
-        guard let name = name.text else { return }
-        guard let description = userDescription.text else { return }
-        if name == "" { return }
-        if description == "" { return }
+        guard let name = name.text,
+        let userDescription = userDescription.text,
+        name == "",
+        userDescription == ""
+        else { return }
 
         let idList = self.images.map {_ in UUID().uuidString }
         
         annotation.coordinate.getPlacemark { placemark in
             
-            let state = placemark.administrativeArea ?? ""
-            let city = placemark.locality ?? ""
+            let state = placemark.administrativeArea
+            let city = placemark.locality
 
-            let newPicnic: Picnic = Picnic(name: name, userDescription: description, category: self.category.text!, state: state, coordinates: self.annotation.coordinate, isFeatured: false, isLiked: false, isFavorite: false, park: "none", imageNames: idList, rating: Float(self.interactiveRating.rating), ratingCount: 1, city: city)
+// MARK: didVisit shouldn't be true by default
+            let locationData = LocationData(latitude: self.annotation.coordinate.latitude, longitude: self.annotation.coordinate.longitude, city: city, state: state, park: nil)
+            let newPicnic = Picnic(uid: UUID().uuidString, name: name, userDescription: userDescription, tags: [], imageNames: idList, rating: self.interactiveRating.rating, didVisit: true, locationData: locationData)
 
             // add to collection view datasource
             locations.append(newPicnic)
@@ -190,7 +184,7 @@ class NewLocationController: UIViewController {
             Shared.shared.databaseManager.store(picnic: newPicnic, images: self.images) {
                 self.navigationController?.popToRootViewController(animated: true)
             }
-            Shared.shared.user.ratePost(id: newPicnic.id)
+            Shared.shared.userManager.ratePost(picnic: newPicnic)
         }
          
      }
@@ -213,10 +207,6 @@ extension NewLocationController: UITextFieldDelegate {
         switch textField {
         case name:
             resignFirstResponder()
-            userDescription.becomeFirstResponder()
-            return true
-        case userDescription:
-            resignFirstResponder()
             category.becomeFirstResponder()
             return true
         case category:
@@ -227,6 +217,10 @@ extension NewLocationController: UITextFieldDelegate {
             return true
         }
     }
+}
+
+extension NewLocationController: UITextViewDelegate {
+    
 }
 
 extension NewLocationController: UIViewControllerTransitioningDelegate {
@@ -241,8 +235,8 @@ extension NewLocationController: RequiredFieldModalDelegate {
         self.name.text = name
     }
     
-    func update(rating: CGFloat) {
-        self.interactiveRating.update(rating: rating)
+    func update(rating: Float) {
+        self.interactiveRating.setRating(value: rating)
     }
     
     func update(description: String) {
@@ -256,3 +250,8 @@ extension NewLocationController: RequiredFieldModalDelegate {
     }
 }
 
+extension NewLocationController: RatingDelegate {
+    func updateRating(value: Float) {
+        interactiveRating.setRating(value: value)
+    }
+}

@@ -34,15 +34,12 @@ class Featured: UICollectionViewController {
         configure()
     }
     
-    func refresh(completion: @escaping ([Picnic]) -> () = {_ in}) {
-        guard let loc = Shared.shared.locationManager.location else {
-            print("Error: Featured: refresh: found nil for location")
-            return
-        }
-        Shared.shared.databaseManager.query(byLocation: loc, queryLimit: 5, precision: 3) { picnics in
+    func refresh(completion: @escaping () -> () = {}) {
+        guard let loc = Shared.shared.locationManager.location else { return }
+        Shared.shared.databaseManager.query(byLocation: loc, queryLimit: 20, precision: 3) { picnics in
             self.locations = picnics
             self.collectionView.reloadData()
-            completion(picnics)
+            completion()
         }
     }
     
@@ -62,7 +59,7 @@ class Featured: UICollectionViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus.square"), style: .plain, target: self, action: #selector(rightBarButton))
         navigationItem.rightBarButtonItem?.tintColor = .olive
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Filter", style: .plain, target: self, action: #selector(filterHandler))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "line.horizontal.3.decrease.circle"), style: .plain, target: self, action: #selector(filterHandler))
         navigationItem.leftBarButtonItem?.tintColor = .olive
         
         Shared.shared.authManager.delegate = self
@@ -71,9 +68,7 @@ class Featured: UICollectionViewController {
     
     
     @objc func pullDown(_ sender: Any) {
-        refresh { picnic in
-            self.refreshController.endRefreshing()
-        }
+        refresh { self.refreshController.endRefreshing() }
     }
     
     @objc func rightBarButton() {
@@ -110,11 +105,9 @@ class Featured: UICollectionViewController {
     // MARK: UICollectionViewDelegate
 
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? FeaturedCell else {
-            print("Error: Featured: didSelectItemAt: Could not cast")
-            return
-        }
-        navigationController?.pushViewController(PicnicDetailViewController(cell: cell), animated: true)
+        let detailView = DetailController()
+        detailView.configure(picnic: locations[indexPath.item])
+        navigationController?.pushViewController(detailView, animated: true)
     }
 
 }

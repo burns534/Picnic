@@ -64,28 +64,6 @@ class LocationSelector: UIViewController {
         map.addGestureRecognizer(tap)
         view.addSubview(map)
         
-// MARK: Navigation Bar
-        navigationBar = NavigationBar()
-        navigationBar.backgroundColor = .white
-        let config = UIImage.SymbolConfiguration(pointSize: 25, weight: .light)
-        let back = UIImage(systemName: "chevron.left", withConfiguration: config)?.withTintColor(.olive, renderingMode: .alwaysOriginal)
-        navigationBar.setLeftBarButton(image: back, target: self, action: #selector(backButtonTap))
-        navigationBar.setLeftButtonPadding(amount: 10)
-        
-        navigationBar.setRightBarButton(title: "next", target: self, action: #selector(nextButtonHandler))
-        navigationBar.rightBarButton?.titleLabel?.font = UIFont.systemFont(ofSize: 25, weight: .light)
-        navigationBar.rightBarButton?.setTitleColor(.olive, for: .normal)
-        navigationBar.setRightButtonPadding(amount: 10)
-        view.addSubview(navigationBar)
-        
-// MARK: Search Button
-        
-        searchButton = UIButton()
-        let image = UIImage(systemName: "magnifyingglass", withConfiguration: config)?.withTintColor(.olive, renderingMode: .alwaysOriginal)
-        searchButton.setImage(image, for: .normal)
-        searchButton.addTarget(self, action: #selector(searchButtonHandler), for: .touchUpInside)
-        view.addSubview(searchButton)
-        
         instructions = UILabel()
         instructions.text = "Select a loction"
         instructions.textColor = .white
@@ -93,19 +71,31 @@ class LocationSelector: UIViewController {
         instructions.backgroundColor = .clear
         view.addSubview(instructions)
         
-        view.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false}
+        view.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+        
+// MARK: Search Button
+        searchButton = UIButton()
+        let image = UIImage(systemName: "magnifyingglass", withConfiguration: UIImage.SymbolConfiguration(pointSize: 25, weight: .thin))?.withRenderingMode(.alwaysTemplate)
+        searchButton.setImage(image, for: .normal)
+        searchButton.tintColor = .olive
+        searchButton.addTarget(self, action: #selector(searchButtonHandler), for: .touchUpInside)
+        
+// MARK: Navigation Bar
+        navigationBar = NavigationBar(frame: kNavigationBarFrame)
+        navigationBar.backgroundColor = .white
+        navigationBar.leftBarButton.addTarget(self, action: #selector(backButtonTap), for: .touchUpInside)
+        navigationBar.setLeftButtonPadding(amount: 10)
+        
+        navigationBar.rightBarButton.setTitle("next", for: .normal)
+        navigationBar.rightBarButton.addTarget(self, action: #selector(nextButtonHandler), for: .touchUpInside)
+        navigationBar.rightBarButton.titleLabel?.font = UIFont.systemFont(ofSize: 25, weight: .light)
+        navigationBar.rightBarButton.setTitleColor(.olive, for: .normal)
+        navigationBar.setRightButtonPadding(amount: 10)
+        
+        navigationBar.setCenterView(view: searchButton)
+        view.addSubview(navigationBar)
 
         NSLayoutConstraint.activate([
-            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            navigationBar.widthAnchor.constraint(equalTo: view.widthAnchor),
-            navigationBar.heightAnchor.constraint(equalToConstant: 40),
-            
-            searchButton.centerXAnchor.constraint(equalTo: navigationBar.centerXAnchor),
-            searchButton.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor),
-            searchButton.widthAnchor.constraint(equalToConstant: 40),
-            searchButton.heightAnchor.constraint(equalTo: searchButton.widthAnchor, multiplier: 1.0),
-            
             map.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
             map.widthAnchor.constraint(equalTo: view.widthAnchor),
             map.heightAnchor.constraint(equalTo: view.heightAnchor),

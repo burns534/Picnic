@@ -34,13 +34,7 @@ class TabController: UITabBarController {
         }
         vc.isModalInPresentation = true
         
-        if let loginStatus = UserDefaults.standard.value(forKey: "isLoggedIn") as? Bool {
-            if loginStatus == false {
-                present(vc, animated: true)
-            } else {
-                return
-            }
-        } else {
+        if !UserDefaults.standard.bool(forKey: "isLoggedIn") {
             present(vc, animated: true)
         }
     }

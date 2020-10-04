@@ -13,10 +13,12 @@ final class Shared {
     static let shared = Shared()
     let databaseManager = DatabaseManager(storagePathURL: "gs://picnic-1c64f.appspot.com/images/")
     let locationManager = LocationManager()
-    let authManager = AuthManager()
-    let user = User()
+    let authManager: AuthManager
+    let userManager: UserManager
     
     private init() {
-        // nothing needed here
+        authManager = AuthManager()
+        userManager = UserManager()
     }
 }
+

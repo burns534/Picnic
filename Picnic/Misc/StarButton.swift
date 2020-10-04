@@ -27,12 +27,12 @@ class StarButton: UIButton {
         }
     }
 
-    private(set) var fullImage: UIImage? {
+    private var fullImage: UIImage? {
         didSet {
             full.image = fullImage
         }
     }
-    private(set) var emptyImage: UIImage? {
+    private var emptyImage: UIImage? {
         didSet {
             empty.image = emptyImage
         }

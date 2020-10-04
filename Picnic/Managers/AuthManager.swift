@@ -40,11 +40,9 @@ extension AuthManager: FUIAuthDelegate {
             return
         }
         if let data = authDataResult {
-            if data.additionalUserInfo?.isNewUser != nil {
-                Shared.shared.user.configureUser(uid: data.user.uid, isAnonymous: false)
-            }
+            Shared.shared.userManager.login(uid: data.user.uid, isAnonymous: data.user.isAnonymous)
         }
-        UserDefaults.standard.setValue(true, forKey: "isLoggedIn")
+        UserDefaults.standard.set(true, forKey: "isLoggedIn")
         delegate?.didSignIn()
     }
     
@@ -52,3 +50,4 @@ extension AuthManager: FUIAuthDelegate {
         return AuthPicker(authUI: authUI)
     }
 }
+

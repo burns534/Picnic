@@ -10,8 +10,15 @@ import UIKit
 
 // will display rating and number of ratings with stars
 protocol RatingDelegate: AnyObject {
-    func ratingDidUpdate(rating: CGFloat)
+    /**
+     Notifies delegate of attempted rating change by the user. Delegate is responsible for validating this change
+     - Parameters:
+        - rating: The attempted new rating
+     */
+    func updateRating(value: Float)
 }
+
+// MARK: This really needs to be rewritten to capture the touch with a gesture recognizer and calculate the rating based on the position in the view
 class Rating: UIView {
     
     enum Mode {
@@ -22,13 +29,13 @@ class Rating: UIView {
     
     var starSize: CGFloat = StarButton.defaultStarSize
     var spacing: CGFloat = 1
-    var rating: CGFloat = 0
+    var rating: Float { Float(cgRating) }
     var width: CGFloat {
         5 * starSize + 4 * spacing
     }
-    var picnic: Picnic!
     var ratingCountLabel: UILabel?
     var ratingCount: Int = 0
+    private var cgRating: CGFloat = 0
     var style: StarButton.Style = .yellowFrame {
         didSet {
             switch style {
@@ -78,49 +85,42 @@ class Rating: UIView {
     init(rating: CGFloat = 0, starSize: CGFloat = StarButton.defaultStarSize, spacing: CGFloat = 1) {
         self.starSize = starSize
         self.spacing = spacing
-        self.rating = rating
+        self.cgRating = rating
         super.init(frame: .zero)
         setup()
         refresh()
     }
     
-    init() {
-        super.init(frame: .zero)
-        setup()
-    }
+//    init() {
+//        super.init(frame: .zero)
+//        setup()
+//    }
     
     required init?(coder: NSCoder) {
         fatalError("NSCoding not supported")
     }
     
     func configure(picnic: Picnic) {
-        self.picnic = picnic
-        rating = CGFloat(picnic.rating)
+        cgRating = CGFloat(picnic.rating)
         ratingCount = picnic.ratingCount
         if mode != .interactable { refresh() }
     }
     
+// MARK: I don't like this
     private func configureRatingCount() {
-        guard let p = picnic else { return }
         if ratingCountLabel != nil {
-            var ratingString: String
-            if p.ratingCount > 1000 {
-                let reduced: Float = Float(p.ratingCount) / 1000.0
-                ratingString = String(format: "%.1fk", reduced)
-            } else {
-                ratingString = "\(p.ratingCount)"
-            }
+            let ratingString = ratingCount > 1000 ? String(format: "%.1fk", Float(ratingCount) / 1000.0) : String(ratingCount)
             ratingCountLabel!.text = "(" + ratingString + ")"
             return
         }
         
         ratingCountLabel = UILabel()
         var ratingString: String
-        if p.ratingCount > 1000 {
-            let reduced: Float = Float(p.ratingCount) / 1000.0
+        if ratingCount > 1000 {
+            let reduced: Float = Float(ratingCount) / 1000.0
             ratingString = String(format: "%.1fk", reduced)
         } else {
-            ratingString = "\(p.ratingCount)"
+            ratingString = "\(ratingCount)"
         }
         ratingCountLabel!.text = "(" + ratingString + ")"
         ratingCountLabel!.translatesAutoresizingMaskIntoConstraints = false
@@ -132,7 +132,7 @@ class Rating: UIView {
         ratingCountLabel!.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
     }
     
-    func setup() {
+    private func setup() {
         isUserInteractionEnabled = false
         for i in 0..<5 {
             let star = StarButton()
@@ -150,41 +150,26 @@ class Rating: UIView {
             stars.append(star)
         }
     }
-    
+// MARK: It's broken now
     private func refresh() {
-        print(rating)
-        stars[0..<Int(rating)].forEach { $0.fill() }
-        stars[Int(rating)..<stars.count].forEach { $0.reset() }
-        /* star symbol does not go edge to edge in the image. The image leaves a small amount on the left and right of the star. Additionally, the the very corners of the stars are imperceptible when applying a small mask. Accounting for these two things, approximately a translation of approximately 1/6 the image size is needed to create correct star behavior.*/
-        if floor(rating) != rating {
-            let mask = starSize * CGFloat(rating.truncatingRemainder(dividingBy: 1.0) * 0.62 + 0.15)
-            stars[Int(rating)].setMask(maskWidth: mask)
+        stars[0..<Int(cgRating)].forEach { $0.fill() }
+        stars[Int(cgRating)..<stars.count].forEach { $0.reset() }
+/* star symbol does not go edge to edge in the image. The image leaves a small amount on the left and right of the star. Additionally, the the very corners of the stars are imperceptible when applying a small mask. Accounting for these two things, approximately a translation of approximately 1/6 the image size is needed to create correct star behavior.
+*/
+        if floor(cgRating) != cgRating {
+            let mask = starSize * CGFloat(cgRating.truncatingRemainder(dividingBy: 1.0) * 0.62 + 0.15)
+            stars[Int(cgRating)].setMask(maskWidth: mask)
         }
     }
     
-    func update(rating: CGFloat) {
-        self.rating = rating
-        delegate?.ratingDidUpdate(rating: rating)
+    func setRating(value: Float, incrementRatingCount: Bool = false) {
+        cgRating = CGFloat(value)
         refresh()
+        if incrementRatingCount { ratingCount += 1 }
     }
 
     @objc func starPress(_ sender: StarButton) {
         let rating = Float(stars.firstIndex(of: sender)!) + 1
-        update(rating: CGFloat(rating))
-// MARK: need to verify here if user has rated this picnic already
-        guard let p = picnic else { return }
-        Shared.shared.user.isRated(post: p.id) { value in
-            if value {
-                Shared.shared.databaseManager.updateRating(picnic: p, rating: rating, increment: false)
-            } else {
-                Shared.shared.databaseManager.updateRating(picnic: p, rating: rating, increment: true) {
-                    Shared.shared.user.ratePost(id: p.id) { err in
-                        if let err = err {
-                            print("Error: \(err.localizedDescription)")
-                        }
-                    }
-                }
-            }
-        }
+        delegate?.updateRating(value: rating)
     }
 }

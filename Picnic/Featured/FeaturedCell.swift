@@ -8,7 +8,9 @@
 
 import UIKit
 
-fileprivate var imageViewSize: CGSize = CGSize(width: kFeaturedCellSize.width, height: 200)
+fileprivate let imageViewSize: CGSize = CGSize(width: kFeaturedCellSize.width, height: 200)
+fileprivate let kTitlePointSize: CGFloat = 25.0
+let kHeartFrame = CGRect(x: 0, y: 0, width: 50, height: 45)
 
 class FeaturedCell: UICollectionViewCell {
     
@@ -41,12 +43,12 @@ class FeaturedCell: UICollectionViewCell {
         // configure title
         title = UILabel(frame: frame)
         title.textColor = .white
-        title.font = UIFont.systemFont(ofSize: 25, weight: .semibold)
+        title.font = UIFont.systemFont(ofSize: kTitlePointSize, weight: .semibold)
         contentView.addSubview(title)
         
         rating = Rating()
         contentView.addSubview(rating)
-        like = HeartButton()
+        like = HeartButton(pointSize: 35)
         contentView.addSubview(like)
         
         location = UILabel()
@@ -72,8 +74,9 @@ class FeaturedCell: UICollectionViewCell {
     func configure(picnic: Picnic) {
         rating.configure(picnic: picnic)
         rating.mode = .displayWithCount
-        like.configure(id: picnic.id)
-        
+        like.setLiked(isLiked: Shared.shared.userManager.isSaved(picnic: picnic))
+// MARK: This was a quick fix and is bad
+        guard let place = picnic.locationData else { return }
 // MARK: change this to loading wheel
         Shared.shared.databaseManager.image(forPicnic: picnic) { image, error in
             if let error = error {
@@ -89,7 +92,8 @@ class FeaturedCell: UICollectionViewCell {
         setShadow(radius: 10, color: .darkGray, opacity: 0.6, offset: CGSize(width: 0, height: 5))
         self.picnic = picnic
         title.text = picnic.name
-        location.text = picnic.city + ", " + picnic.state
+// MARK: I don't really like this
+        location.text = (place.city ?? "") + ", " + (place.state ?? "")
         
 // MARK: Constraints
         NSLayoutConstraint.activate([
@@ -115,8 +119,8 @@ class FeaturedCell: UICollectionViewCell {
             
             like.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
             like.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -15),
-            like.widthAnchor.constraint(equalToConstant: 50),
-            like.heightAnchor.constraint(equalToConstant: 45),
+//            like.widthAnchor.constraint(equalToConstant: 50),
+//            like.heightAnchor.constraint(equalToConstant: 45),
             
             location.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -10),
             location.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
@@ -125,7 +129,7 @@ class FeaturedCell: UICollectionViewCell {
     }
     
     @objc func doubleTap(_ sender: UITapGestureRecognizer) {
-//        like.like()
+        
     }
 }
 

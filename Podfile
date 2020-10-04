@@ -9,7 +9,7 @@ target 'Picnic' do
   pod 'Firebase/Auth'
   pod 'Firebase/Analytics'
   pod 'Firebase/Storage'
-  pod 'Firebase/Database'
+  pod 'Firebase/'
   pod 'FirebaseUI'
   pod 'GoogleSignIn'
   

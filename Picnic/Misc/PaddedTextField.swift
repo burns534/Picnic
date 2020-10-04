@@ -10,14 +10,14 @@ import UIKit
 
 class PaddedTextField: UITextField {
 
-    enum Padding: CGFloat {
+    public enum Padding: CGFloat {
         case standard = 10
         case extra = 20
         case thin = 5
         case none = 0
     }
     
-    private var inset: Padding = .none
+    private var inset: Padding = .standard
     
     func setPadding(_ amount: Padding) {
         inset = amount
@@ -26,7 +26,7 @@ class PaddedTextField: UITextField {
     override func textRect(forBounds bounds: CGRect) -> CGRect {
         return bounds.insetBy(dx: inset.rawValue, dy: inset.rawValue)
     }
-    
+
     override func editingRect(forBounds bounds: CGRect) -> CGRect {
         return bounds.insetBy(dx: inset.rawValue, dy: inset.rawValue)
     }

@@ -9,6 +9,7 @@
 import MapKit
 
 fileprivate let kPreviewHeight: CGFloat = 300
+let kNavigationBarFrame: CGRect = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 40)
 
 class DetailController: UIViewController {
     
@@ -17,27 +18,17 @@ class DetailController: UIViewController {
     var scrollView: UIScrollView!
     var preview: UIImageView!
     var rating: Rating!
-    var name: UILabel!
-    var overviewLabel: UILabel!
+    var nameLabel: UILabel!
+    var aboutLabel: UILabel!
     var overview: UITextView!
     var tapToRateLabel: UILabel!
     var tapToRate: Rating!
     var liked: HeartButton!
     var navigationBar: NavigationBar!
-//    var presentingCell: FeaturedCell
-    
-//    init(cell: FeaturedCell) {
-//        self.picnic = cell.picnic
-//        presentingCell = cell
-//        super.init(nibName: nil, bundle: nil)
-//    }
-    
-//    required init?(coder: NSCoder) {
-//        fatalError("NSCoding not supported")
-//    }
+
 // MARK: What is this ????
     override var preferredStatusBarStyle: UIStatusBarStyle { style }
-    
+
     var style: UIStatusBarStyle = .default
 
     override func viewDidLoad() {
@@ -85,14 +76,6 @@ class DetailController: UIViewController {
         map.layer.setShadow(radius: 5, color: .darkGray, opacity: 0.6, offset: CGSize(width: 0, height: 5))
         scrollView.addSubview(map)
         
-        navigationBar = NavigationBar()
-        navigationBar.backgroundColor = .clear
-        let config = UIImage.SymbolConfiguration(pointSize: 35, weight: .light)
-        let back = UIImage(systemName: "chevron.left", withConfiguration: config)?.withTintColor(.white, renderingMode: .alwaysOriginal)
-        navigationBar.setLeftBarButton(image: back, target: self, action: #selector(backButtonTap))
-        navigationBar.setLeftButtonPadding(amount: 10)
-        view.addSubview(navigationBar)
-        
         rating = Rating()
         rating.configure(picnic: picnic)
         rating.mode = .displayWithCount
@@ -102,13 +85,13 @@ class DetailController: UIViewController {
         liked.setLiked(isLiked: Shared.shared.userManager.isSaved(picnic: picnic))
         scrollView.addSubview(liked)
         
-        name = UILabel()
-        name.minimumScaleFactor = 0.8
-        name.adjustsFontSizeToFitWidth = true
-        name.text = picnic.name
-        name.textColor = .white
-        name.font = UIFont.systemFont(ofSize: 40)
-        view.addSubview(name)
+        nameLabel = UILabel()
+        nameLabel.minimumScaleFactor = 0.8
+        nameLabel.adjustsFontSizeToFitWidth = true
+        nameLabel.text = picnic.name
+        nameLabel.textColor = .white
+        nameLabel.font = UIFont.systemFont(ofSize: 40)
+        view.addSubview(nameLabel)
         
         tapToRate = Rating(starSize: 50)
         tapToRate.delegate = self
@@ -121,10 +104,10 @@ class DetailController: UIViewController {
         tapToRateLabel.text = "Tap to rate"
         scrollView.addSubview(tapToRateLabel)
         
-        overviewLabel = UILabel()
-        overviewLabel.text = "About"
-        overviewLabel.font = UIFont.systemFont(ofSize: 35, weight: .heavy)
-        view.addSubview(overviewLabel)
+        aboutLabel = UILabel()
+        aboutLabel.text = "About"
+        aboutLabel.font = UIFont.systemFont(ofSize: 35, weight: .heavy)
+        view.addSubview(aboutLabel)
         
         overview = UITextView()
 //        overview.layer.cornerRadius = 5
@@ -135,6 +118,13 @@ class DetailController: UIViewController {
         
         view.subviews.forEach {$0.translatesAutoresizingMaskIntoConstraints = false}
         scrollView.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+
+        navigationBar = NavigationBar(frame: kNavigationBarFrame.offsetBy(dx: 0, dy: 44))
+        navigationBar.backgroundColor = .clear
+        navigationBar.setContentColor(.white)
+        navigationBar.leftBarButton.addTarget(self, action: #selector(backButtonTap), for: .touchUpInside)
+        navigationBar.setLeftButtonPadding(amount: 10)
+        view.addSubview(navigationBar)
     
         NSLayoutConstraint.activate([
             
@@ -143,22 +133,17 @@ class DetailController: UIViewController {
             scrollView.widthAnchor.constraint(equalTo: view.widthAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
-            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            navigationBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            navigationBar.heightAnchor.constraint(equalToConstant: 40),
-            
             preview.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             preview.topAnchor.constraint(equalTo: view.topAnchor),
             preview.widthAnchor.constraint(equalTo: view.widthAnchor),
             preview.heightAnchor.constraint(equalToConstant: kPreviewHeight),
             
-            overviewLabel.topAnchor.constraint(equalTo: preview.bottomAnchor, constant: 10),
-            overviewLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15),
-            overviewLabel.heightAnchor.constraint(equalToConstant: 40),
-            overviewLabel.widthAnchor.constraint(lessThanOrEqualTo: view.widthAnchor),
+            aboutLabel.topAnchor.constraint(equalTo: preview.bottomAnchor, constant: 10),
+            aboutLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15),
+            aboutLabel.heightAnchor.constraint(equalToConstant: 40),
+            aboutLabel.widthAnchor.constraint(lessThanOrEqualTo: view.widthAnchor),
             
-            overview.topAnchor.constraint(equalTo: overviewLabel.bottomAnchor, constant: 10),
+            overview.topAnchor.constraint(equalTo: aboutLabel.bottomAnchor, constant: 10),
             overview.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 15),
             overview.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -30),
             overview.heightAnchor.constraint(equalToConstant: 100)
@@ -181,19 +166,17 @@ class DetailController: UIViewController {
             map.heightAnchor.constraint(equalToConstant: 220),
             
             liked.trailingAnchor.constraint(equalTo: preview.trailingAnchor, constant: -10),
-            liked.bottomAnchor.constraint(equalTo: preview.bottomAnchor, constant: -10),
-//            liked.widthAnchor.constraint(equalToConstant: 50),
-//            liked.heightAnchor.constraint(equalToConstant: 45),
+            liked.topAnchor.constraint(equalTo: preview.topAnchor, constant: 10),
             
-            name.leadingAnchor.constraint(equalTo: preview.leadingAnchor, constant: 10),
-            name.bottomAnchor.constraint(equalTo: preview.bottomAnchor, constant: -10),
-            name.trailingAnchor.constraint(lessThanOrEqualTo: liked.leadingAnchor, constant: -5),
-            name.heightAnchor.constraint(lessThanOrEqualToConstant: 40),
+            nameLabel.leadingAnchor.constraint(equalTo: preview.leadingAnchor, constant: 10),
+            nameLabel.bottomAnchor.constraint(equalTo: preview.bottomAnchor, constant: -10),
+            nameLabel.trailingAnchor.constraint(lessThanOrEqualTo: liked.leadingAnchor, constant: -5),
+            nameLabel.heightAnchor.constraint(lessThanOrEqualToConstant: 40),
             
             rating.leadingAnchor.constraint(equalTo: preview.leadingAnchor, constant: 10),
             rating.widthAnchor.constraint(equalToConstant: rating.width),
             rating.heightAnchor.constraint(equalToConstant: rating.starSize),
-            rating.bottomAnchor.constraint(equalTo: name.topAnchor)
+            rating.bottomAnchor.constraint(equalTo: nameLabel.topAnchor)
         ])
     }
     
@@ -201,6 +184,7 @@ class DetailController: UIViewController {
         style = .lightContent
         setNeedsStatusBarAppearanceUpdate()
     }
+    
     
     override func viewWillDisappear(_ animated: Bool) {
         navigationController?.setNavigationBarHidden(false, animated: false)

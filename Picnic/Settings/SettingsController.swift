@@ -64,7 +64,7 @@ class SettingsController: UIViewController {
             print("Error: SettingsController: logout: Could not sign out user")
             return
         }
-        UserDefaults.standard.setValue(false, forKey: "isLoggedIn")
+        UserDefaults.standard.set(false, forKey: "isLoggedIn")
         tabBarController?.selectedIndex = 0
         let vc = authUI.authViewController()
         vc.isModalInPresentation = true

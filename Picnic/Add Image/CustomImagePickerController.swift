@@ -33,7 +33,7 @@ class CustomImagePickerController: UICollectionViewController {
     var menu: FloatingMenu!
     var counter: Int16 = 0
     var availableWidth: CGFloat = 0
-    let limitView = UILabel()
+    var limitView: UILabel!
     var navigationBar: NavigationBar!
     var imagePickerController: UIImagePickerController!
     
@@ -72,7 +72,7 @@ class CustomImagePickerController: UICollectionViewController {
         
         let asset = fetchResult.object(at: 0)
         preview = UIImageView()
-        preview.contentMode = .scaleAspectFill
+        preview.contentMode = .scaleAspectFit
         view.addSubview(preview)
         PHImageManager.default().requestImage(for: asset, targetSize: CGSize(width: 800, height: 1200), contentMode: .aspectFit, options: nil) { image, _ in
             if image != nil {
@@ -93,20 +93,22 @@ class CustomImagePickerController: UICollectionViewController {
         menu.clipsToBounds = true
         view.addSubview(menu)
         
-        limitView.backgroundColor = .white
+        limitView = UILabel()
+        limitView.backgroundColor = .darkWhite
         limitView.text = "There is a limit of 5 photos per picnic"
         limitView.textColor = .black
         limitView.textAlignment = .center
         limitView.isHidden = true
         view.addSubview(limitView)
         
-        navigationBar = NavigationBar()
+        navigationBar = NavigationBar(frame: kNavigationBarFrame)
         navigationBar.setTitle(text: "Select Photos")
         navigationBar.title?.font = UIFont.systemFont(ofSize: 25)
         navigationBar.title?.textColor = .olive
-        navigationBar.setRightBarButton(title: "Confirm", target: self, action: #selector(confirmPhotos))
-        navigationBar.rightBarButton?.setTitleColor(.olive, for: .normal)
-        navigationBar.rightBarButton?.titleLabel?.font = UIFont.systemFont(ofSize: 25, weight: .light)
+        navigationBar.rightBarButton.setTitle("Confirm", for: .normal)
+        navigationBar.rightBarButton.addTarget(self, action: #selector(confirm), for: .touchUpInside)
+        navigationBar.rightBarButton.setTitleColor(.olive, for: .normal)
+        navigationBar.rightBarButton.titleLabel?.font = UIFont.systemFont(ofSize: 25, weight: .light)
         navigationBar.setRightButtonPadding(amount: 10)
         view.addSubview(navigationBar)
         
@@ -114,7 +116,7 @@ class CustomImagePickerController: UICollectionViewController {
         
         NSLayoutConstraint.activate([
             
-            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            navigationBar.topAnchor.constraint(equalTo: view.topAnchor),
             navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             navigationBar.widthAnchor.constraint(equalTo: view.widthAnchor),
             navigationBar.heightAnchor.constraint(equalToConstant: 60),
@@ -126,18 +128,18 @@ class CustomImagePickerController: UICollectionViewController {
             
             collectionView.topAnchor.constraint(equalTo: preview.bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            collectionView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            collectionView.widthAnchor.constraint(equalTo: view.widthAnchor),
             
             menu.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
-            menu.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            menu.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             menu.widthAnchor.constraint(equalToConstant: 200),
             menu.heightAnchor.constraint(equalToConstant: 50),
             
             limitView.bottomAnchor.constraint(equalTo: preview.bottomAnchor),
-            limitView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            limitView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            limitView.heightAnchor.constraint(equalToConstant: 50)
+            limitView.centerXAnchor.constraint(equalTo: preview.centerXAnchor),
+            limitView.heightAnchor.constraint(equalToConstant: 50),
+            limitView.widthAnchor.constraint(equalTo: view.widthAnchor)
         ])
     }
 
@@ -266,7 +268,7 @@ class CustomImagePickerController: UICollectionViewController {
                     limitView.isHidden = true
                 }
                 selectedImages.removeValue(forKey: indexPath.item)
-                cell.toggleSelectionState()
+                cell.hasActiveSelection = false
             } else if selectedImages.count < 5 {
                 let options = PHImageRequestOptions()
                 options.isSynchronous = true
@@ -274,14 +276,13 @@ class CustomImagePickerController: UICollectionViewController {
                 PHImageManager.default().requestImage(for: asset, targetSize: CGSize(width: 800, height: 1200), contentMode: .aspectFit, options: options) { image, _ in
                     if image != nil {
                         self.selectedImages[indexPath.item] = image
-                        if self.selectedImages.count >= 5 {
-                            self.limitView.isHidden = false
-                        }
                     } else {
                         print("Error: CustomImagePickerController: didSelectItemAt: PHImageManager returned nil for image at cell \(indexPath.item)")
                     }
                 }
-                cell.toggleSelectionState()
+                cell.hasActiveSelection = true
+            } else {
+                limitView.isHidden = false
             }
 // case: is not current preview - only case that changes index path
         } else {
@@ -290,7 +291,7 @@ class CustomImagePickerController: UICollectionViewController {
                     limitView.isHidden = true
                 }
                 selectedImages.removeValue(forKey: indexPath.item)
-                cell.toggleSelectionState()
+                cell.hasActiveSelection = false
             } else if selectedImages.count < 5 {
                 let options = PHImageRequestOptions()
                 options.isSynchronous = true
@@ -299,27 +300,25 @@ class CustomImagePickerController: UICollectionViewController {
                     if let image = image {
                         self.preview.image = image
                         self.selectedImages[indexPath.item] = image
-                        if self.selectedImages.count > 5 {
-                            self.limitView.isHidden = false
-                        }
                     } else {
                         print("Error: CustomImagePickerController: didSelectItemAt: PHImageManager returned nil for image at cell \(indexPath.item)")
                     }
                 }
                 previousSelectedIndexPath = indexPath
-                cell.toggleSelectionState()
+                cell.hasActiveSelection = true
+            } else {
+                limitView.isHidden = false
             }
         }
     }
 // MARK: Objective C Functions
     
-    @objc func confirmPhotos(_ sender: UIButton) {
+    @objc func confirm(_ sender: UIButton) {
         if selectedImages.count == 0 {
             limitView.text = "No images selected"
             limitView.isHidden = false
             return
         }
-//        navigationController?.popViewController(animated: true)
         dismiss(animated: true)
         delegate?.refreshImageSource(images: Array(selectedImages.values))
     }

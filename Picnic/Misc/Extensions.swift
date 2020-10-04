@@ -6,7 +6,7 @@
 //  Copyright © 2020 Kyle Burns. All rights reserved.
 //
 
-import UIKit
+import MapKit
 
 extension UIImageView {
     func sizeForImageInImageViewAspectFit() -> CGSize
@@ -68,6 +68,7 @@ extension CALayer {
         shadowColor = color.cgColor
         shadowOffset = offset
         shadowOpacity = opacity
+        shadowPath = UIBezierPath(rect: bounds).cgPath
     }
     
     func prepareSublayersForShadow() {
@@ -90,6 +91,7 @@ extension UIView {
         layer.shadowColor = color.cgColor
         layer.shadowOffset = offset
         layer.shadowOpacity = opacity
+        layer.shadowPath = UIBezierPath(rect: bounds).cgPath
     }
 }
 // from paul hudson
@@ -159,4 +161,14 @@ extension UIColor {
     }
     self.init(red:red, green:green, blue:blue, alpha:alpha)
   }
+}
+
+extension MKCoordinateRegion {
+    var bounds: (minLat: Double, maxLat: Double, minLong: Double, maxLong: Double) {
+        let minLat = center.latitude - 0.5 * span.latitudeDelta
+        let maxLat = center.latitude + 0.5 * span.latitudeDelta
+        let minLong = center.longitude - 0.5 * span.longitudeDelta
+        let maxLong = center.longitude + 0.5 * span.longitudeDelta
+        return (minLat, maxLat, minLong, maxLong)
+    }
 }

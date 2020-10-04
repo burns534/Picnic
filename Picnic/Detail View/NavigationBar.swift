@@ -10,114 +10,58 @@ import UIKit
 
 class NavigationBar: UIView {
     
-    private(set) var leftBarButton: UIButton?
-    private(set) var rightBarButton: UIButton?
-    private(set) var centerView: UIView?
-    private(set) var title: UILabel?
+    let leftBarButton: UIButton
+    let rightBarButton: UIButton
+    var centerView: UIView?
+    var title: UILabel?
     
-    init() {
-        super.init(frame: .zero)
+    private let defaultLeftButtonImage: UIImage?
+    private let defaultRightButtonImage: UIImage?
+    
+    override init(frame: CGRect) {
+        leftBarButton = UIButton(frame: CGRect(x: 0, y: 0, width: frame.height, height: frame.height))
+        rightBarButton = UIButton(frame: CGRect(x: frame.width - frame.height, y: 0, width: frame.height, height: frame.height))
+        defaultLeftButtonImage = UIImage(systemName: "chevron.left", withConfiguration: UIImage.SymbolConfiguration(pointSize: frame.height, weight: .thin))?.withRenderingMode(.alwaysTemplate)
+        defaultRightButtonImage = UIImage(systemName: "chevron.right", withConfiguration: UIImage.SymbolConfiguration(pointSize: frame.height, weight: .thin))?.withRenderingMode(.alwaysTemplate)
+        leftBarButton.setImage(defaultLeftButtonImage, for: .normal)
+        rightBarButton.setImage(defaultRightButtonImage, for: .normal)
+        super.init(frame: frame)
+        addSubview(leftBarButton)
+        addSubview(rightBarButton)
     }
-
+    
     required init?(coder: NSCoder) {
-        fatalError("NSCoding not supported")
+        fatalError("init(coder:) has not been implemented")
     }
     
     func setRightButtonPadding(amount: CGFloat) {
-        rightBarButton?.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -amount).isActive = true
+        rightBarButton.frame = rightBarButton.frame.offsetBy(dx: -amount, dy: 0)
     }
     
     func setLeftButtonPadding(amount: CGFloat) {
-        leftBarButton?.leadingAnchor.constraint(equalTo: leadingAnchor, constant: amount).isActive = true
+        leftBarButton.frame = leftBarButton.frame.offsetBy(dx: amount, dy: 0)
     }
     
     func setCenterView(view: UIView) {
         centerView?.removeFromSuperview()
         title?.removeFromSuperview()
         centerView = view
+        centerView?.center = center
         addSubview(centerView!)
-        
-        NSLayoutConstraint.activate([
-            centerView!.centerYAnchor.constraint(equalTo: centerYAnchor),
-            centerView!.centerXAnchor.constraint(equalTo: centerXAnchor)
-        ])
     }
     
     func setTitle(text: String) {
         title?.removeFromSuperview()
         centerView?.removeFromSuperview()
         title = UILabel()
-        title!.text = text
-        title!.textAlignment = .center
-        title?.translatesAutoresizingMaskIntoConstraints = false
+        title?.text = text
+        title?.textAlignment = .center
+        title?.center = center
         addSubview(title!)
-        
-        NSLayoutConstraint.activate([
-            title!.centerYAnchor.constraint(equalTo: centerYAnchor),
-            title!.centerXAnchor.constraint(equalTo: centerXAnchor)
-        ])
-    }
-
-    func setLeftBarButton(image: UIImage?, target: Any?, action: Selector) {
-        leftBarButton?.removeFromSuperview()
-        leftBarButton = UIButton()
-        leftBarButton!.translatesAutoresizingMaskIntoConstraints = false
-        leftBarButton!.setImage(image, for: .normal)
-        leftBarButton!.addTarget(target, action: action, for: .touchUpInside)
-        addSubview(leftBarButton!)
-        NSLayoutConstraint.activate([
-            leftBarButton!.centerYAnchor.constraint(equalTo: centerYAnchor),
-            leftBarButton!.trailingAnchor.constraint(lessThanOrEqualTo: centerXAnchor),
-            leftBarButton!.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor),
-            leftBarButton!.heightAnchor.constraint(lessThanOrEqualTo: heightAnchor)
-        ])
     }
     
-    func setLeftBarButton(title: String, target: Any?, action: Selector) {
-        leftBarButton?.removeFromSuperview()
-        leftBarButton = UIButton()
-        leftBarButton!.translatesAutoresizingMaskIntoConstraints = false
-        leftBarButton!.setTitle(title, for: .normal)
-        leftBarButton!.addTarget(target, action: action, for: .touchUpInside)
-        addSubview(leftBarButton!)
-        NSLayoutConstraint.activate([
-            leftBarButton!.centerYAnchor.constraint(equalTo: centerYAnchor),
-            leftBarButton!.trailingAnchor.constraint(lessThanOrEqualTo: centerXAnchor),
-            leftBarButton!.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor),
-            leftBarButton!.heightAnchor.constraint(lessThanOrEqualTo: heightAnchor)
-        ])
-
-    }
-    
-    func setRightBarButton(image: UIImage?, target: Any?, action: Selector) {
-        rightBarButton?.removeFromSuperview()
-        rightBarButton = UIButton()
-        rightBarButton!.translatesAutoresizingMaskIntoConstraints = false
-        rightBarButton!.setImage(image, for: .normal)
-        rightBarButton!.addTarget(target, action: action, for: .touchUpInside)
-        addSubview(rightBarButton!)
-        NSLayoutConstraint.activate([
-            rightBarButton!.centerYAnchor.constraint(equalTo: centerYAnchor),
-            rightBarButton!.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor),
-            rightBarButton!.leadingAnchor.constraint(greaterThanOrEqualTo: centerXAnchor),
-            rightBarButton!.heightAnchor.constraint(lessThanOrEqualTo: heightAnchor)
-        ])
-
-    }
-    
-    func setRightBarButton(title: String, target: Any?, action: Selector) {
-        rightBarButton?.removeFromSuperview()
-        rightBarButton = UIButton()
-        rightBarButton!.translatesAutoresizingMaskIntoConstraints = false
-        rightBarButton!.setTitle(title, for: .normal)
-        rightBarButton!.addTarget(target, action: action, for: .touchUpInside)
-        addSubview(rightBarButton!)
-        NSLayoutConstraint.activate([
-            rightBarButton!.centerYAnchor.constraint(equalTo: centerYAnchor),
-            rightBarButton!.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor),
-            rightBarButton!.leadingAnchor.constraint(greaterThanOrEqualTo: centerXAnchor),
-            rightBarButton!.heightAnchor.constraint(lessThanOrEqualTo: heightAnchor)
-        ])
+    func setContentColor(_ color: UIColor) {
+        subviews.forEach { $0.tintColor = color }
     }
 }
 

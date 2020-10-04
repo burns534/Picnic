@@ -15,7 +15,7 @@ fileprivate let labelTopMargin: CGFloat = 30
 fileprivate let fieldTopMargin: CGFloat = 30
 
 protocol RequiredFieldModalDelegate: AnyObject {
-    func update(rating: CGFloat)
+    func update(rating: Float)
     func update(name: String)
     func update(description: String)
     func update(images: [UIImage])
@@ -88,7 +88,6 @@ class RequiredFieldModal: UIViewController {
         view.addSubview(descriptionInstructions)
         
         userDescription = PaddedTextField()
-        userDescription.setPadding(.standard)
         userDescription.backgroundColor = .darkWhite
         userDescription.layer.cornerRadius = 10
         userDescription.contentVerticalAlignment = .top
@@ -106,6 +105,7 @@ class RequiredFieldModal: UIViewController {
         view.addSubview(ratingInstructions)
         
         rating = Rating(starSize: 60)
+        rating.delegate = self
         rating.mode = .interactable
         rating.style = .grayFill
         rating.delegate = self
@@ -119,7 +119,6 @@ class RequiredFieldModal: UIViewController {
         view.addSubview(nameInstructions)
         
         nameField = PaddedTextField()
-        nameField.setPadding(.standard)
         nameField.backgroundColor = .darkWhite
         nameField.layer.cornerRadius = 10
         nameField.textAlignment = .center
@@ -219,12 +218,12 @@ class RequiredFieldModal: UIViewController {
         present(imagePicker, animated: true)
     }
     
-    func updateState() {
+    @objc func confirm(_ sender: UIButton) {
         switch state {
         case .one:
-            if nameField.text! == "" { print("it's empty"); return } // present warning
+            guard let text = nameField.text else { return }
             state = .two
-            delegate?.update(name: nameField.text!)
+            delegate?.update(name: text)
             nameField.isHidden = true
             nameInstructions.isHidden = true
             view.sendSubviewToBack(nameField)
@@ -245,8 +244,9 @@ class RequiredFieldModal: UIViewController {
             userDescription.isHidden = false
             descriptionInstructions.isHidden = false
         case .three:
+            guard let text = userDescription.text else { return }
             state = .done
-            delegate?.update(description: userDescription.text!)
+            delegate?.update(description: text)
             confirmButton.titleLabel?.text = "Confirm"
             userDescription.isHidden = true
             descriptionInstructions.isHidden = true
@@ -270,10 +270,6 @@ class RequiredFieldModal: UIViewController {
         }
         progressIndicator.updateState(state: state)
     }
-    
-    @objc func confirm(_ sender: UIButton) {
-        updateState()
-    }
 }
 
 extension RequiredFieldModal: UITextFieldDelegate {
@@ -285,8 +281,10 @@ extension RequiredFieldModal: UITextFieldDelegate {
 }
 
 extension RequiredFieldModal: RatingDelegate {
-    func ratingDidUpdate(rating: CGFloat) {
+// MARK: look into the description for this function. needs to handle updating
+    func updateRating(value: Float) {
         confirmButton.backgroundColor = .olive
+        rating.setRating(value: value)
     }
 }
 

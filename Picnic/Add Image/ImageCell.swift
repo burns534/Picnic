@@ -13,7 +13,20 @@ class ImageCell: UICollectionViewCell {
     var imageView: UIImageView!
     var representedAssetIdentifier: String!
     var selectionImage: UIImageView!
-    var hasActiveSelection: Bool = false
+    var hasActiveSelection: Bool = false {
+        didSet {
+            if hasActiveSelection {
+                selectionImage.image = circleFill
+                selectionImage.tintColor = .lightBlue
+            } else {
+                selectionImage.image = circle
+                selectionImage.tintColor = .lightGray
+            }
+        }
+    }
+    
+    let circle = UIImage(systemName: "circle")!.withRenderingMode(.alwaysTemplate)
+    let circleFill = UIImage(systemName: "largecircle.fill.circle")?.withRenderingMode(.alwaysTemplate)
     
     private let toggleColor: UIColor = .systemBlue
     
@@ -36,11 +49,11 @@ class ImageCell: UICollectionViewCell {
         imageView.clipsToBounds = true
         contentView.addSubview(imageView)
         
-        let circle = UIImage(systemName: "circle")!.withTintColor(.lightGray, renderingMode: .alwaysOriginal)
         selectionImage = UIImageView(image: circle)
         selectionImage.translatesAutoresizingMaskIntoConstraints = false
         selectionImage.backgroundColor = .clear
         selectionImage.contentMode = .scaleAspectFit
+        selectionImage.tintColor = .lightGray
         contentView.addSubview(selectionImage)
     }
     
@@ -61,17 +74,6 @@ class ImageCell: UICollectionViewCell {
             selectionImage.widthAnchor.constraint(equalToConstant: 20),
             selectionImage.heightAnchor.constraint(equalToConstant: 20)
         ])
-    }
-    
-    func toggleSelectionState() {
-        hasActiveSelection.toggle()
-        if hasActiveSelection {
-            let largeCircleFillCircle = UIImage(systemName: "largecircle.fill.circle")?.withTintColor(.lime, renderingMode: .alwaysOriginal)
-            selectionImage.image = largeCircleFillCircle
-        } else {
-            let circle = UIImage(systemName: "circle")?.withTintColor(.lightGray, renderingMode: .alwaysOriginal)
-            selectionImage.image = circle
-        }
     }
     
     override func prepareForReuse() {

@@ -118,8 +118,8 @@ class ProgressIndicator: UIView {
         NSLayoutConstraint.activate([
             circleOne.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor),
             circleOne.trailingAnchor.constraint(equalTo: barOne.leadingAnchor),
-            barOne.trailingAnchor.constraint(equalTo: circleTwo.leadingAnchor, constant: spacing),
-            circleTwo.trailingAnchor.constraint(equalTo: barTwo.leadingAnchor, constant: spacing),
+            barOne.trailingAnchor.constraint(equalTo: circleTwo.leadingAnchor, constant: -spacing),
+            circleTwo.trailingAnchor.constraint(equalTo: barTwo.leadingAnchor, constant: -spacing),
             barTwo.centerXAnchor.constraint(equalTo: centerXAnchor),
             circleThree.leadingAnchor.constraint(equalTo: barTwo.trailingAnchor, constant: spacing),
             barThree.leadingAnchor.constraint(equalTo: circleThree.trailingAnchor, constant: spacing),

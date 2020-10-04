@@ -2,74 +2,38 @@
 //  User.swift
 //  Picnic
 //
-//  Created by Kyle Burns on 7/30/20.
+//  Created by Kyle Burns on 10/3/20.
 //  Copyright © 2020 Kyle Burns. All rights reserved.
 //
 
 import Foundation
-import FirebaseDatabase
-
-final class User: NSObject {
+struct User: Decodable {
     
-    private let database = Database.database().reference()
-    private var ref: DatabaseReference!
-    
-// MARK: User Data
-    var uid: String! {
-        didSet {
-            UserDefaults.standard.setValue(uid, forKey: "uid")
-        }
-    }
-    var isAnonymous: Bool!
-    
-    override init() {
-        if let id = UserDefaults.standard.value(forKey: "uid") as? String {
-            uid = id
-            ref = database.child("Users").child(uid)
-        }
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        uid = try container.decode(String.self, forKey: .uid)
+        isAnonymous = try container.decode(Bool.self, forKey: .isAnonymous)
     }
     
-    func configureUser(uid: String, isAnonymous: Bool) {
+    init(uid: String?, isAnonymous: Bool) {
         self.uid = uid
         self.isAnonymous = isAnonymous
-        ref = database.child("Users").child(uid)
     }
     
-    func likePost(id: String, value: Bool, completion: @escaping (Error?) -> () = {_ in}) {
-        guard let _ = ref else { return }
-        ref.child("likedPosts").updateChildValues([id: value]) { error, _ in
-            completion(error)
-        }
+    var uid: String?
+    var isAnonymous: Bool
+    var rated: [String] = []
+    var saved: [String] = []
+
+    enum CodingKeys: String, CodingKey {
+        case uid, isAnonymous
     }
-    
-    func isLiked(post id: String, completion: @escaping (Bool) -> ()) {
-        guard let _ = ref else { return }
-        ref.child("likedPosts").child(id).observeSingleEvent(of: .value) { snapshot in
-            if let liked = snapshot.value as? Bool {
-                completion(liked)
-            } else {
-                completion(false)
-            }
-        }
+}
+
+extension User: Encodable {
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(uid, forKey: .uid)
+        try container.encode(isAnonymous, forKey: .isAnonymous)
     }
-    
-    func ratePost(id: String, completion: @escaping (Error?) -> () = {_ in}) {
-        guard let _ = ref else { return }
-        ref.child("ratedPosts").updateChildValues([id: true]) { error, _ in
-            completion(error)
-        }
-    }
-    
-    func isRated(post id: String, completion: @escaping (Bool) -> ()) {
-        guard let _ = ref else { return }
-        ref.child("ratedPosts").child(id).observeSingleEvent(of: .value) { snapshot in
-            if let rated = snapshot.value as? Bool {
-                completion(rated)
-            } else {
-                completion(false)
-            }
-        }
-    }
-    
-    
 }

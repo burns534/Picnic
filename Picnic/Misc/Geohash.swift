@@ -27,12 +27,16 @@ public struct Region {
 
 extension Region {
 
-    public var center: (latitude: Double, longitude: Double) {
-        return (height.mean, width.mean)
+    public var center: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(latitude: height.mean, longitude: width.mean)
     }
-
+    
     public var size: (width: Double, height: Double) {
         return (width.distance, height.distance)
+    }
+    
+    public init(location: CLLocationCoordinate2D, precision: Int) {
+        self.init(latitude: location.latitude, longitude: location.longitude, precision: precision)
     }
 
     public init(latitude: Double, longitude: Double, precision: Int) {
@@ -77,7 +81,6 @@ extension Region {
         let width = Span(min: lng.min, max: lng.min)
 
         self = Region(width: width, height: height, hash: String(hash))
-
     }
 
     public init?(hash: String) {
@@ -193,3 +196,130 @@ extension Region {
         }
     }
 }
+
+public let kDefaultPrecision = 9
+
+public enum Precision: Int {
+
+    /// ±2500 km
+    case twentyFiveHundredKilometers = 1
+
+    /// ±630 km
+    case sixHundredThirtyKilometers = 2
+
+    /// ±78 km
+    case seventyEightKilometers = 3
+
+    /// ±20 km
+    case twentyKilometers = 4
+
+    /// ±2.4 km, ±2400 m
+    case twentyFourHundredMeters = 5
+
+    /// ±0.61 km, ±610 m
+    case sixHundredTenMeters = 6
+
+    /// ±0.076 km, ±76 m
+    case seventySixMeters = 7
+
+    /// ±0.019 km, ±19 m
+    case nineteenMeters = 8
+
+    /// ±0.0024 km, ±2.4 m, ±240 cm
+    case twoHundredFortyCentimeters = 9
+
+    /// ±0.00060 km, ±0.6 m, ±60 cm
+    case sixtyCentimeters = 10
+
+    /// ±0.000074 km, ±0.07 m, ±7.4 cm, ±74 mm
+    case seventyFourMillimeters = 11
+
+    var margin: Double {
+        switch self {
+        case .twentyFiveHundredKilometers: return 2_500_000.0
+        case .sixHundredThirtyKilometers: return 610_000.0
+        case .seventyEightKilometers: return 78_000.0
+        case .twentyKilometers: return 20_000.0
+        case .twentyFourHundredMeters: return 2_400.0
+        case .sixHundredTenMeters: return 610.0
+        case .seventySixMeters: return 76.0
+        case .nineteenMeters: return 19.0
+        case .twoHundredFortyCentimeters: return 2.4
+        case .sixtyCentimeters: return 0.6
+        case .seventyFourMillimeters: return 0.07
+        }
+    }
+}
+
+#if os(OSX) || os(iOS)
+
+    import CoreLocation
+
+    extension Region {
+
+        init(coordinate: CLLocationCoordinate2D, precision: Int = kDefaultPrecision) {
+            self = Region(latitude: coordinate.latitude, longitude: coordinate.longitude, precision: precision)
+        }
+
+        init(location: CLLocation, precision: Int = kDefaultPrecision) {
+            self = Region(coordinate: location.coordinate, precision: precision)
+        }
+
+    }
+
+    extension CLLocationCoordinate2D {
+
+        public init(geohash: String) {
+            guard let region = Region(hash: geohash) else {
+                self = kCLLocationCoordinate2DInvalid
+                return
+            }
+            self = region.center
+        }
+
+        public func geohash(precision: Int = kDefaultPrecision) -> String {
+            Region(coordinate: self, precision: precision).hash
+        }
+
+        public func geohash(precision: Precision) -> String {
+            Region(coordinate: self, precision: precision.rawValue).hash
+        }
+        
+        /// Geohash neighbors
+        public func neighbors(precision: Int = kDefaultPrecision) -> [String] {
+            Region(coordinate: self, precision: precision).neighbors().map { $0.hash }
+        }
+        
+        public func neighbors(precision: Precision) -> [String] {
+            neighbors(precision: precision.rawValue)
+        }
+
+    }
+
+    extension CLLocation {
+
+        public convenience init?(geohash: String) {
+            guard let region = Region.init(hash: geohash) else { return nil }
+            self.init(latitude: region.center.latitude, longitude: region.center.longitude)
+        }
+
+        public func geohash(precision: Int = kDefaultPrecision) -> String {
+            return Region(coordinate: self.coordinate, precision: precision).hash
+        }
+
+        public func geohash(precision: Precision) -> String {
+            return geohash(precision: precision.rawValue)
+        }
+
+        /// Geohash neighbors
+        public func neighbors(precision: Int = kDefaultPrecision) -> [String] {
+            return Region.init(location: self, precision: precision).neighbors().map { $0.hash }
+        }
+
+        public func neighbors(precision: Precision) -> [String] {
+            return neighbors(precision: precision.rawValue)
+        }
+
+    }
+
+#endif
