@@ -20,7 +20,7 @@ protocol RequiredFieldModalDelegate: AnyObject {
     func update(description: String)
     func update(images: [UIImage])
 }
-
+@available(iOS 14, *)
 class RequiredFieldModal: UIViewController {
     
     var nameInstructions: UILabel!
@@ -32,7 +32,7 @@ class RequiredFieldModal: UIViewController {
     var imageLabel: UILabel!
     var imageSelection: MultipleSelectionIcon!
     var progressIndicator: ProgressIndicator!
-    var imagePicker: CustomImagePickerController!
+    var imagePicker: ImagePicker!
     var confirmButton: UIButton!
     var modalOffsetY: CGFloat?
     
@@ -51,8 +51,7 @@ class RequiredFieldModal: UIViewController {
         view.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
         view.setShadow(radius: 5, color: .darkGray, opacity: 0.6, offset: .zero)
         
-        let layout = CustomPickerFlowLayout(itemSize: imageSize, scrollDirection: .vertical, minimumLineSpacing: 1, sectionInset: .zero, minimumInteritemSpacing: 0)
-        imagePicker = CustomImagePickerController(collectionViewLayout: layout)
+        imagePicker = ImagePicker()
         imagePicker.delegate = self
         
         progressIndicator = ProgressIndicator()
@@ -213,7 +212,7 @@ class RequiredFieldModal: UIViewController {
                 confirmButton.backgroundColor = .lightGray
         }
     }
-    
+// MARK: This needs to handle denied photo library access
     @objc func presentImagePicker(_ sender: UIButton) {
         present(imagePicker, animated: true)
     }
@@ -272,6 +271,7 @@ class RequiredFieldModal: UIViewController {
     }
 }
 
+@available(iOS 14, *)
 extension RequiredFieldModal: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         resignFirstResponder()
@@ -280,6 +280,7 @@ extension RequiredFieldModal: UITextFieldDelegate {
     }
 }
 
+@available(iOS 14, *)
 extension RequiredFieldModal: RatingDelegate {
 // MARK: look into the description for this function. needs to handle updating
     func updateRating(value: Float) {
@@ -288,7 +289,8 @@ extension RequiredFieldModal: RatingDelegate {
     }
 }
 
-extension RequiredFieldModal: CustomImagePickerControllerDelegate {
+@available(iOS 14, *)
+extension RequiredFieldModal: ImagePickerDelegate {
     func refreshImageSource(images: [UIImage]) {
         delegate?.update(images: images)
         imageSelection.isMultipleSelection = images.count > 1 ? true : false

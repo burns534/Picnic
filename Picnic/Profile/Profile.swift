@@ -10,16 +10,6 @@ import UIKit
 
 class Profile: UIViewController {
     
-    init() {
-        super.init(nibName: nil, bundle: nil)
-        title = "Profile"
-        tabBarItem.image = UIImage(systemName: "person")
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("NSCoding not supported")
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
         

@@ -14,9 +14,7 @@ fileprivate let kLongitudeDelta = 0.2
 
 class LocationSelector: UIViewController {
     
-    private enum AnnotationReuseID: String {
-        case pin
-    }
+    private enum AnnotationReuseID: String { case pin }
     
     var map: MKMapView!
     var selectedCoordinate: CLLocationCoordinate2D!
@@ -27,15 +25,6 @@ class LocationSelector: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        configure()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        navigationController?.setNavigationBarHidden(true, animated: true)
-        navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-    }
-    
-    func configure() {
         view.backgroundColor = .white
         
 // MARK: Warning Box
@@ -43,10 +32,12 @@ class LocationSelector: UIViewController {
         warningBox.text = "Please select a location first"
         warningBox.textAlignment = .center
         warningBox.backgroundColor = .white
+        warningBox.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(warningBox)
         
 // MARK: Map
-        map = MKMapView(frame: .zero)
+        map = MKMapView(frame: view.frame)
+// MARK: This is bad practice and needs to be fixed
         guard let location = Shared.shared.locationManager.location else {
             map.setRegion(MKCoordinateRegion(), animated: true)
             return
@@ -71,43 +62,43 @@ class LocationSelector: UIViewController {
         instructions.backgroundColor = .clear
         view.addSubview(instructions)
         
-        view.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
-        
-// MARK: Search Button
-        searchButton = UIButton()
-        let image = UIImage(systemName: "magnifyingglass", withConfiguration: UIImage.SymbolConfiguration(pointSize: 25, weight: .thin))?.withRenderingMode(.alwaysTemplate)
-        searchButton.setImage(image, for: .normal)
-        searchButton.tintColor = .olive
-        searchButton.addTarget(self, action: #selector(searchButtonHandler), for: .touchUpInside)
-        
 // MARK: Navigation Bar
-        navigationBar = NavigationBar(frame: kNavigationBarFrame)
-        navigationBar.backgroundColor = .white
-        navigationBar.leftBarButton.addTarget(self, action: #selector(backButtonTap), for: .touchUpInside)
-        navigationBar.setLeftButtonPadding(amount: 10)
+        navigationBar = NavigationBar()
+        navigationBar.defaultConfiguration(left: true)
+        navigationBar.backgroundColor = .clear
+        navigationBar.leftBarButton?.addTarget(self, action: #selector(backButtonTap), for: .touchUpInside)
         
-        navigationBar.rightBarButton.setTitle("next", for: .normal)
-        navigationBar.rightBarButton.addTarget(self, action: #selector(nextButtonHandler), for: .touchUpInside)
-        navigationBar.rightBarButton.titleLabel?.font = UIFont.systemFont(ofSize: 25, weight: .light)
-        navigationBar.rightBarButton.setTitleColor(.olive, for: .normal)
+        let rightButton = UIButton()
+        rightButton.setTitle("Next", for: .normal)
+        rightButton.addTarget(self, action: #selector(nextButtonHandler), for: .touchUpInside)
+        rightButton.titleLabel?.font = UIFont.systemFont(ofSize: 40, weight: .thin)
+        navigationBar.setRightBarButton(button: rightButton)
         navigationBar.setRightButtonPadding(amount: 10)
         
+        searchButton = UIButton()
+        searchButton.setImage(UIImage(systemName: "magnifyingglass", withConfiguration: UIImage.SymbolConfiguration(pointSize: 40, weight: .thin))?.withRenderingMode(.alwaysTemplate), for: .normal)
+        searchButton.addTarget(self, action: #selector(searchButtonHandler), for: .touchUpInside)
         navigationBar.setCenterView(view: searchButton)
+        navigationBar.setContentColor(.white)
+        navigationBar.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(navigationBar)
 
         NSLayoutConstraint.activate([
-            map.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
-            map.widthAnchor.constraint(equalTo: view.widthAnchor),
-            map.heightAnchor.constraint(equalTo: view.heightAnchor),
-            map.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            navigationBar.widthAnchor.constraint(equalTo: view.widthAnchor),
+            navigationBar.heightAnchor.constraint(equalToConstant: 40),
             
             warningBox.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             warningBox.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             warningBox.widthAnchor.constraint(equalTo: view.widthAnchor),
-            warningBox.heightAnchor.constraint(equalToConstant: 60),
-            
-            instructions.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            warningBox.heightAnchor.constraint(equalToConstant: 60)
         ])
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        navigationController?.setNavigationBarHidden(true, animated: true)
+        tabBarController?.tabBar.isHidden = true
     }
     
     @objc func searchButtonHandler(_ sender: UIButton) {
@@ -119,9 +110,14 @@ class LocationSelector: UIViewController {
             view.bringSubviewToFront(warningBox)
             return
         }
-        let next = NewLocationController()
-        next.delegate = self
-        navigationController?.pushViewController(next, animated: true)
+// MARK: This is bad
+        if #available(iOS 14, *) {
+            let next = NewPicnicController()
+            next.delegate = self
+            navigationController?.pushViewController(next, animated: true)
+        } else {
+            fatalError()
+        }
     }
     
     @objc func backButtonTap(_ sender: UIButton) {

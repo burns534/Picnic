@@ -8,46 +8,69 @@
 
 import UIKit
 
+let kNavigationBarBezelOffset: CGFloat = 44.0
+
 class NavigationBar: UIView {
     
-    let leftBarButton: UIButton
-    let rightBarButton: UIButton
-    var centerView: UIView?
-    var title: UILabel?
+    private(set) var leftBarButton: UIButton?
+    private(set) var rightBarButton: UIButton?
+    private(set) var centerView: UIView?
+    private(set) var title: UILabel?
+ 
+    private var leading: NSLayoutConstraint?
+    private var trailing: NSLayoutConstraint?
     
-    private let defaultLeftButtonImage: UIImage?
-    private let defaultRightButtonImage: UIImage?
+    func defaultConfiguration(left: Bool = false, right: Bool = false) {
+        backgroundColor = .white
+        if left {
+            leftBarButton = UIButton(frame: .zero)
+            leftBarButton!.setImage(UIImage(systemName: "chevron.left", withConfiguration: UIImage.SymbolConfiguration(pointSize: 40, weight: .thin))?.withRenderingMode(.alwaysTemplate), for: .normal)
+            leftBarButton!.translatesAutoresizingMaskIntoConstraints = false
+            addSubview(leftBarButton!)
+            leading = NSLayoutConstraint(item: leftBarButton!, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1.0, constant: 10.0)
+            leftBarButton?.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+            leading?.isActive = true
+        }
+        if right {
+            rightBarButton = UIButton(frame: .zero)
+            rightBarButton!.setImage(UIImage(systemName: "chevron.right", withConfiguration: UIImage.SymbolConfiguration(pointSize: 40, weight: .thin))?.withRenderingMode(.alwaysTemplate), for: .normal)
+            rightBarButton!.translatesAutoresizingMaskIntoConstraints = false
+            addSubview(rightBarButton!)
+            trailing = NSLayoutConstraint(item: rightBarButton!, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1.0, constant: -10.0)
+            rightBarButton?.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+            trailing?.isActive = true
+        }
+    }
+
+    func setRightButtonPadding(amount: CGFloat) { trailing?.constant = -amount }
+    func setLeftButtonPadding(amount: CGFloat) { leading?.constant = amount }
     
-    override init(frame: CGRect) {
-        leftBarButton = UIButton(frame: CGRect(x: 0, y: 0, width: frame.height, height: frame.height))
-        rightBarButton = UIButton(frame: CGRect(x: frame.width - frame.height, y: 0, width: frame.height, height: frame.height))
-        defaultLeftButtonImage = UIImage(systemName: "chevron.left", withConfiguration: UIImage.SymbolConfiguration(pointSize: frame.height, weight: .thin))?.withRenderingMode(.alwaysTemplate)
-        defaultRightButtonImage = UIImage(systemName: "chevron.right", withConfiguration: UIImage.SymbolConfiguration(pointSize: frame.height, weight: .thin))?.withRenderingMode(.alwaysTemplate)
-        leftBarButton.setImage(defaultLeftButtonImage, for: .normal)
-        rightBarButton.setImage(defaultRightButtonImage, for: .normal)
-        super.init(frame: frame)
-        addSubview(leftBarButton)
-        addSubview(rightBarButton)
+    func setRightBarButton(button: UIButton) {
+        rightBarButton = button
+        button.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(button)
+        trailing = NSLayoutConstraint(item: rightBarButton!, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1.0, constant: 0.0)
+        rightBarButton?.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        trailing?.isActive = true
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    func setRightButtonPadding(amount: CGFloat) {
-        rightBarButton.frame = rightBarButton.frame.offsetBy(dx: -amount, dy: 0)
-    }
-    
-    func setLeftButtonPadding(amount: CGFloat) {
-        leftBarButton.frame = leftBarButton.frame.offsetBy(dx: amount, dy: 0)
+    func setLeftBarButton(button: UIButton) {
+        leftBarButton = button
+        button.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(button)
+        leading = NSLayoutConstraint(item: leftBarButton!, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1.0, constant: 0.0)
+        leftBarButton?.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        leading?.isActive = true
     }
     
     func setCenterView(view: UIView) {
         centerView?.removeFromSuperview()
         title?.removeFromSuperview()
         centerView = view
-        centerView?.center = center
+        centerView?.translatesAutoresizingMaskIntoConstraints = false
         addSubview(centerView!)
+        centerView?.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        centerView?.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
     }
     
     func setTitle(text: String) {
@@ -56,8 +79,10 @@ class NavigationBar: UIView {
         title = UILabel()
         title?.text = text
         title?.textAlignment = .center
-        title?.center = center
+        title?.translatesAutoresizingMaskIntoConstraints = false
         addSubview(title!)
+        title?.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        title?.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
     }
     
     func setContentColor(_ color: UIColor) {

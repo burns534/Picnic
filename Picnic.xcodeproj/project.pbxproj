@@ -24,16 +24,14 @@
 		274386162478925F0029F00F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 274386152478925F0029F00F /* Assets.xcassets */; };
 		274386192478925F0029F00F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 274386182478925F0029F00F /* Preview Assets.xcassets */; };
 		2743861C2478925F0029F00F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2743861A2478925F0029F00F /* LaunchScreen.storyboard */; };
-		274B051F24AD308900747D25 /* CustomImagePickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274B051E24AD308900747D25 /* CustomImagePickerController.swift */; };
+		274B051F24AD308900747D25 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274B051E24AD308900747D25 /* ImagePicker.swift */; };
 		274B052124BF928100747D25 /* ImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274B052024BF928100747D25 /* ImageCell.swift */; };
-		274B052324BF9B5100747D25 /* CustomPickerFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274B052224BF9B5100747D25 /* CustomPickerFlowLayout.swift */; };
 		274B052624C39ECC00747D25 /* ZoomableImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274B052524C39ECC00747D25 /* ZoomableImage.swift */; };
 		274B052D24C3FB9100747D25 /* DetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274B052C24C3FB9100747D25 /* DetailController.swift */; };
 		2752092324C4EF12002E8761 /* SpinnerWheel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2752092224C4EF12002E8761 /* SpinnerWheel.swift */; };
 		2752092524C53BED002E8761 /* ImageScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2752092424C53BED002E8761 /* ImageScrollView.swift */; };
 		2752092724CF494B002E8761 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2752092624CF494B002E8761 /* LocationManager.swift */; };
-		2756C288247D84080070D61A /* AddImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2756C287247D84080070D61A /* AddImage.swift */; };
-		2756C28B247F2BCA0070D61A /* NewLocationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2756C28A247F2BCA0070D61A /* NewLocationController.swift */; };
+		2756C28B247F2BCA0070D61A /* NewPicnicController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2756C28A247F2BCA0070D61A /* NewPicnicController.swift */; };
 		275AD147248180F100EE3DBA /* LocationSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275AD146248180F100EE3DBA /* LocationSelector.swift */; };
 		275AD1492481BCAB00EE3DBA /* LocationPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275AD1482481BCAB00EE3DBA /* LocationPopover.swift */; };
 		275AD14B2482CAE300EE3DBA /* LocationLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275AD14A2482CAE300EE3DBA /* LocationLabel.swift */; };
@@ -103,16 +101,14 @@
 		274386182478925F0029F00F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		2743861B2478925F0029F00F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2743861D2478925F0029F00F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		274B051E24AD308900747D25 /* CustomImagePickerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomImagePickerController.swift; sourceTree = "<group>"; };
+		274B051E24AD308900747D25 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		274B052024BF928100747D25 /* ImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCell.swift; sourceTree = "<group>"; };
-		274B052224BF9B5100747D25 /* CustomPickerFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomPickerFlowLayout.swift; sourceTree = "<group>"; };
 		274B052524C39ECC00747D25 /* ZoomableImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableImage.swift; sourceTree = "<group>"; };
 		274B052C24C3FB9100747D25 /* DetailController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailController.swift; sourceTree = "<group>"; };
 		2752092224C4EF12002E8761 /* SpinnerWheel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerWheel.swift; sourceTree = "<group>"; };
 		2752092424C53BED002E8761 /* ImageScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageScrollView.swift; sourceTree = "<group>"; };
 		2752092624CF494B002E8761 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
-		2756C287247D84080070D61A /* AddImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddImage.swift; sourceTree = "<group>"; };
-		2756C28A247F2BCA0070D61A /* NewLocationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewLocationController.swift; sourceTree = "<group>"; };
+		2756C28A247F2BCA0070D61A /* NewPicnicController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPicnicController.swift; sourceTree = "<group>"; };
 		275AD146248180F100EE3DBA /* LocationSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSelector.swift; sourceTree = "<group>"; };
 		275AD1482481BCAB00EE3DBA /* LocationPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPopover.swift; sourceTree = "<group>"; };
 		275AD14A2482CAE300EE3DBA /* LocationLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationLabel.swift; sourceTree = "<group>"; };
@@ -202,7 +198,7 @@
 			isa = PBXGroup;
 			children = (
 				279DEB6824DB35F6003035AC /* ShortPresentationTransitioningDelegate.swift */,
-				2756C28A247F2BCA0070D61A /* NewLocationController.swift */,
+				2756C28A247F2BCA0070D61A /* NewPicnicController.swift */,
 				279A26A424DB1AC300D71FD1 /* RequiredFieldModal.swift */,
 				279A26A824DB21F300D71FD1 /* ShortPresentationController.swift */,
 				279DEB6C24DB3D83003035AC /* ProgressIndicator.swift */,
@@ -240,7 +236,7 @@
 				274B052B24C3FB6A00747D25 /* Detail View */,
 				274B052424C39EA100747D25 /* Misc */,
 				275AD145248180BD00EE3DBA /* Map */,
-				2756C286247D83EA0070D61A /* Add Image */,
+				2756C286247D83EA0070D61A /* Image Picker */,
 				27B072ED247CCC70009974BD /* Tab Controller */,
 				27EB2DC42478CBF50093362C /* Models */,
 				2756C289247D94F30070D61A /* App */,
@@ -295,16 +291,14 @@
 			path = "Detail View";
 			sourceTree = "<group>";
 		};
-		2756C286247D83EA0070D61A /* Add Image */ = {
+		2756C286247D83EA0070D61A /* Image Picker */ = {
 			isa = PBXGroup;
 			children = (
-				2756C287247D84080070D61A /* AddImage.swift */,
-				274B051E24AD308900747D25 /* CustomImagePickerController.swift */,
+				274B051E24AD308900747D25 /* ImagePicker.swift */,
 				274B052024BF928100747D25 /* ImageCell.swift */,
-				274B052224BF9B5100747D25 /* CustomPickerFlowLayout.swift */,
 				27407AD324C4004F00AE7AAF /* FloatingMenu.swift */,
 			);
-			path = "Add Image";
+			path = "Image Picker";
 			sourceTree = "<group>";
 		};
 		2756C289247D94F30070D61A /* App */ = {
@@ -572,7 +566,6 @@
 			files = (
 				2723A5592527A461008150DC /* Shared.swift in Sources */,
 				279A269624D4ADF000D71FD1 /* HeartButton.swift in Sources */,
-				2756C288247D84080070D61A /* AddImage.swift in Sources */,
 				279A268A24D34AED00D71FD1 /* Colors.swift in Sources */,
 				279DEB7624E09405003035AC /* SearchViewController.swift in Sources */,
 				274B052624C39ECC00747D25 /* ZoomableImage.swift in Sources */,
@@ -590,7 +583,6 @@
 				279DEB6B24DB3B33003035AC /* SwipeView.swift in Sources */,
 				2723A5612529363F008150DC /* UserManager.swift in Sources */,
 				27B072EF247CCC94009974BD /* TabController.swift in Sources */,
-				274B052324BF9B5100747D25 /* CustomPickerFlowLayout.swift in Sources */,
 				27407AD424C4004F00AE7AAF /* FloatingMenu.swift in Sources */,
 				279DEB7124DCA4C4003035AC /* PaddedTextField.swift in Sources */,
 				2716B5B22491A83A0092A622 /* MapSearchResultsController.swift in Sources */,
@@ -599,7 +591,7 @@
 				279DEB6924DB35F6003035AC /* ShortPresentationTransitioningDelegate.swift in Sources */,
 				27BFC41A2486E7FB00A3C968 /* Rating.swift in Sources */,
 				2725763724D1F492008916B7 /* AuthPicker.swift in Sources */,
-				274B051F24AD308900747D25 /* CustomImagePickerController.swift in Sources */,
+				274B051F24AD308900747D25 /* ImagePicker.swift in Sources */,
 				27EB2DD52478CE730093362C /* LoadData.swift in Sources */,
 				27B072EA247CC7BB009974BD /* CustomFlowLayout.swift in Sources */,
 				2723A5652529368B008150DC /* User.swift in Sources */,
@@ -614,7 +606,7 @@
 				279DEB7324DDBA07003035AC /* Divider.swift in Sources */,
 				279A269824D4BE2700D71FD1 /* Profile.swift in Sources */,
 				2743860F2478925D0029F00F /* SceneDelegate.swift in Sources */,
-				2756C28B247F2BCA0070D61A /* NewLocationController.swift in Sources */,
+				2756C28B247F2BCA0070D61A /* NewPicnicController.swift in Sources */,
 				279A268C24D34BFB00D71FD1 /* SignInButton.swift in Sources */,
 				27B072E8247CC66B009974BD /* Featured.swift in Sources */,
 				2752092524C53BED002E8761 /* ImageScrollView.swift in Sources */,

@@ -98,6 +98,7 @@ final class UserManager {
     }
     
     func isSaved(picnic: Picnic) -> Bool {
-        user.saved.contains(picnic.uid)
+        guard let id = picnic.id else { return false }
+        return user.saved.contains(id)
     }
 }

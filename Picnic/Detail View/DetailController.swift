@@ -47,13 +47,10 @@ class DetailController: UIViewController {
         preview = UIImageView()
         preview.contentMode = .scaleAspectFill
         preview.clipsToBounds = true
+        preview.setGradient(colors: [.clear, UIColor.black.withAlphaComponent(0.4)])
         Shared.shared.databaseManager.image(forPicnic: picnic) { image, error in
-            if let error = error {
-                print(error.localizedDescription)
-                return
-            } else {
-                self.preview.image = image
-            }
+            guard let image = image else { return }
+            self.preview.image = image
         }
         scrollView.addSubview(preview)
 // MARK: Probably change this
@@ -86,7 +83,7 @@ class DetailController: UIViewController {
         scrollView.addSubview(liked)
         
         nameLabel = UILabel()
-        nameLabel.minimumScaleFactor = 0.8
+        nameLabel.minimumScaleFactor = 0.5
         nameLabel.adjustsFontSizeToFitWidth = true
         nameLabel.text = picnic.name
         nameLabel.textColor = .white
@@ -110,23 +107,27 @@ class DetailController: UIViewController {
         view.addSubview(aboutLabel)
         
         overview = UITextView()
-//        overview.layer.cornerRadius = 5
         overview.isEditable = false
         overview.text = picnic.userDescription
         overview.font = UIFont.systemFont(ofSize: 20, weight: .thin)
         scrollView.addSubview(overview)
         
-        view.subviews.forEach {$0.translatesAutoresizingMaskIntoConstraints = false}
-        scrollView.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
-
-        navigationBar = NavigationBar(frame: kNavigationBarFrame.offsetBy(dx: 0, dy: 44))
+        navigationBar = NavigationBar()
+        navigationBar.defaultConfiguration(left: true)
         navigationBar.backgroundColor = .clear
         navigationBar.setContentColor(.white)
-        navigationBar.leftBarButton.addTarget(self, action: #selector(backButtonTap), for: .touchUpInside)
-        navigationBar.setLeftButtonPadding(amount: 10)
+        navigationBar.leftBarButton?.addTarget(self, action: #selector(backButtonTap), for: .touchUpInside)
         view.addSubview(navigationBar)
+        
+        view.subviews.forEach {$0.translatesAutoresizingMaskIntoConstraints = false}
+        scrollView.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
     
         NSLayoutConstraint.activate([
+            
+            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            navigationBar.widthAnchor.constraint(equalTo: view.widthAnchor),
+            navigationBar.heightAnchor.constraint(equalToConstant: 40),
             
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -212,7 +213,7 @@ extension MKMapViewDelegate {
 extension DetailController: RatingDelegate {
 // MARK: There will be an issue with a user trying to change their rating on a post, but that's probably okay for now
     func updateRating(value: Float) {
-        rating.setRating(value: value)
+        tapToRate.setRating(value: value)
         Shared.shared.userManager.rateRequest(picnic: picnic) {
             Shared.shared.databaseManager.updateRating(picnic: self.picnic, rating: value, increment: true)
         }

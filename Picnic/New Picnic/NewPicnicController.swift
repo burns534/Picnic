@@ -16,11 +16,11 @@ protocol NewLocationControllerDelegate: AnyObject {
     func requestAnnotation() -> MKPointAnnotation?
 }
 
-class NewLocationController: UIViewController {
+@available(iOS 14, *)
+class NewPicnicController: UIViewController {
     
     var map: MKMapView!
     var name: PaddedTextField!
-//    var userDescription: PaddedTextView!
     var userDescription: PaddedTextField!
     var category: PaddedTextField!
     var images = [UIImage]()
@@ -62,16 +62,6 @@ class NewLocationController: UIViewController {
         scrollView = UIScrollView()
         view.addSubview(scrollView)
         
-// MARK: Map
-        map = MKMapView()
-        map.addAnnotation(annotation)
-        let span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-        let region = MKCoordinateRegion(center: annotation.coordinate, span: span)
-        map.setRegion(region, animated: false)
-        map.mapType = .hybrid
-        map.isUserInteractionEnabled = false
-        view.addSubview(map)
-        
 // MARK: Name
         name = PaddedTextField()
         name.placeholder = "Enter name"
@@ -110,21 +100,41 @@ class NewLocationController: UIViewController {
         selectedImages.layer.cornerRadius = 5
         view.addSubview(selectedImages)
         
-        view.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+// MARK: Map
+        map = MKMapView()
+        map.addAnnotation(annotation)
+        let span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+        let region = MKCoordinateRegion(center: annotation.coordinate, span: span)
+        map.setRegion(region, animated: false)
+        map.mapType = .hybrid
+        map.isUserInteractionEnabled = false
+        view.addSubview(map)
         
-        navigationBar = NavigationBar(frame: kNavigationBarFrame)
-        navigationBar.backgroundColor = .white
-        navigationBar.leftBarButton.addTarget(self, action: #selector(backButtonTap), for: .touchUpInside)
-        navigationBar.setLeftButtonPadding(amount: 10)
-        navigationBar.rightBarButton.setTitle("Share", for: .normal)
-        navigationBar.rightBarButton.addTarget(self, action: #selector(share), for: .touchUpInside)
+        navigationBar = NavigationBar()
+        navigationBar.defaultConfiguration(left: true)
+        navigationBar.backgroundColor = .clear
+        navigationBar.leftBarButton?.addTarget(self, action: #selector(backButtonTap), for: .touchUpInside)
+        
+        let rightButton = UIButton()
+        rightButton.setTitle("Share", for: .normal)
+        rightButton.titleLabel!.sizeToFit()
+        rightButton.addTarget(self, action: #selector(share), for: .touchUpInside)
+        navigationBar.setRightBarButton(button: rightButton)
         navigationBar.setRightButtonPadding(amount: 10)
+        navigationBar.setContentColor(.white)
         view.addSubview(navigationBar)
+        
+        view.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
         
 // MARK: Constraints
         NSLayoutConstraint.activate([
+            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            navigationBar.widthAnchor.constraint(equalTo: view.widthAnchor),
+            navigationBar.heightAnchor.constraint(equalToConstant: 40),
+            
+            map.topAnchor.constraint(equalTo: view.topAnchor),
             map.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            map.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
             map.widthAnchor.constraint(equalTo: view.widthAnchor),
             map.heightAnchor.constraint(equalToConstant: 300),
             
@@ -162,10 +172,7 @@ class NewLocationController: UIViewController {
     @objc func share(_ sender: UIButton) {
         guard let name = name.text,
         let userDescription = userDescription.text,
-        name == "",
-        userDescription == ""
-        else { return }
-
+        name != "", userDescription != "" else { return }
         let idList = self.images.map {_ in UUID().uuidString }
         
         annotation.coordinate.getPlacemark { placemark in
@@ -175,8 +182,7 @@ class NewLocationController: UIViewController {
 
 // MARK: didVisit shouldn't be true by default
             let locationData = LocationData(latitude: self.annotation.coordinate.latitude, longitude: self.annotation.coordinate.longitude, city: city, state: state, park: nil)
-            let newPicnic = Picnic(uid: UUID().uuidString, name: name, userDescription: userDescription, tags: [], imageNames: idList, rating: self.interactiveRating.rating, didVisit: true, locationData: locationData)
-
+            let newPicnic = Picnic(name: name, userDescription: userDescription, tags: [], imageNames: idList, rating: self.interactiveRating.rating, didVisit: true, locationData: locationData)
             // add to collection view datasource
             locations.append(newPicnic)
 
@@ -202,7 +208,8 @@ class NewLocationController: UIViewController {
     }
 }
 // MARK: UITextFieldDelegate
-extension NewLocationController: UITextFieldDelegate {
+@available(iOS 14, *)
+extension NewPicnicController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         switch textField {
         case name:
@@ -219,18 +226,16 @@ extension NewLocationController: UITextFieldDelegate {
     }
 }
 
-extension NewLocationController: UITextViewDelegate {
-    
-}
-
-extension NewLocationController: UIViewControllerTransitioningDelegate {
+@available(iOS 14, *)
+extension NewPicnicController: UIViewControllerTransitioningDelegate {
     func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
         shortPresentationController = ShortPresentationController(offsetY: modalOffsetY, presentedViewController: presented, presenting: presenting)
         return shortPresentationController
     }
 }
 
-extension NewLocationController: RequiredFieldModalDelegate {
+@available(iOS 14, *)
+extension NewPicnicController: RequiredFieldModalDelegate {
     func update(name: String) {
         self.name.text = name
     }
@@ -250,7 +255,8 @@ extension NewLocationController: RequiredFieldModalDelegate {
     }
 }
 
-extension NewLocationController: RatingDelegate {
+@available(iOS 14, *)
+extension NewPicnicController: RatingDelegate {
     func updateRating(value: Float) {
         interactiveRating.setRating(value: value)
     }

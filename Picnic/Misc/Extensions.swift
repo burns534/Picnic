@@ -93,6 +93,13 @@ extension UIView {
         layer.shadowOpacity = opacity
         layer.shadowPath = UIBezierPath(rect: bounds).cgPath
     }
+    
+    func setGradient(colors: [UIColor]) {
+        let gradient = CAGradientLayer()
+        gradient.colors = colors.map { $0.cgColor }
+        gradient.frame = bounds
+        layer.insertSublayer(gradient, at: 0)
+    }
 }
 // from paul hudson
 extension String {
@@ -114,6 +121,9 @@ extension CGSize {
     static func -(left: CGSize, right: Int) -> CGSize {
         let r = CGFloat(right)
         return CGSize(width: left.width - r, height: left.height - r)
+    }
+    static func *(left: CGSize, right: CGFloat) -> CGSize {
+        CGSize(width: left.width * right, height: left.height * right)
     }
 }
 

@@ -14,12 +14,15 @@ class TabController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        tabBar.isTranslucent = false
+        let controllers = [Featured(), Profile(), SettingsController()]
         
-        let controllers = [Featured(collectionViewLayout: CustomFlowLayout()), Profile(), SettingsController()]
-        
-        viewControllers = controllers.map {
-            UINavigationController(rootViewController: $0)
+        viewControllers = controllers.map { UINavigationController(rootViewController: $0) }
+    
+        let titles = ["Featured", "Profile", "Settings"]
+        let imageNames = ["star", "person", "gear"]
+        for (index, item) in tabBar.items!.enumerated() {
+            item.image = UIImage(systemName: imageNames[index])
+            item.title = titles[index]
         }
         
         selectedIndex = 0

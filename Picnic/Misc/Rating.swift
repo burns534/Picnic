@@ -150,11 +150,12 @@ class Rating: UIView {
             stars.append(star)
         }
     }
-// MARK: It's broken now
+    
     private func refresh() {
         stars[0..<Int(cgRating)].forEach { $0.fill() }
         stars[Int(cgRating)..<stars.count].forEach { $0.reset() }
-/* star symbol does not go edge to edge in the image. The image leaves a small amount on the left and right of the star. Additionally, the the very corners of the stars are imperceptible when applying a small mask. Accounting for these two things, approximately a translation of approximately 1/6 the image size is needed to create correct star behavior.
+/*
+         star symbol does not go edge to edge in the image. The image leaves a small amount on the left and right of the star. Additionally, the the very corners of the stars are imperceptible when applying a small mask. Accounting for these two things, approximately a translation of approximately 1/6 the image size is needed to create correct star behavior.
 */
         if floor(cgRating) != cgRating {
             let mask = starSize * CGFloat(cgRating.truncatingRemainder(dividingBy: 1.0) * 0.62 + 0.15)

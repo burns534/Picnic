@@ -13,48 +13,32 @@ private let reuseIdentifier = "Cell"
 
 let kFeaturedCellSize = CGSize(width: 400, height: 260)
 
-class Featured: UICollectionViewController {
+class Featured: UIViewController {
     
     var locations = [Picnic]()
+    var collectionView: UICollectionView!
     
     private let refreshController = UIRefreshControl()
     
-    override init(collectionViewLayout layout: UICollectionViewLayout) {
-        super.init(collectionViewLayout: layout)
-        title = "Featured"
-        tabBarItem.image = UIImage(systemName: "star")
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("NSCoding not supported")
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        configure()
-    }
-    
-    func refresh(completion: @escaping () -> () = {}) {
-        guard let loc = Shared.shared.locationManager.location else { return }
-        Shared.shared.databaseManager.query(byLocation: loc, queryLimit: 20, precision: 3) { picnics in
-            self.locations = picnics
-            self.collectionView.reloadData()
-            completion()
-        }
-    }
-    
-    func configure() {
-        refresh()
-        
+        title = "Featured"
+        refreshController.addTarget(self, action: #selector(pullDown), for: .valueChanged)
+        collectionView = UICollectionView(frame: view.frame, collectionViewLayout: CustomFlowLayout())
+        collectionView.dataSource = self
+        collectionView.delegate = self
         collectionView.backgroundColor = .white
         collectionView.alwaysBounceVertical = true
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.refreshControl = refreshController
-        
-        refreshController.addTarget(self, action: #selector(pullDown), for: .valueChanged)
-        
-        self.collectionView!.register(FeaturedCell.self, forCellWithReuseIdentifier: reuseIdentifier)
+        collectionView.register(FeaturedCell.self, forCellWithReuseIdentifier: reuseIdentifier)
+        refreshDataSource {
+            self.collectionView.performBatchUpdates {
+                self.collectionView.reloadSections(IndexSet(integer: 0))
+            }
+        }
+        view.addSubview(collectionView)
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus.square"), style: .plain, target: self, action: #selector(rightBarButton))
         navigationItem.rightBarButtonItem?.tintColor = .olive
@@ -65,10 +49,27 @@ class Featured: UICollectionViewController {
         Shared.shared.authManager.delegate = self
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        navigationController?.setNavigationBarHidden(false, animated: true)
+        tabBarController?.tabBar.isHidden = false
+    }
     
+    func refreshDataSource(completion: @escaping () -> ()) {
+        guard let loc = Shared.shared.locationManager.location else { return }
+        Shared.shared.databaseManager.query(byLocation: loc, queryLimit: 20, precision: 3) { picnics in
+            self.locations = picnics
+            completion()
+        }
+    }
     
     @objc func pullDown(_ sender: Any) {
-        refresh { self.refreshController.endRefreshing() }
+        refreshDataSource {
+            self.collectionView.performBatchUpdates {
+                self.collectionView.reloadSections(IndexSet(integer: 0))
+            } completion: { _ in
+                self.refreshController.endRefreshing()
+            }
+        }
     }
     
     @objc func rightBarButton() {
@@ -78,42 +79,35 @@ class Featured: UICollectionViewController {
     @objc func filterHandler(_ sender: UIBarButtonItem) {
         
     }
+}
 
-    // MARK: UICollectionViewDataSource
-
-    override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
+extension Featured: UICollectionViewDataSource {
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        1
+    }
+   
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        locations.count
     }
 
-
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return locations.count
-    }
-
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? FeaturedCell else
-        {
-            print("Error: Could not load cell")
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? FeaturedCell else {
             return UICollectionViewCell()
         }
-        let picnic = locations[indexPath.item]
-        cell.configure(picnic: picnic)
-        
+        cell.configure(picnic: locations[indexPath.item])
         return cell
     }
+}
 
-    // MARK: UICollectionViewDelegate
-
-    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+extension Featured: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let detailView = DetailController()
         detailView.configure(picnic: locations[indexPath.item])
         navigationController?.pushViewController(detailView, animated: true)
     }
-
 }
 
 extension Featured: AuthManagerDelegate {
-    func didSignIn() {
-        collectionView.reloadData()
-    }
+    func didSignIn() { collectionView.reloadData() }
 }

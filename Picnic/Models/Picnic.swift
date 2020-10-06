@@ -6,16 +6,16 @@
 //  Copyright © 2020 Kyle Burns. All rights reserved.
 //
 
-import Foundation
 import MapKit
+import FirebaseFirestoreSwift
 
 enum PicnicTag: String, Codable {
     case empty
 }
 
 // MARK: Probably ought to store its own images.... or in a manager class
-struct Picnic: Codable {
-    var uid: String = UUID().uuidString
+struct Picnic: Codable, Identifiable {
+    @DocumentID var id: String?
     var name: String = ""
     var userDescription: String = ""
     var tags: [PicnicTag] = []
@@ -25,26 +25,27 @@ struct Picnic: Codable {
     var wouldVisit: Int = 0
     var visitCount: Int = 0
     var locationData: LocationData?
+// MARK: Had to store outside location info for querying
+    var geohash: String = ""
 
-    init(fromDictionary dict: [String: Any]) {
-        name = dict["name"] as? String ?? ""
-        userDescription = dict["userDescription"] as? String ?? ""
-        tags = dict["tags"] as? [PicnicTag] ?? []
-        imageNames = dict["imageNames"] as? [String] ?? ["loading"]
-        uid = dict["key"] as? String ?? ""
-        rating = (dict["rating"] as? NSNumber)?.floatValue ?? 0.0
-        ratingCount = dict["ratingCount"] as? Int ?? 0
-        wouldVisit = dict["wouldVisit"] as? Int ?? 0 // probably won't use this
-        visitCount = dict["didVisit"] as? Int ?? 0
-        let city = dict["city"] as? String
-        let state = dict["state"] as? String
-        let lat = dict["latitude"] as? Double ?? 0.0
-        let long = dict["longitude"] as? Double ?? 0.0
-        locationData = LocationData(latitude: lat, longitude: long, city: city, state: state)
-    }
+//    init(fromDictionary dict: [String: Any]) {
+//        name = dict["name"] as? String ?? ""
+//        userDescription = dict["userDescription"] as? String ?? ""
+//        tags = dict["tags"] as? [PicnicTag] ?? []
+//        imageNames = dict["imageNames"] as? [String] ?? ["loading"]
+//        uid = dict["key"] as? String ?? ""
+//        rating = (dict["rating"] as? NSNumber)?.floatValue ?? 0.0
+//        ratingCount = dict["ratingCount"] as? Int ?? 0
+//        wouldVisit = dict["wouldVisit"] as? Int ?? 0 // probably won't use this
+//        visitCount = dict["didVisit"] as? Int ?? 0
+//        let city = dict["city"] as? String
+//        let state = dict["state"] as? String
+//        let lat = dict["latitude"] as? Double ?? 0.0
+//        let long = dict["longitude"] as? Double ?? 0.0
+//        locationData = LocationData(latitude: lat, longitude: long, city: city, state: state)
+//    }
     
-    init(uid: String, name: String, userDescription: String, tags: [PicnicTag], imageNames: [String], rating: Float, didVisit: Bool, locationData: LocationData) {
-        self.uid = uid
+    init(name: String, userDescription: String, tags: [PicnicTag], imageNames: [String], rating: Float, didVisit: Bool, locationData: LocationData) {
         self.name = name
         self.userDescription = userDescription
         self.tags = tags
@@ -53,6 +54,7 @@ struct Picnic: Codable {
         ratingCount = 1
         self.visitCount = didVisit ? 1 : 0
         self.locationData = locationData
+        geohash = locationData.hash
     }
     
     init() {}
@@ -64,10 +66,14 @@ struct LocationData: Codable {
     var city: String?
     var state: String?
     var park: String?
+}
+
+extension LocationData {
     var location: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
+
     var hash: String {
-        location.geohash(precision: kDefaultPrecision)
+        Region(latitude: latitude, longitude: longitude, precision: kDefaultPrecision).hash
     }
 }
