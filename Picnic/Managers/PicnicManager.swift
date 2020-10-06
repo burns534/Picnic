@@ -27,8 +27,8 @@ final class PicnicManager: NSObject {
             uploadGroup.enter()
             
             guard let ref = try? self?.picnics.addDocument(from: picnic, completion: { _ in uploadGroup.leave() }) else { return }
-            
-            for (name, image) in zip(picnic.imageNames, images) {
+            guard let imageNames = picnic.imageNames else { return }
+            for (name, image) in zip(imageNames, images) {
                 uploadGroup.enter()
                 if let data = image.jpegData(compressionQuality: 0.7) {
                     self?.storage.child(ref.documentID + "/\(name)").putData(data, metadata: StorageMetadata(dictionary: ["contentType": "image/jpeg"])) { metadata, error in
@@ -42,8 +42,8 @@ final class PicnicManager: NSObject {
     }
 
     func image(forPicnic picnic: Picnic, index: Int = 0, maxSize: Int64 = 2 * 1024 * 1024, completion: ((UIImage?, Error?) -> ())? = nil) {
-        guard let id = picnic.id else { return }
-        storage.child(id).child(picnic.imageNames[index]).getData(maxSize: maxSize) { data, error in
+        guard let id = picnic.id, let imageNames = picnic.imageNames else { return }
+        storage.child(id).child(imageNames[index]).getData(maxSize: maxSize) { data, error in
             if let error = error {
                 print("Error: DatabaseManager: image forPicnic: could not load image from firebase storage: \(error.localizedDescription)")
             }
@@ -70,7 +70,6 @@ final class PicnicManager: NSObject {
     }
     
 // MARK: query by location
-
     func query(byLocation loc: CLLocation, queryLimit: Int, precision: Int, completion: @escaping ([Picnic]) -> ()) {
         let hash = Region(latitude: loc.coordinate.latitude, longitude: loc.coordinate.longitude, precision: kDefaultPrecision).hash
         // messy
@@ -90,25 +89,5 @@ final class PicnicManager: NSObject {
             }
         }
     }
-    
-//@available(iOS, unavailable, message: "Does not support geohashing")
-//    func query(byCoordinates loc: CLLocationCoordinate2D, queryLimit: Int, completion: @escaping ([Picnic]) -> ()) {
-//        loc.getPlacemark { placemark in
-//            self.ref.child("Picnics").queryOrdered(byChild: "state").queryEqual(toValue: "AR").observeSingleEvent(of: .value) { snapshot in
-//                guard let result = snapshot.children.allObjects as? [DataSnapshot] else {
-//                    print("Error: DatabaseManager: query byLocation: Cast failure, possibly no children")
-//                    return
-//                }
-//                let picnics: [Picnic] = result.map { snapshot in
-//                    guard let temp = snapshot.value as? [String: Any] else {
-//                        print("Error: DatabaseManager: query byLocation: Could not cast snapshot")
-//                        return Picnic()
-//                    }
-//                    return Picnic(fromDictionary: temp)
-//                }
-//                completion(picnics)
-//            }
-//        }
-//    }
 }
 

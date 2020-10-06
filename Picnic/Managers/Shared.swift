@@ -6,12 +6,11 @@
 //  Copyright © 2020 Kyle Burns. All rights reserved.
 //
 
-import Foundation
 
 
 final class Shared {
     static let shared = Shared()
-    let databaseManager = DatabaseManager(storagePathURL: "gs://picnic-1c64f.appspot.com/images")
+    let picnicManager = PicnicManager(storagePathURL: "gs://picnic-1c64f.appspot.com/images")
     let locationManager = LocationManager()
     let authManager: AuthManager
     let userManager: UserManager
@@ -19,6 +18,7 @@ final class Shared {
     private init() {
         authManager = AuthManager()
         userManager = UserManager()
+        userManager.configure()
     }
 }
 

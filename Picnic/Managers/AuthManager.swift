@@ -37,17 +37,14 @@ extension AuthManager: FUIAuthDelegate {
     func authUI(_ authUI: FUIAuth, didSignInWith authDataResult: AuthDataResult?, error: Error?) {
         if let error = error {
             print("Error: TabController: authUI didSignInWith: \(error.localizedDescription)")
-            return
+        } else {
+            Shared.shared.userManager.signIn()
         }
-        if let data = authDataResult {
-            Shared.shared.userManager.login(uid: data.user.uid, isAnonymous: data.user.isAnonymous)
-        }
-        UserDefaults.standard.set(true, forKey: "isLoggedIn")
         delegate?.didSignIn()
     }
     
     func authPickerViewController(forAuthUI authUI: FUIAuth) -> FUIAuthPickerViewController {
-        return AuthPicker(authUI: authUI)
+        AuthPicker(authUI: authUI)
     }
 }
 

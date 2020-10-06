@@ -173,7 +173,7 @@ class NewPicnicController: UIViewController {
         guard let name = name.text,
         let userDescription = userDescription.text,
         name != "", userDescription != "" else { return }
-        let idList = self.images.map {_ in UUID().uuidString }
+        let imageNames = self.images.map {_ in UUID().uuidString }
         
         annotation.coordinate.getPlacemark { placemark in
             
@@ -181,16 +181,16 @@ class NewPicnicController: UIViewController {
             let city = placemark.locality
 
 // MARK: didVisit shouldn't be true by default
-            let locationData = LocationData(latitude: self.annotation.coordinate.latitude, longitude: self.annotation.coordinate.longitude, city: city, state: state, park: nil)
-            let newPicnic = Picnic(name: name, userDescription: userDescription, tags: [], imageNames: idList, rating: self.interactiveRating.rating, didVisit: true, locationData: locationData)
+            let newPicnic = Picnic(name: name, userDescription: userDescription, tags: nil, imageNames: imageNames, rating: self.interactiveRating.rating, ratingCount: 1, wouldVisit: 0, visitCount: 1, latitude: self.annotation.coordinate.latitude, longitude: self.annotation.coordinate.longitude, city: city, state: state, park: nil)
+       
             // add to collection view datasource
             locations.append(newPicnic)
 
             // store picnic data
-            Shared.shared.databaseManager.store(picnic: newPicnic, images: self.images) {
+            Shared.shared.picnicManager.store(picnic: newPicnic, images: self.images) {
                 self.navigationController?.popToRootViewController(animated: true)
             }
-            Shared.shared.userManager.ratePost(picnic: newPicnic)
+            Shared.shared.userManager.rateRequest(picnic: newPicnic)
         }
          
      }

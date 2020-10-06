@@ -56,7 +56,7 @@ class Featured: UIViewController {
     
     func refreshDataSource(completion: @escaping () -> ()) {
         guard let loc = Shared.shared.locationManager.location else { return }
-        Shared.shared.databaseManager.query(byLocation: loc, queryLimit: 20, precision: 3) { picnics in
+        Shared.shared.picnicManager.query(byLocation: loc, queryLimit: 20, precision: 3) { picnics in
             self.locations = picnics
             completion()
         }

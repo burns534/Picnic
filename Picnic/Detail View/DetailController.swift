@@ -48,21 +48,19 @@ class DetailController: UIViewController {
         preview.contentMode = .scaleAspectFill
         preview.clipsToBounds = true
         preview.setGradient(colors: [.clear, UIColor.black.withAlphaComponent(0.4)])
-        Shared.shared.databaseManager.image(forPicnic: picnic) { image, error in
+        Shared.shared.picnicManager.image(forPicnic: picnic) { image, error in
             guard let image = image else { return }
             self.preview.image = image
         }
         scrollView.addSubview(preview)
-// MARK: Probably change this
-        guard let picnicLocation = picnic.locationData?.location else { return }
         
         map = MKMapView()
         let span = MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
-        let region = MKCoordinateRegion(center: picnicLocation, span: span)
+        let region = MKCoordinateRegion(center: picnic.location, span: span)
         map.setRegion(region, animated: false)
         map.mapType = .hybrid
         let loc = MKPointAnnotation()
-        loc.coordinate = picnicLocation
+        loc.coordinate = picnic.location
         loc.title = picnic.name
         map.addAnnotation(loc)
         map.layer.cornerRadius = 5
@@ -213,9 +211,13 @@ extension MKMapViewDelegate {
 extension DetailController: RatingDelegate {
 // MARK: There will be an issue with a user trying to change their rating on a post, but that's probably okay for now
     func updateRating(value: Float) {
-        tapToRate.setRating(value: value)
-        Shared.shared.userManager.rateRequest(picnic: picnic) {
-            Shared.shared.databaseManager.updateRating(picnic: self.picnic, rating: value, increment: true)
+        Shared.shared.userManager.rateRequest(picnic: picnic) { allowable in
+            if allowable {
+                Shared.shared.picnicManager.updateRating(picnic: self.picnic, value: value)
+                self.tapToRate.setRating(value: value)
+            } else {
+                // explain to user
+            }
         }
     }
 }

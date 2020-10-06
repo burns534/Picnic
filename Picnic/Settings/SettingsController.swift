@@ -35,19 +35,12 @@ class SettingsController: UIViewController {
         ])
     }
     
-// MARK: FIX THIS
     @objc func logout(_ sender: UIButton) {
-        do {
-            try authUI?.signOut()
-        } catch {
-            print("Error: SettingsController: logout: Could not sign out user")
-            return
-        }
-        UserDefaults.standard.set(false, forKey: "isLoggedIn")
+        Shared.shared.userManager.logOut()
         tabBarController?.selectedIndex = 0
         if let vc = authUI?.authViewController() {
             vc.isModalInPresentation = true
-            present(vc, animated: true)
+            tabBarController?.present(vc, animated: true)
         }
     }
 }

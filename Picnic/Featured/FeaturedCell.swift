@@ -75,10 +75,8 @@ class FeaturedCell: UICollectionViewCell {
         rating.configure(picnic: picnic)
         rating.mode = .displayWithCount
         like.setLiked(isLiked: Shared.shared.userManager.isSaved(picnic: picnic))
-// MARK: This was a quick fix and is bad
-        guard let place = picnic.locationData else { return }
 // MARK: change this to loading wheel
-        Shared.shared.databaseManager.image(forPicnic: picnic) { image, error in
+        Shared.shared.picnicManager.image(forPicnic: picnic) { image, error in
             if let error = error {
                 print("Error: FeaturedCell: configure: \(error.localizedDescription)")
                 return
@@ -93,7 +91,7 @@ class FeaturedCell: UICollectionViewCell {
         self.picnic = picnic
         title.text = picnic.name
 // MARK: I don't really like this
-        location.text = (place.city ?? "") + ", " + (place.state ?? "")
+        location.text = (picnic.city ?? "") + ", " + (picnic.state ?? "")
         
 // MARK: Constraints
         NSLayoutConstraint.activate([

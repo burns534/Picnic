@@ -51,7 +51,11 @@ class AuthPicker: FUIAuthPickerViewController {
     }
     
     @objc func skipButtonHandler(_ sender: UIBarButtonItem) {
-        Shared.shared.userManager.login(uid: nil, isAnonymous: true)
+        Auth.auth().signInAnonymously { _, error in
+            if let error = error {
+                print(error.localizedDescription)
+            }
+        }
         dismiss(animated: true)
     }
 }

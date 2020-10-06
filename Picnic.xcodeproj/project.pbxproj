@@ -11,7 +11,7 @@
 		2716B5B22491A83A0092A622 /* MapSearchResultsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2716B5B12491A83A0092A622 /* MapSearchResultsController.swift */; };
 		2723A5552527A42C008150DC /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2723A5542527A42C008150DC /* AuthManager.swift */; };
 		2723A5592527A461008150DC /* Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2723A5582527A461008150DC /* Shared.swift */; };
-		2723A55D2527A484008150DC /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2723A55C2527A484008150DC /* DatabaseManager.swift */; };
+		2723A55D2527A484008150DC /* PicnicManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2723A55C2527A484008150DC /* PicnicManager.swift */; };
 		2723A5612529363F008150DC /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2723A5602529363F008150DC /* UserManager.swift */; };
 		2723A5652529368B008150DC /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2723A5642529368B008150DC /* User.swift */; };
 		2725763424D0F1EB008916B7 /* Geohash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2725763324D0F1EB008916B7 /* Geohash.swift */; };
@@ -86,7 +86,7 @@
 		2716B5B12491A83A0092A622 /* MapSearchResultsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSearchResultsController.swift; sourceTree = "<group>"; };
 		2723A5542527A42C008150DC /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		2723A5582527A461008150DC /* Shared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared.swift; sourceTree = "<group>"; };
-		2723A55C2527A484008150DC /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
+		2723A55C2527A484008150DC /* PicnicManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PicnicManager.swift; sourceTree = "<group>"; };
 		2723A5602529363F008150DC /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
 		2723A5642529368B008150DC /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		2725763324D0F1EB008916B7 /* Geohash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geohash.swift; sourceTree = "<group>"; };
@@ -178,7 +178,7 @@
 				2723A5542527A42C008150DC /* AuthManager.swift */,
 				2752092624CF494B002E8761 /* LocationManager.swift */,
 				2723A5582527A461008150DC /* Shared.swift */,
-				2723A55C2527A484008150DC /* DatabaseManager.swift */,
+				2723A55C2527A484008150DC /* PicnicManager.swift */,
 				2723A5602529363F008150DC /* UserManager.swift */,
 			);
 			path = Managers;
@@ -579,7 +579,7 @@
 				27DDBA3525040BE20061B4BC /* Cluster.swift in Sources */,
 				2725763424D0F1EB008916B7 /* Geohash.swift in Sources */,
 				2752092724CF494B002E8761 /* LocationManager.swift in Sources */,
-				2723A55D2527A484008150DC /* DatabaseManager.swift in Sources */,
+				2723A55D2527A484008150DC /* PicnicManager.swift in Sources */,
 				279DEB6B24DB3B33003035AC /* SwipeView.swift in Sources */,
 				2723A5612529363F008150DC /* UserManager.swift in Sources */,
 				27B072EF247CCC94009974BD /* TabController.swift in Sources */,
@@ -683,7 +683,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -737,7 +737,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;

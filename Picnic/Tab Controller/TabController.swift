@@ -37,7 +37,8 @@ class TabController: UITabBarController {
         }
         vc.isModalInPresentation = true
         
-        if !UserDefaults.standard.bool(forKey: "isLoggedIn") {
+// MARK: Asks userManager if it should present sign in
+        if Shared.shared.userManager.shouldRequestLogin() {
             present(vc, animated: true)
         }
     }
