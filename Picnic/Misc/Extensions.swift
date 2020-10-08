@@ -7,6 +7,7 @@
 //
 
 import MapKit
+import FirebaseFirestore
 
 extension UIImageView {
     func sizeForImageInImageViewAspectFit() -> CGSize
@@ -124,6 +125,12 @@ extension CGSize {
     }
     static func *(left: CGSize, right: CGFloat) -> CGSize {
         CGSize(width: left.width * right, height: left.height * right)
+    }
+}
+
+extension GeoPoint {
+    var location: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
 }
 

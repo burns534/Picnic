@@ -91,17 +91,12 @@ class Rating: UIView {
         refresh()
     }
     
-//    init() {
-//        super.init(frame: .zero)
-//        setup()
-//    }
-    
     required init?(coder: NSCoder) {
-        fatalError("NSCoding not supported")
+        fatalError("init(coder:) has not been implemented")
     }
     
     func configure(picnic: Picnic) {
-        cgRating = CGFloat(picnic.rating)
+        cgRating = CGFloat(picnic.totalRating / Double(picnic.ratingCount))
         ratingCount = picnic.ratingCount
         if mode != .interactable { refresh() }
     }

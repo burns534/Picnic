@@ -15,10 +15,10 @@ fileprivate let queryPrecision: Int = 7
 
 final class PicnicManager: NSObject {
     private let picnics: CollectionReference = Firestore.firestore().collection("Picnics")
-    private let storage: StorageReference
-    init(storagePathURL: String) {
-        storage = Storage.storage().reference(forURL: storagePathURL)
-    }
+    private let storage = Storage.storage().reference(withPath: "images")
+    private var listeners = [Int: ListenerRegistration]()
+    
+    deinit { listeners.values.forEach { $0.remove() } }
     
     func store(picnic: Picnic, images: [UIImage], completion: @escaping () -> ()) {
         
@@ -41,14 +41,14 @@ final class PicnicManager: NSObject {
         }
     }
 
-    func image(forPicnic picnic: Picnic, index: Int = 0, maxSize: Int64 = 2 * 1024 * 1024, completion: ((UIImage?, Error?) -> ())? = nil) {
+    func image(forPicnic picnic: Picnic, index: Int = 0, maxSize: Int64 = 2 * 1024 * 1024, completion: @escaping (UIImage) -> ()) {
         guard let id = picnic.id, let imageNames = picnic.imageNames else { return }
         storage.child(id).child(imageNames[index]).getData(maxSize: maxSize) { data, error in
             if let error = error {
                 print("Error: DatabaseManager: image forPicnic: could not load image from firebase storage: \(error.localizedDescription)")
+            } else if let data = data, let image = UIImage(data: data) {
+                completion(image)
             }
-            guard let data = data else { return }
-            completion?(UIImage(data: data), error)
         }
     }
     
@@ -88,6 +88,44 @@ final class PicnicManager: NSObject {
                 }
             }
         }
+    }
+    
+    func addVisitedListener(picnic: Picnic, listener: UILabel) {
+        guard let id = picnic.id else { return }
+        listeners[listener.hash] = picnics.document(id).addSnapshotListener { snapshot, error in
+            if let error = error {
+                print(error.localizedDescription)
+            } else if let visited = snapshot?.data()?["visitCount"] as? Int {
+                listener.text = "I've been (\(visited))"
+            }
+        }
+    }
+    
+    func addWouldVisitListener(picnic: Picnic, listener: UILabel) {
+        guard let id = picnic.id else { return }
+        listeners[listener.hash] = picnics.document(id).addSnapshotListener { snapshot, error in
+            if let error = error {
+                print(error.localizedDescription)
+            } else if let wouldVisit = snapshot?.data()?["wouldVisit"] as? Int {
+                listener.text = "I'd go (\(wouldVisit))"
+            }
+        }
+    }
+    
+    func removeListeners(_ listeners: [UIView]) {
+        listeners.forEach {
+            self.listeners.removeValue(forKey: $0.hash)?.remove()
+        }
+    }
+    
+    func updateWouldVisit(picnic: Picnic, value: Int64) {
+        guard let id = picnic.id else { return }
+        picnics.document(id).updateData(["wouldVisit": FieldValue.increment(value)])
+    }
+    
+    func updateVisited(picnic: Picnic, value: Int64) {
+        guard let id = picnic.id else { return }
+        picnics.document(id).updateData(["visitCount": FieldValue.increment(value)])
     }
 }
 

@@ -109,15 +109,17 @@ class ImagePicker: UIViewController {
         
         navigationBar = NavigationBar()
         navigationBar.defaultConfiguration(left: true)
+        navigationBar.leftBarButton?.tintColor = .olive
         navigationBar.setTitle(text: "Select Photos")
-        navigationBar.title?.font = UIFont.systemFont(ofSize: 25, weight: .light)
+        navigationBar.title?.font = UIFont.systemFont(ofSize: 25, weight: .semibold)
+        navigationBar.title?.textColor = .olive
         let rightButton = UIButton()
         rightButton.setTitle("Confirm", for: .normal)
         rightButton.addTarget(self, action: #selector(confirm), for: .touchUpInside)
         rightButton.titleLabel?.font = UIFont.systemFont(ofSize: 25, weight: .light)
+        rightButton.setTitleColor(.olive, for: .normal)
         navigationBar.setRightBarButton(button: rightButton)
         navigationBar.setRightButtonPadding(amount: 10)
-        navigationBar.setContentColor(.olive)
         view.addSubview(navigationBar)
         
         view.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
@@ -280,7 +282,7 @@ extension ImagePicker: UICollectionViewDataSource {
         let asset = fetchResult.object(at: indexPath.item)
         cell.representedAssetIdentifier = asset.localIdentifier
         cell.configure()
-        imageManager.requestImage(for: asset, targetSize: cellSize, contentMode: .aspectFill, options: nil) { image, _ in
+        imageManager.requestImage(for: asset, targetSize: cellSize * scale, contentMode: .aspectFill, options: nil) { image, _ in
             if cell.representedAssetIdentifier == asset.localIdentifier {
                 cell.imageView.image = image
             }

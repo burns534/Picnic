@@ -12,8 +12,8 @@ import MapKit
 fileprivate let imageSize: CGSize = CGSize(width: 102, height: 102)
 fileprivate let kTextBoxCornerRadius: CGFloat = 5.0
 
-protocol NewLocationControllerDelegate: AnyObject {
-    func requestAnnotation() -> MKPointAnnotation?
+protocol NewPicnicControllerDelegate: AnyObject {
+    func createdPicnic(picnic: Picnic)
 }
 
 @available(iOS 14, *)
@@ -29,31 +29,18 @@ class NewPicnicController: UIViewController {
     var selectedImages: MultipleSelectionIcon!
     var navigationBar: NavigationBar!
     var scrollView: UIScrollView!
-    var annotation: MKPointAnnotation!
+    var coordinate: CLLocationCoordinate2D?
     var shortPresentationController: ShortPresentationController!
     var requiredFieldModal: RequiredFieldModal!
     
-    weak var delegate: NewLocationControllerDelegate?
+    weak var delegate: NewPicnicControllerDelegate?
     
     private let modalOffsetY: CGFloat = 500
 
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-    
-        annotation = delegate?.requestAnnotation()
-        configure()
         
-        requiredFieldModal = RequiredFieldModal()
-        requiredFieldModal.modalOffsetY = modalOffsetY
-        requiredFieldModal.delegate = self
-        requiredFieldModal.transitioningDelegate = self
-        requiredFieldModal.modalPresentationStyle = .custom
-        navigationController?.present(requiredFieldModal, animated: true)
-    }
-    
-// MARK: Configure
-    func configure() {
         view.backgroundColor = .white
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapToEndEditing))
         view.addGestureRecognizer(tapGestureRecognizer)
@@ -73,7 +60,7 @@ class NewPicnicController: UIViewController {
 // MARK: User Description
 //        userDescription = PaddedTextView()
         userDescription = PaddedTextField()
-        userDescription.contentMode = .top
+        userDescription.contentVerticalAlignment = .top
         userDescription.delegate = self
         userDescription.backgroundColor = .darkWhite
         userDescription.layer.cornerRadius = kTextBoxCornerRadius
@@ -102,26 +89,30 @@ class NewPicnicController: UIViewController {
         
 // MARK: Map
         map = MKMapView()
-        map.addAnnotation(annotation)
-        let span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-        let region = MKCoordinateRegion(center: annotation.coordinate, span: span)
-        map.setRegion(region, animated: false)
         map.mapType = .hybrid
         map.isUserInteractionEnabled = false
         view.addSubview(map)
+        
+        if let coordinate = coordinate {
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = coordinate
+            map.addAnnotation(annotation)
+            let span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+            let region = MKCoordinateRegion(center: coordinate, span: span)
+            map.setRegion(region, animated: false)
+        }
         
         navigationBar = NavigationBar()
         navigationBar.defaultConfiguration(left: true)
         navigationBar.backgroundColor = .clear
         navigationBar.leftBarButton?.addTarget(self, action: #selector(backButtonTap), for: .touchUpInside)
-        
+        navigationBar.leftBarButton?.tintColor = .white
         let rightButton = UIButton()
         rightButton.setTitle("Share", for: .normal)
-        rightButton.titleLabel!.sizeToFit()
         rightButton.addTarget(self, action: #selector(share), for: .touchUpInside)
+        rightButton.setTitleColor(.white, for: .normal)
         navigationBar.setRightBarButton(button: rightButton)
         navigationBar.setRightButtonPadding(amount: 10)
-        navigationBar.setContentColor(.white)
         view.addSubview(navigationBar)
         
         view.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
@@ -165,6 +156,18 @@ class NewPicnicController: UIViewController {
             selectedImages.widthAnchor.constraint(equalToConstant: 100),
             selectedImages.heightAnchor.constraint(equalToConstant: 100)
         ])
+        
+        requiredFieldModal = RequiredFieldModal()
+        requiredFieldModal.modalOffsetY = modalOffsetY
+        requiredFieldModal.delegate = self
+        requiredFieldModal.transitioningDelegate = self
+        requiredFieldModal.modalPresentationStyle = .custom
+        navigationController?.present(requiredFieldModal, animated: true)
+    }
+    
+// MARK: Configure
+    func configure(coordinate: CLLocationCoordinate2D) {
+        self.coordinate = coordinate
     }
     
 // MARK: Obj-C functions
@@ -172,25 +175,19 @@ class NewPicnicController: UIViewController {
     @objc func share(_ sender: UIButton) {
         guard let name = name.text,
         let userDescription = userDescription.text,
+        let coordinate = coordinate,
         name != "", userDescription != "" else { return }
         let imageNames = self.images.map {_ in UUID().uuidString }
         
-        annotation.coordinate.getPlacemark { placemark in
-            
-            let state = placemark.administrativeArea
-            let city = placemark.locality
-
-// MARK: didVisit shouldn't be true by default
-            let newPicnic = Picnic(name: name, userDescription: userDescription, tags: nil, imageNames: imageNames, rating: self.interactiveRating.rating, ratingCount: 1, wouldVisit: 0, visitCount: 1, latitude: self.annotation.coordinate.latitude, longitude: self.annotation.coordinate.longitude, city: city, state: state, park: nil)
-       
-            // add to collection view datasource
-            locations.append(newPicnic)
+        coordinate.getPlacemark { placemark in
+            let picnic = Picnic(name: name, userDescription: userDescription, tags: nil, imageNames: imageNames, totalRating: Double(self.interactiveRating.rating), ratingCount: 1, wouldVisit: 0, visitCount: 1, reviews: nil, latitude: coordinate.latitude, longitude: coordinate.longitude, city: placemark.locality, state: placemark.administrativeArea, park: nil)
+            self.delegate?.createdPicnic(picnic: picnic)
 
             // store picnic data
-            Shared.shared.picnicManager.store(picnic: newPicnic, images: self.images) {
+            Shared.shared.picnicManager.store(picnic: picnic, images: self.images) {
                 self.navigationController?.popToRootViewController(animated: true)
             }
-            Shared.shared.userManager.rateRequest(picnic: newPicnic)
+            Shared.shared.userManager.rateRequest(picnic: picnic)
         }
          
      }

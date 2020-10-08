@@ -9,8 +9,6 @@
 import UIKit
 import CoreLocation
 
-var locations: [Picnic] = [Picnic]()
-
 func load<T: Decodable>(_ filename: String) -> T {
     let data: Data
     

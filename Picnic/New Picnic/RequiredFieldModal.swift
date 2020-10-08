@@ -246,7 +246,7 @@ class RequiredFieldModal: UIViewController {
             guard let text = userDescription.text else { return }
             state = .done
             delegate?.update(description: text)
-            confirmButton.titleLabel?.text = "Confirm"
+            confirmButton.setTitle("Confirm", for: .normal)
             userDescription.isHidden = true
             descriptionInstructions.isHidden = true
             view.sendSubviewToBack(userDescription)
@@ -257,7 +257,7 @@ class RequiredFieldModal: UIViewController {
             view.endEditing(true)
         case .done:
             state = .one
-            confirmButton.titleLabel?.text = "Next"
+            confirmButton.setTitle("Next", for: .normal)
             imageSelection.isHidden = true
             imageLabel.isHidden = true
             view.sendSubviewToBack(imageSelection)

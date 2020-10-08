@@ -67,19 +67,20 @@ class LocationSelector: UIViewController {
         navigationBar.defaultConfiguration(left: true)
         navigationBar.backgroundColor = .clear
         navigationBar.leftBarButton?.addTarget(self, action: #selector(backButtonTap), for: .touchUpInside)
-        
+        navigationBar.leftBarButton?.tintColor = .white
         let rightButton = UIButton()
         rightButton.setTitle("Next", for: .normal)
         rightButton.addTarget(self, action: #selector(nextButtonHandler), for: .touchUpInside)
         rightButton.titleLabel?.font = UIFont.systemFont(ofSize: 40, weight: .thin)
+        rightButton.setTitleColor(.white, for: .normal)
         navigationBar.setRightBarButton(button: rightButton)
         navigationBar.setRightButtonPadding(amount: 10)
         
         searchButton = UIButton()
         searchButton.setImage(UIImage(systemName: "magnifyingglass", withConfiguration: UIImage.SymbolConfiguration(pointSize: 40, weight: .thin))?.withRenderingMode(.alwaysTemplate), for: .normal)
         searchButton.addTarget(self, action: #selector(searchButtonHandler), for: .touchUpInside)
+        searchButton.tintColor = .white
         navigationBar.setCenterView(view: searchButton)
-        navigationBar.setContentColor(.white)
         navigationBar.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(navigationBar)
 
@@ -113,8 +114,11 @@ class LocationSelector: UIViewController {
 // MARK: This is bad
         if #available(iOS 14, *) {
             let next = NewPicnicController()
-            next.delegate = self
+            next.configure(coordinate: selectedCoordinate)
             navigationController?.pushViewController(next, animated: true)
+            if let featured = tabBarController?.viewControllers?.first as? Featured {
+                next.delegate = featured
+            }
         } else {
             fatalError()
         }
@@ -139,15 +143,6 @@ class LocationSelector: UIViewController {
 extension LocationSelector: UISearchBarDelegate {
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         print("searchBarTextDidBeginEditing")
-    }
-}
-
-extension LocationSelector: NewLocationControllerDelegate {
-    func requestAnnotation() -> MKPointAnnotation? {
-        guard let loc = selectedCoordinate else { return nil }
-        let annotation = MKPointAnnotation()
-        annotation.coordinate = loc
-        return annotation
     }
 }
 

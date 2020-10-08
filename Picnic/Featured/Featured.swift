@@ -15,7 +15,7 @@ let kFeaturedCellSize = CGSize(width: 400, height: 260)
 
 class Featured: UIViewController {
     
-    var locations = [Picnic]()
+    var picnics = [Picnic]()
     var collectionView: UICollectionView!
     
     private let refreshController = UIRefreshControl()
@@ -57,7 +57,7 @@ class Featured: UIViewController {
     func refreshDataSource(completion: @escaping () -> ()) {
         guard let loc = Shared.shared.locationManager.location else { return }
         Shared.shared.picnicManager.query(byLocation: loc, queryLimit: 20, precision: 3) { picnics in
-            self.locations = picnics
+            self.picnics = picnics
             completion()
         }
     }
@@ -88,14 +88,14 @@ extension Featured: UICollectionViewDataSource {
     }
    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        locations.count
+        picnics.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? FeaturedCell else {
             return UICollectionViewCell()
         }
-        cell.configure(picnic: locations[indexPath.item])
+        cell.configure(picnic: picnics[indexPath.item])
         return cell
     }
 }
@@ -103,11 +103,17 @@ extension Featured: UICollectionViewDataSource {
 extension Featured: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let detailView = DetailController()
-        detailView.configure(picnic: locations[indexPath.item])
+        detailView.configure(picnic: picnics[indexPath.item])
         navigationController?.pushViewController(detailView, animated: true)
     }
 }
 
 extension Featured: AuthManagerDelegate {
     func didSignIn() { collectionView.reloadData() }
+}
+
+extension Featured: NewPicnicControllerDelegate {
+    func createdPicnic(picnic: Picnic) {
+        collectionView.reloadData()
+    }
 }

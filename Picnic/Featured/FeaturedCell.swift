@@ -23,14 +23,6 @@ class FeaturedCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setup()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("NSCoding not supported")
-    }
-    
-    func setup() {
         self.backgroundColor = .white
         self.contentView.translatesAutoresizingMaskIntoConstraints = false
         // configure image
@@ -38,6 +30,7 @@ class FeaturedCell: UICollectionViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 10
         imageView.clipsToBounds = true
+        imageView.setGradient(colors: [.clear, UIColor.black.withAlphaComponent(0.4)])
         contentView.addSubview(imageView)
         
         // configure title
@@ -49,6 +42,7 @@ class FeaturedCell: UICollectionViewCell {
         rating = Rating()
         contentView.addSubview(rating)
         like = HeartButton(pointSize: 35)
+        like.addTarget(self, action: #selector(likePress), for: .touchUpInside)
         contentView.addSubview(like)
         
         location = UILabel()
@@ -57,32 +51,26 @@ class FeaturedCell: UICollectionViewCell {
         
         contentView.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false
         }
-        
-        // MARK: FIX
-        let dtgr = UITapGestureRecognizer(target: self, action: #selector(doubleTap))
-        dtgr.delegate = self
-        dtgr.numberOfTapsRequired = 2
-        addGestureRecognizer(dtgr)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("NSCoding not supported")
     }
     
     // this isn't working
     override func prepareForReuse() {
         imageView.image = nil
         title.text = nil
+        Shared.shared.userManager.removeSaveListener(like)
     }
     
     func configure(picnic: Picnic) {
         rating.configure(picnic: picnic)
         rating.mode = .displayWithCount
-        like.setLiked(isLiked: Shared.shared.userManager.isSaved(picnic: picnic))
+        Shared.shared.userManager.addSaveListener(picnic: picnic, listener: like)
 // MARK: change this to loading wheel
-        Shared.shared.picnicManager.image(forPicnic: picnic) { image, error in
-            if let error = error {
-                print("Error: FeaturedCell: configure: \(error.localizedDescription)")
-                return
-            } else {
-                self.imageView.image = image
-            }
+        Shared.shared.picnicManager.image(forPicnic: picnic) {
+            self.imageView.image = $0
         }
         
 // apply shadow to cell
@@ -117,20 +105,18 @@ class FeaturedCell: UICollectionViewCell {
             
             like.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
             like.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -15),
-//            like.widthAnchor.constraint(equalToConstant: 50),
-//            like.heightAnchor.constraint(equalToConstant: 45),
-            
+
             location.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -10),
             location.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
             location.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.centerXAnchor, constant: 5)
         ])
     }
     
-    @objc func doubleTap(_ sender: UITapGestureRecognizer) {
-        
+    @objc func likePress(_ sender: HeartButton) {
+        if sender.isActive {
+            Shared.shared.userManager.unsavePost(picnic: picnic)
+        } else {
+            Shared.shared.userManager.savePost(picnic: picnic)
+        }
     }
-}
-
-extension FeaturedCell: UIGestureRecognizerDelegate {
-    
 }

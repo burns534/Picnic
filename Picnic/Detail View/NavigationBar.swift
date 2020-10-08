@@ -84,9 +84,5 @@ class NavigationBar: UIView {
         title?.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         title?.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
     }
-    
-    func setContentColor(_ color: UIColor) {
-        subviews.forEach { $0.tintColor = color }
-    }
 }
 
