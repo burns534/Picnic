@@ -18,7 +18,7 @@ class VisitButton: UIView {
         if isActive {
             button.setImage(UIImage(systemName: "plus"), for: .normal)
         } else {
-            button.setImage(UIImage(systemName: "plus"), for: .normal)
+            button.setImage(UIImage(systemName: "checkmark"), for: .normal)
         }
         isActive.toggle()
         return isActive

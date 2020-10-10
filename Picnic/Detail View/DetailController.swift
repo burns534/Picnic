@@ -26,8 +26,9 @@ class DetailController: UIViewController {
     let overview = UITextView()
     let visitedLabel = UILabel()
     let wouldVisitLabel = UILabel()
-    var wouldVisitButton: VisitButton!
-    var visitedButton: VisitButton!
+    let reviews = Reviews()
+//    var wouldVisitButton: VisitButton!
+//    var visitedButton: VisitButton!
     var liked: HeartButton!
     
 
@@ -82,12 +83,13 @@ class DetailController: UIViewController {
         ])
         
 // MARK: Section One
+        preview.isUserInteractionEnabled = true
         preview.contentMode = .scaleAspectFill
         preview.clipsToBounds = true
         preview.setGradient(colors: [.clear, UIColor.black.withAlphaComponent(0.4)])
         preview.translatesAutoresizingMaskIntoConstraints = false
         preview.setGradient(colors: [.clear, UIColor.black.withAlphaComponent(0.4)])
-        Shared.shared.picnicManager.image(forPicnic: picnic) { image in
+        Managers.shared.databaseManager.image(forPicnic: picnic) { image in
             self.preview.image = image
         }
         
@@ -128,26 +130,6 @@ class DetailController: UIViewController {
         stackView.addArrangedSubview(preview)
 
 // MARK: Section Two
-        visitedButton = VisitButton()
-        visitedButton.translatesAutoresizingMaskIntoConstraints = false
-        visitedButton.configure(text: "I've been")
-        visitedButton.button.addTarget(self, action: #selector(didVisit), for: .touchUpInside)
-        wouldVisitButton = VisitButton()
-        wouldVisitButton.translatesAutoresizingMaskIntoConstraints = false
-        wouldVisitButton.configure(text: "I'd go")
-        wouldVisitButton.button.addTarget(self, action: #selector(wouldVisit), for: .touchUpInside)
-        
-        let visitedBarDivider = UIView()
-        visitedBarDivider.backgroundColor = .black
-        visitedBarDivider.translatesAutoresizingMaskIntoConstraints = false
-        
-        let visitedBar = UIStackView(arrangedSubviews: [visitedButton, visitedBarDivider, wouldVisitButton])
-        visitedBar.axis = .horizontal
-        visitedBar.alignment = .center
-        visitedBar.translatesAutoresizingMaskIntoConstraints = false
-        visitedBar.spacing = 0
-        visitedBar.distribution = .equalCentering
-
         let overviewDivider = UIView()
         overviewDivider.translatesAutoresizingMaskIntoConstraints = false
         overviewDivider.backgroundColor = .lightGray
@@ -177,18 +159,6 @@ class DetailController: UIViewController {
             preview.widthAnchor.constraint(equalTo: view.widthAnchor),
             preview.heightAnchor.constraint(equalToConstant: kPreviewHeight),
             
-            visitedButton.widthAnchor.constraint(equalToConstant: 150),
-            visitedButton.heightAnchor.constraint(equalToConstant: 80),
-            
-            wouldVisitButton.widthAnchor.constraint(equalToConstant: 150),
-            wouldVisitButton.heightAnchor.constraint(equalToConstant: 80),
-            
-            visitedBarDivider.heightAnchor.constraint(equalToConstant: 40),
-            visitedBarDivider.widthAnchor.constraint(equalToConstant: 1),
-            
-            visitedBar.widthAnchor.constraint(equalToConstant: 370),
-            visitedBar.heightAnchor.constraint(equalToConstant: 80),
-            
             overviewLabel.widthAnchor.constraint(equalToConstant: 370),
             overviewLabel.heightAnchor.constraint(equalToConstant: 30),
             overview.widthAnchor.constraint(equalToConstant: 370),
@@ -199,11 +169,8 @@ class DetailController: UIViewController {
             map.heightAnchor.constraint(equalToConstant: 220)
         ])
         
-        stackView.addArrangedSubview(visitedBar)
-//        stackView.addArrangedSubview(overviewLabel)
         stackView.addArrangedSubview(overview)
         stackView.addArrangedSubview(overviewDivider)
-//        stackView.addArrangedSubview(infoBar)
         stackView.addArrangedSubview(map)
         
         view.bringSubviewToFront(navigationBar)
@@ -214,17 +181,14 @@ class DetailController: UIViewController {
         style = .lightContent
         setNeedsStatusBarAppearanceUpdate()
         navigationController?.setNavigationBarHidden(true, animated: false)
-        Shared.shared.userManager.addSaveListener(picnic: picnic, listener: liked)
-        Shared.shared.picnicManager.addWouldVisitListener(picnic: picnic, listener: wouldVisitButton.label)
-        Shared.shared.picnicManager.addVisitedListener(picnic: picnic, listener: visitedButton.label)
+        Managers.shared.databaseManager.addSaveListener(picnic: picnic, listener: liked)
     }
     
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
-        Shared.shared.userManager.removeSaveListener(liked)
-        Shared.shared.picnicManager.removeListeners([wouldVisitButton.label, visitedButton.label])
+        Managers.shared.databaseManager.removeListener(liked)
     }
     
     func configure(picnic: Picnic) { self.picnic = picnic }
@@ -239,35 +203,18 @@ class DetailController: UIViewController {
     }
     
     @objc func likePress(_ sender: HeartButton) {
+        print("called")
         if sender.isActive {
-            Shared.shared.userManager.unsavePost(picnic: picnic)
+            Managers.shared.databaseManager.unsavePost(picnic: picnic)
         } else {
-            Shared.shared.userManager.savePost(picnic: picnic)
+            Managers.shared.databaseManager.savePost(picnic: picnic)
         }
-    }
-    
-    @objc func wouldVisit(_ sender: UIButton) {
-        guard let sender = sender.superview as? VisitButton else { return }
-        Shared.shared.picnicManager.updateWouldVisit(picnic: picnic, value: sender.toggle() ? 1 : -1)
-    }
-    
-    @objc func didVisit(_ sender: VisitButton) {
-        guard let sender = sender.superview as? VisitButton else { return }
-        Shared.shared.picnicManager.updateVisited(picnic: picnic, value: sender.toggle() ? 1 : -1)
     }
 }
 
 extension DetailController: RatingDelegate {
-// MARK: There will be an issue with a user trying to change their rating on a post, but that's probably okay for now
     func updateRating(value: Float) {
-        Shared.shared.userManager.rateRequest(picnic: picnic) { allowable in
-            if allowable {
-                Shared.shared.picnicManager.updateRating(picnic: self.picnic, value: value)
-                // update rating
-            } else {
-                // explain to user
-            }
-        }
+        Managers.shared.databaseManager.updateRating(picnic: picnic, value: Int64(value))
     }
 }
 

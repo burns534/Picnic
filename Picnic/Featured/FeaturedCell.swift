@@ -61,15 +61,15 @@ class FeaturedCell: UICollectionViewCell {
     override func prepareForReuse() {
         imageView.image = nil
         title.text = nil
-        Shared.shared.userManager.removeSaveListener(like)
+        Managers.shared.databaseManager.removeListener(like)
     }
     
     func configure(picnic: Picnic) {
         rating.configure(picnic: picnic)
         rating.mode = .displayWithCount
-        Shared.shared.userManager.addSaveListener(picnic: picnic, listener: like)
+        Managers.shared.databaseManager.addSaveListener(picnic: picnic, listener: like)
 // MARK: change this to loading wheel
-        Shared.shared.picnicManager.image(forPicnic: picnic) {
+        Managers.shared.databaseManager.image(forPicnic: picnic) {
             self.imageView.image = $0
         }
         
@@ -114,9 +114,9 @@ class FeaturedCell: UICollectionViewCell {
     
     @objc func likePress(_ sender: HeartButton) {
         if sender.isActive {
-            Shared.shared.userManager.unsavePost(picnic: picnic)
+            Managers.shared.databaseManager.unsavePost(picnic: picnic)
         } else {
-            Shared.shared.userManager.savePost(picnic: picnic)
+            Managers.shared.databaseManager.savePost(picnic: picnic)
         }
     }
 }

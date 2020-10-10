@@ -33,20 +33,22 @@ class Featured: UIViewController {
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.refreshControl = refreshController
         collectionView.register(FeaturedCell.self, forCellWithReuseIdentifier: reuseIdentifier)
-        refreshDataSource {
+        let location = Managers.shared.locationManager.location ?? .init()
+        Managers.shared.databaseManager.addPicnicQuery(location: location, limit: 50, radius: 20, key: "Picnics")
+        Managers.shared.databaseManager.nextPage(forPicnicQueryKey: "Picnics") { picnics in
             self.collectionView.performBatchUpdates {
+                self.picnics = picnics
                 self.collectionView.reloadSections(IndexSet(integer: 0))
             }
         }
         view.addSubview(collectionView)
-        
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus.square"), style: .plain, target: self, action: #selector(rightBarButton))
         navigationItem.rightBarButtonItem?.tintColor = .olive
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "line.horizontal.3.decrease.circle"), style: .plain, target: self, action: #selector(filterHandler))
         navigationItem.leftBarButtonItem?.tintColor = .olive
         
-        Shared.shared.authManager.delegate = self
+        Managers.shared.authManager.delegate = self
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -54,17 +56,10 @@ class Featured: UIViewController {
         tabBarController?.tabBar.isHidden = false
     }
     
-    func refreshDataSource(completion: @escaping () -> ()) {
-        guard let loc = Shared.shared.locationManager.location else { return }
-        Shared.shared.picnicManager.query(byLocation: loc, queryLimit: 20, precision: 3) { picnics in
-            self.picnics = picnics
-            completion()
-        }
-    }
-    
     @objc func pullDown(_ sender: Any) {
-        refreshDataSource {
+        Managers.shared.databaseManager.refresh(forPicnicQueryKey: "Picnics") { picnics in
             self.collectionView.performBatchUpdates {
+                self.picnics = picnics
                 self.collectionView.reloadSections(IndexSet(integer: 0))
             } completion: { _ in
                 self.refreshController.endRefreshing()

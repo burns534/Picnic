@@ -15,7 +15,7 @@ enum PicnicTag: String, Codable {
 }
 
 struct Picnic: Codable, Identifiable {
-    init(name: String = "", userDescription: String = "", tags: [PicnicTag]? = nil, imageNames: [String]? = nil, totalRating: Double = 0.0, ratingCount: Int = 0, wouldVisit: Int = 0, visitCount: Int = 0, reviews: [String]? = nil, latitude: Double = 0.0, longitude: Double = 0.0, city: String? = nil, state: String? = nil, park: String? = nil) {
+    init(name: String = "", userDescription: String = "", tags: [PicnicTag]? = nil, imageNames: [String]? = nil, totalRating: Double = 0.0, ratingCount: Int = 0, wouldVisit: Int = 0, visitCount: Int = 0, reviews: [DocumentReference]? = nil, latitude: Double = 0.0, longitude: Double = 0.0, city: String? = nil, state: String? = nil, park: String? = nil) {
         self.name = name
         self.userDescription = userDescription
         self.tags = tags
@@ -41,7 +41,7 @@ struct Picnic: Codable, Identifiable {
     var ratingCount: Int = 0
     var wouldVisit: Int = 0
     var visitCount: Int = 0
-    var reviews: [String]?
+    var reviews: [DocumentReference]?
 // MARK: Location Data
     var coordinates: GeoPoint
     var city: String?

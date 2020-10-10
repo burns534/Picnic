@@ -9,8 +9,8 @@
 import FirebaseFirestoreSwift
 struct User: Codable, Identifiable {
     @DocumentID var id: String?
-    var rated: [String]?
-    var saved: [String]?
+    var rated = [String: Int64]()
+    var saved = [String]()
 }
 
 

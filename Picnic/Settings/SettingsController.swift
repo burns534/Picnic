@@ -36,7 +36,7 @@ class SettingsController: UIViewController {
     }
     
     @objc func logout(_ sender: UIButton) {
-        Shared.shared.userManager.logOut()
+        Managers.shared.databaseManager.logOut()
         tabBarController?.selectedIndex = 0
         if let vc = authUI?.authViewController() {
             vc.isModalInPresentation = true

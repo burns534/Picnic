@@ -38,7 +38,7 @@ extension AuthManager: FUIAuthDelegate {
         if let error = error {
             print("Error: TabController: authUI didSignInWith: \(error.localizedDescription)")
         } else {
-            Shared.shared.userManager.signIn()
+            Managers.shared.databaseManager.signIn()
         }
         delegate?.didSignIn()
     }

@@ -181,13 +181,12 @@ class NewPicnicController: UIViewController {
         
         coordinate.getPlacemark { placemark in
             let picnic = Picnic(name: name, userDescription: userDescription, tags: nil, imageNames: imageNames, totalRating: Double(self.interactiveRating.rating), ratingCount: 1, wouldVisit: 0, visitCount: 1, reviews: nil, latitude: coordinate.latitude, longitude: coordinate.longitude, city: placemark.locality, state: placemark.administrativeArea, park: nil)
-            self.delegate?.createdPicnic(picnic: picnic)
 
             // store picnic data
-            Shared.shared.picnicManager.store(picnic: picnic, images: self.images) {
+            Managers.shared.databaseManager.store(picnic: picnic, images: self.images) {
+                self.delegate?.createdPicnic(picnic: picnic)
                 self.navigationController?.popToRootViewController(animated: true)
             }
-            Shared.shared.userManager.rateRequest(picnic: picnic)
         }
          
      }

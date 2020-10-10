@@ -1,0 +1,486 @@
+//
+//  Geohash.swift
+//  Picnic
+
+import CoreLocation
+
+//private let charmap = Array("0123456789bcdefghjkmnpqrstuvwxyz")
+
+private extension String {
+    init(integer n: Int, radix: Int, padding: Int) {
+        let s = String(n, radix: radix)
+        let pad = (padding - s.count % padding) % padding
+        self = Array(repeating: "0", count: pad).joined(separator: "") + s
+    }
+}
+
+private func + (left: [String], right: String) -> [String] {
+    var arr = left
+    arr.append(right)
+    return arr
+}
+
+private func << (left: [String], right: String) -> [String] {
+    var arr = left
+    var s = arr.popLast()!
+    s += right
+    arr.append(s)
+    return arr
+}
+
+public struct Span {
+    public let min: Double
+    public let max: Double
+}
+
+extension Span {
+    public var mean: Double { (min + max) / 2 }
+    public var distance: Double { max - min }
+    
+    static let latitude = Span(min: -90.0, max: 90.0)
+    static let longitude = Span(min: -180.0, max: 180.0)
+}
+
+public struct Region {
+    public let width: Span
+    public let height: Span
+    public let hash: String
+    public let precision: Precision?
+    
+    // MARK: Private
+    private static let bitmap = "0123456789bcdefghjkmnpqrstuvwxyz".enumerated()
+        .map {
+            ($1, String(integer: $0, radix: 2, padding: 5))
+        }
+        .reduce(into: [Character: String]()) {
+            $0[$1.0] = $1.1
+    }
+
+    private static let charmap = bitmap
+        .reduce(into: [String: Character]()) {
+            $0[$1.1] = $1.0
+    }
+    
+    public static func decode(hash: String) -> (latitude: (min: Double, max: Double), longitude: (min: Double, max: Double))? {
+        // For example: hash = u4pruydqqvj
+        let bits = hash.map { bitmap[$0] ?? "?" }.joined(separator: "")
+        guard bits.count % 5 == 0 else { return nil }
+        // bits = 1101000100101011011111010111100110010110101101101110001
+        let (lat, lon) = bits.enumerated().reduce(into: ([Character](), [Character]())) {
+            if $1.0 % 2 == 0 {
+                $0.1.append($1.1)
+            } else {
+                $0.0.append($1.1)
+            }
+        }
+        // lat = [1,1,0,1,0,0,0,1,1,1,1,1,1,1,0,1,0,1,1,0,0,1,1,0,1,0,0]
+        // lon = [1,0,0,0,0,1,1,1,0,1,1,0,0,1,1,0,1,0,0,1,1,1,0,1,1,1,0,1]
+        func combiner(array a: (min: Double, max: Double), value: Character) -> (Double, Double) {
+            let mean = (a.min + a.max) / 2
+            return value == "1" ? (mean, a.max) : (a.min, mean)
+        }
+
+        let latRange = lat.reduce((-90.0, 90.0), combiner)
+        // latRange = (57.649109959602356, 57.649111300706863)
+        let lonRange = lon.reduce((-180.0, 180.0), combiner)
+        // lonRange = (10.407439023256302, 10.407440364360809)
+        return (latRange, lonRange)
+    }
+    
+    public static func encode(latitude: Double, longitude: Double, length: Int) -> String {
+        // For example: (latitude, longitude) = (57.6491106301546, 10.4074396938086)
+        func combiner(array a: (min: Double, max: Double, array: [String]), value: Double) -> (Double, Double, [String]) {
+            let mean = (a.min + a.max) / 2
+            if value < mean {
+                return (a.min, mean, a.array + "0")
+            } else {
+                return (mean, a.max, a.array + "1")
+            }
+        }
+
+        let lat = Array(repeating: latitude, count: length*5).reduce((-90.0, 90.0, [String]()), combiner)
+        // lat = (57.64911063015461, 57.649110630154766, [1,1,0,1,0,0,0,1,1,1,1,1,1,1,0,1,0,1,1,0,0,1,1,0,1,0,0,1,0,0,...])
+        let lon = Array(repeating: longitude, count: length*5).reduce((-180.0, 180.0, [String]()), combiner)
+        // lon = (10.407439693808236, 10.407439693808556, [1,0,0,0,0,1,1,1,0,1,1,0,0,1,1,0,1,0,0,1,1,1,0,1,1,1,0,1,0,1,..])
+        let latlon = lon.2.enumerated().flatMap { [$1, lat.2[$0]] }
+        // latlon - [1,1,0,1,0,0,0,1,0,0,1,0,1,0,1,1,0,1,1,1,1,1,0,1,0,1,1,1,1,...]
+        let bits = latlon.enumerated().reduce([String]()) { $1.0 % 5 > 0 ? $0 << $1.1 : $0 + $1.1 }
+        //  bits: [11010,00100,10101,10111,11010,11110,01100,10110,10110,11011,10001,10010,10101,...]
+        let arr = bits.compactMap { charmap[$0] }
+        // arr: [u,4,p,r,u,y,d,q,q,v,j,k,p,b,...]
+        return String(arr.prefix(length))
+    }
+}
+
+extension Region {
+
+    public var center: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(latitude: height.mean, longitude: width.mean)
+    }
+    
+    public var size: (width: Double, height: Double) {
+        return (width.distance, height.distance)
+    }
+    
+    public init(location: CLLocationCoordinate2D, precision: Int) {
+        self.init(latitude: location.latitude, longitude: location.longitude, precision: precision)
+    }
+    
+    public init(latitude: Double, longitude: Double, precision: Int) {
+        let hash = Region.encode(latitude: latitude, longitude: longitude, length: precision)
+        let data = Region.decode(hash: hash)!
+        let width = Span(min: data.longitude.min, max: data.longitude.max)
+        let height = Span(min: data.latitude.min, max: data.latitude.max)
+        self = Region(width: width, height: height, hash: hash, precision: Precision(rawValue: precision))
+    }
+    
+    public init?(hash: String) {
+        guard let data = Region.decode(hash: hash) else { return nil }
+        let width = Span(min: data.longitude.min, max: data.longitude.max)
+        let height = Span(min: data.latitude.min, max: data.latitude.max)
+        self = Region(width: width, height: height, hash: hash, precision: Precision(rawValue: hash.count))
+    }
+
+//    public init(latitude: Double, longitude: Double, precision: Int) {
+//
+//        var lat = Span.latitude
+//        var lng = Span.longitude
+//
+//        var hash: Array<Character> = []
+//        var parity = Parity.lng
+//        var char = 0
+//        var count = 0
+//
+//        func inc() {
+//            let mask = 0b10000 >> count
+//            char |= mask
+//        }
+//
+//        func compare(span: Span, source: Double) -> Span {
+//            let mean = span.mean
+//            let isLow = source < mean
+//            let (min, max) = isLow ? (span.min, mean) : (mean, span.max)
+//            if !isLow { inc() }
+//            return Span(min: min, max: max)
+//        }
+//
+//        repeat {
+//            switch parity {
+//            case .lng: lng = compare(span: lng, source: longitude)
+//            case .lat: lat = compare(span: lat, source: latitude)
+//            }
+//            parity.flip()
+//            count += 1
+//            if count == 5 {
+//                hash.append(charmap[char])
+//                count = 0
+//                char = 0
+//            }
+//
+//        } while hash.count < precision
+//
+//        let height = Span(min: lat.min, max: lat.max)
+//        let width = Span(min: lng.min, max: lng.min)
+//
+//        self = Region(width: width, height: height, hash: String(hash), precision: Precision(rawValue: precision))
+//    }
+
+//    public init?(hash: String) {
+//
+//        var lat = Span.latitude
+//        var lng = Span.longitude
+//
+//        var parity = Parity.lng
+//
+//        for char in hash {
+//            guard let bitmap = charmap.firstIndex(of: char) else { return nil }
+//            var mask = 0b10000
+//
+//            func compare(span: Span) -> Span {
+//                let mean = span.mean
+//                let isLow = bitmap & mask == 0
+//                let (min, max) = isLow ? (span.min, mean) : (mean, span.max)
+//                return Span(min: min, max: max)
+//            }
+//
+//            while mask != 0 {
+//                switch parity {
+//                case .lng: lng = compare(span: lng)
+//                case .lat: lat = compare(span: lat)
+//                }
+//                parity.flip()
+//                mask >>= 1
+//            }
+//        }
+//        self = Region(width: lng, height: lat, hash: hash, precision: Precision(rawValue: hash.count))
+//    }
+    
+    
+
+    func north(_ region: Region, _ precision: Int) -> Region {
+        let lat = region.center.latitude
+        let lng = region.center.longitude
+        let v = region.height.distance
+        let northCenter = lat + v
+        if northCenter > 90.0 {
+            let k = lng > 0 ? lng - 180.0 : lng + 180.0
+            return Region(latitude: lat, longitude: k, precision: precision)
+        }
+        return Region(latitude: northCenter, longitude: lng, precision: precision)
+    }
+
+    func south(_ region: Region, _ precision: Int) -> Region {
+        let lat = region.center.latitude
+        let lng = region.center.longitude
+        let v = region.height.distance
+        let southCenter = lat - v
+        if southCenter < -90.0 {
+            let k = lng < 0 ? lng + 180.0 : lng - 180.0
+            return Region(latitude: lat, longitude: k, precision: precision)
+        }
+        return Region(latitude: southCenter, longitude: lng, precision: precision)
+    }
+    
+    func east(_ region: Region, _ precision: Int) -> Region {
+        let lat = region.center.latitude
+        let lng = region.center.longitude
+        let h = region.width.distance
+        var eastCenter = lng + h
+        if eastCenter > 180.0 { eastCenter -= 360.0 }
+        return Region(latitude: lat, longitude: eastCenter, precision: precision)
+    }
+
+    func west(_ region: Region, _ precision: Int) -> Region {
+        let lat = region.center.latitude
+        let lng = region.center.longitude
+        let h = region.width.distance
+        var westCenter = lng - h
+        if westCenter < -180.0 { westCenter += 360.0 }
+        return Region(latitude: lat, longitude: westCenter, precision: precision)
+    }
+
+    func northeast(_ region: Region, _ precision: Int) -> Region {
+        return north(east(region, precision), precision)
+    }
+
+    func southeast(_ region: Region, _ precision: Int) -> Region {
+        return south(east(self, precision), precision)
+    }
+
+    func southwest(_ region: Region, _ precision: Int) -> Region {
+        return south(west(self, precision), precision)
+    }
+
+    func northwest(_ region: Region, _ precision: Int) -> Region {
+        return north(west(self, precision), precision)
+    }
+// I don't think I like this
+    public func neighbors() -> [Region] {
+        let precision = hash.count
+        return [
+            north(self, precision),
+            northeast(self, precision),
+            east(self, precision),
+            southeast(self, precision),
+            south(self, precision),
+            southwest(self, precision),
+            west(self, precision),
+            northwest(self, precision)
+        ]
+    }
+
+    private enum Parity {
+        case lng
+        case lat
+        mutating func flip() {
+            switch self {
+            case .lng: self = .lat
+            case .lat: self = .lng
+            }
+        }
+    }
+}
+
+extension Region {
+    /**
+     Converts supplied radius in kilometers to associated precision value such that a point in a region of this precision would have a (threshold) chance of having greater than (radius) distance from any given edge of the region.
+     */
+    static func radiusToPrecision(radius: Double, threshold: Double) -> Precision {
+        let radiusInMeters = radius * 1000.0
+        for precision in Precision.allCases.reversed() {
+            if precision.margin > 8 * radiusInMeters && pow(precision.margin - 2.0 * radiusInMeters, 2) / pow(precision.margin, 2) >= threshold {
+                print("called rediuaToPrecision: radius: \(radiusInMeters), returning \(precision.rawValue)")
+                return precision
+            }
+        }
+        return .seventyEightKilometers
+    }
+}
+
+public let kDefaultPrecision = 9
+
+public enum Precision: Int, CaseIterable {
+
+    /// ±2500 km
+    case twentyFiveHundredKilometers = 1
+
+    /// ±630 km
+    case sixHundredThirtyKilometers = 2
+
+    /// ±78 km
+    case seventyEightKilometers = 3
+
+    /// ±20 km
+    case twentyKilometers = 4
+
+    /// ±2.4 km, ±2400 m
+    case twentyFourHundredMeters = 5
+
+    /// ±0.61 km, ±610 m
+    case sixHundredTenMeters = 6
+
+    /// ±0.076 km, ±76 m
+    case seventySixMeters = 7
+
+    /// ±0.019 km, ±19 m
+    case nineteenMeters = 8
+
+    /// ±0.0024 km, ±2.4 m, ±240 cm
+    case twoHundredFortyCentimeters = 9
+
+    /// ±0.00060 km, ±0.6 m, ±60 cm
+    case sixtyCentimeters = 10
+
+    /// ±0.000074 km, ±0.07 m, ±7.4 cm, ±74 mm
+    case seventyFourMillimeters = 11
+
+    var margin: Double {
+        switch self {
+        case .twentyFiveHundredKilometers: return 2_500_000.0
+        case .sixHundredThirtyKilometers: return 630_000.0
+        case .seventyEightKilometers: return 78_000.0
+        case .twentyKilometers: return 20_000.0
+        case .twentyFourHundredMeters: return 2_400.0
+        case .sixHundredTenMeters: return 610.0
+        case .seventySixMeters: return 76.0
+        case .nineteenMeters: return 19.0
+        case .twoHundredFortyCentimeters: return 2.4
+        case .sixtyCentimeters: return 0.6
+        case .seventyFourMillimeters: return 0.07
+        }
+    }
+}
+
+#if canImport(CoreLocation)
+
+    import CoreLocation
+
+    extension Region {
+
+        init(coordinate: CLLocationCoordinate2D, precision: Int = kDefaultPrecision) {
+            self = Region(latitude: coordinate.latitude, longitude: coordinate.longitude, precision: precision)
+        }
+
+        init(location: CLLocation, precision: Int = kDefaultPrecision) {
+            self = Region(coordinate: location.coordinate, precision: precision)
+        }
+        
+        init(location: CLLocation, radius: Double) {
+            self = Region(coordinate: location.coordinate, precision: Region.radiusToPrecision(radius: radius, threshold: 0.8).rawValue)
+        }
+        /**
+         Returns regions containing possible locations within a radius(km) of the location
+         */
+        
+        func queryRegions(location: CLLocation, radius: Double) -> [Region]? {
+            guard let precision = precision else { return nil }
+            var result = [self]
+            let radiusLatitude = radius / 111.0
+            let radiusLongitude = radius / (cos(radiusLatitude * Double.pi / 180.0) * 111.0)
+            print("queryRegions called with coordinate: (\(location.coordinate.latitude), \(location.coordinate.longitude))\nwidth.min: \(width.min)\nradius: \(radius)\noffset: (\(radiusLatitude), \(radiusLongitude))")
+            if location.coordinate.longitude < width.min + radiusLongitude {
+                result.append(west(self, precision.rawValue))
+                
+                if location.coordinate.latitude > height.max - radiusLatitude {
+                    result.append(northwest(self, precision.rawValue))
+                }
+                if location.coordinate.latitude < height.min + radiusLatitude {
+                    result.append(southwest(self, precision.rawValue))
+                }
+            }
+            if location.coordinate.longitude > width.max - radiusLongitude {
+                result.append(east(self, precision.rawValue))
+                
+                if location.coordinate.latitude > height.max - radiusLatitude {
+                    result.append(northeast(self, precision.rawValue))
+                }
+                if location.coordinate.latitude < height.min + radiusLatitude {
+                    result.append(southeast(self, precision.rawValue))
+                }
+            }
+            if location.coordinate.latitude > height.max - radiusLatitude {
+                result.append(north(self, precision.rawValue))
+            }
+            if location.coordinate.latitude < height.min + radiusLatitude {
+                result.append(south(self, precision.rawValue))
+            }
+            return result
+        }
+    }
+
+    extension CLLocationCoordinate2D {
+
+        init(geohash: String) {
+            if let (lat, lon) = Geohash.decode(hash: geohash) {
+                self = CLLocationCoordinate2DMake((lat.min + lat.max) / 2, (lon.min + lon.max) / 2)
+            } else {
+                self = kCLLocationCoordinate2DInvalid
+            }
+        }
+
+        public func geohash(precision: Int = kDefaultPrecision) -> String {
+            Region(coordinate: self, precision: precision).hash
+        }
+
+        public func geohash(precision: Precision) -> String {
+            Region(coordinate: self, precision: precision.rawValue).hash
+        }
+        
+        /// Geohash neighbors
+        public func neighbors(precision: Int = kDefaultPrecision) -> [String] {
+            Region(coordinate: self, precision: precision).neighbors().map { $0.hash }
+        }
+        
+        public func neighbors(precision: Precision) -> [String] {
+            neighbors(precision: precision.rawValue)
+        }
+
+    }
+
+    extension CLLocation {
+
+        public convenience init?(geohash: String) {
+            guard let region = Region.init(hash: geohash) else { return nil }
+            self.init(latitude: region.center.latitude, longitude: region.center.longitude)
+        }
+
+        public func geohash(precision: Int = kDefaultPrecision) -> String {
+            return Region(coordinate: self.coordinate, precision: precision).hash
+        }
+
+        public func geohash(precision: Precision) -> String {
+            return geohash(precision: precision.rawValue)
+        }
+
+        /// Geohash neighbors
+        public func neighbors(precision: Int = kDefaultPrecision) -> [String] {
+            return Region.init(location: self, precision: precision).neighbors().map { $0.hash }
+        }
+
+        public func neighbors(precision: Precision) -> [String] {
+            return neighbors(precision: precision.rawValue)
+        }
+
+    }
+
+#endif

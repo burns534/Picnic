@@ -38,7 +38,7 @@ class LocationSelector: UIViewController {
 // MARK: Map
         map = MKMapView(frame: view.frame)
 // MARK: This is bad practice and needs to be fixed
-        guard let location = Shared.shared.locationManager.location else {
+        guard let location = Managers.shared.locationManager.location else {
             map.setRegion(MKCoordinateRegion(), animated: true)
             return
         }

@@ -40,7 +40,7 @@ class ButtonView: UIView {
     init(sender: AuthPicker) {
         self.sender = sender
         super.init(frame: .zero)
-        guard let providers = Shared.shared.authManager.authUI?.providers else {
+        guard let providers = Managers.shared.authManager.authUI?.providers else {
             print("Error: ButtonView: init: authUI returned nil for providers")
             return
         }
@@ -67,7 +67,7 @@ class ButtonView: UIView {
     }
     
     @objc func didTapSignInButton(_ sender: SignInButton) {
-        Shared.shared.authManager.authUI?.signIn(withProviderUI: sender.provider, presenting: self.sender, defaultValue: nil)
+        Managers.shared.authManager.authUI?.signIn(withProviderUI: sender.provider, presenting: self.sender, defaultValue: nil)
     }
 }
 
