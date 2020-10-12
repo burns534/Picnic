@@ -14,12 +14,12 @@ class TabController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let controllers = [Featured(), SearchController(), Profile(), SettingsController()]
+        let controllers = [Featured(), SearchController(), LocationSelector(), Profile(), SettingsController()]
         
         viewControllers = controllers.map { UINavigationController(rootViewController: $0) }
     
-        let titles = ["Featured", "Search", "Profile", "Settings"]
-        let imageNames = ["star", "magnifyingglass", "person", "gear"]
+        let titles = ["Featured", "Search", "New", "Profile", "Settings"]
+        let imageNames = ["star", "magnifyingglass", "plus.square", "person", "gear"]
         for (index, item) in tabBar.items!.enumerated() {
             item.image = UIImage(systemName: imageNames[index])
             item.title = titles[index]

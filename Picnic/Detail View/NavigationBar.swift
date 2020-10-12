@@ -49,7 +49,7 @@ class NavigationBar: UIView {
         rightBarButton = button
         button.translatesAutoresizingMaskIntoConstraints = false
         addSubview(button)
-        trailing = NSLayoutConstraint(item: rightBarButton!, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1.0, constant: 0.0)
+        trailing = NSLayoutConstraint(item: rightBarButton!, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1.0, constant: -10.0)
         rightBarButton?.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         trailing?.isActive = true
     }
@@ -58,7 +58,7 @@ class NavigationBar: UIView {
         leftBarButton = button
         button.translatesAutoresizingMaskIntoConstraints = false
         addSubview(button)
-        leading = NSLayoutConstraint(item: leftBarButton!, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1.0, constant: 0.0)
+        leading = NSLayoutConstraint(item: leftBarButton!, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1.0, constant: 10.0)
         leftBarButton?.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         leading?.isActive = true
     }

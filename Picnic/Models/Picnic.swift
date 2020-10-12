@@ -10,42 +10,34 @@ import MapKit
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-enum PicnicTag: String, Codable {
-    case empty
-}
-
 struct Picnic: Codable, Identifiable {
-    init(name: String = "", userDescription: String = "", tags: [PicnicTag]? = nil, imageNames: [String]? = nil, totalRating: Double = 0.0, ratingCount: Int = 0, wouldVisit: Int = 0, visitCount: Int = 0, reviews: [DocumentReference]? = nil, latitude: Double = 0.0, longitude: Double = 0.0, city: String? = nil, state: String? = nil, park: String? = nil) {
-        self.name = name
-        self.userDescription = userDescription
-        self.tags = tags
-        self.imageNames = imageNames
-        self.totalRating = totalRating
-        self.ratingCount = ratingCount
-        self.wouldVisit = wouldVisit
-        self.visitCount = visitCount
-        self.reviews = reviews
-        self.coordinates = GeoPoint(latitude: latitude, longitude: longitude)
-        self.city = city
-        self.state = state
-        self.park = park
-        self.geohash = Region(latitude: latitude, longitude: longitude, precision: kDefaultPrecision).hash
-    }
-    
     @DocumentID var id: String?
-    var name: String = ""
-    var userDescription: String = ""
+    var uid: String
+    var name: String
+    var userDescription: String
     var tags: [PicnicTag]?
     var imageNames: [String]?
-    var totalRating: Double = 0.0
-    var ratingCount: Int = 0
-    var wouldVisit: Int = 0
-    var visitCount: Int = 0
-    var reviews: [DocumentReference]?
+    var totalRating: Double
+    var ratingCount: Int
+    var wouldVisit: Int
+    var visitCount: Int
 // MARK: Location Data
     var coordinates: GeoPoint
     var city: String?
     var state: String?
     var park: String?
-    var geohash: String = Region(latitude: 0, longitude: 0, precision: kDefaultPrecision).hash
+    var geohash: String
+}
+
+extension Picnic {
+    static var empty: Picnic {
+        Picnic(id: nil, uid: "", name: "", userDescription: "", tags: nil, imageNames: nil, totalRating: 0, ratingCount: 0, wouldVisit: 0, visitCount: 0, coordinates: GeoPoint(latitude: 0, longitude: 0), city: nil, state: nil, park: nil, geohash: "")
+    }
+    var coordinate: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(latitude: coordinates.latitude, longitude: coordinates.longitude)
+    }
+    
+    var location: CLLocation {
+        CLLocation(latitude: coordinates.latitude, longitude: coordinates.longitude)
+    }
 }

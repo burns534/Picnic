@@ -62,6 +62,21 @@ extension UIImageView {
 //    }
 //}
 
+extension Collection where Self.Iterator.Element: RandomAccessCollection {
+    /**
+     Returns tranposed collection
+    - Author: Alexander - Reinstate Monica (stackoverflow)
+    - Important:
+     'self' must be rectangular, i.e. every row has equal size.
+     */
+    func transposed() -> [[Self.Iterator.Element.Iterator.Element]] {
+        guard let firstRow = self.first else { return [] }
+        return firstRow.indices.map { index in
+            self.map{ $0[index] }
+        }
+    }
+}
+
 extension CALayer {
     func setShadow(radius: CGFloat, color: UIColor, opacity: Float = 1.0, offset: CGSize = .zero) {
         masksToBounds = false

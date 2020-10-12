@@ -9,15 +9,18 @@
 import MapKit
 
 class LocationManager: CLLocationManager {
-    override init() {
-        super.init()
-        setup()
-    }
-    
-    func setup() {
+    func configure() {
         requestAlwaysAuthorization()
         startUpdatingLocation()
         desiredAccuracy = kCLLocationAccuracyBest
+    }
+
+    var coordinate: CLLocationCoordinate2D {
+        location?.coordinate ?? kCLLocationCoordinate2DInvalid
+    }
+    
+    var safeLocation: CLLocation {
+        location ?? CLLocation()
     }
 }
 

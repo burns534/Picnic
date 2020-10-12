@@ -63,14 +63,20 @@ final class PaginatedQuery {
     }
 }
 
+struct QueryGroup {
+    var values: [PaginatedQuery] = []
+    var radius: Double?
+    var center: CLLocation?
+}
+
 final class DatabaseManager: NSObject {
     private let picnics: CollectionReference = Firestore.firestore().collection("Picnics")
     private let users: CollectionReference = Firestore.firestore().collection("Users")
     private let reviews = Firestore.firestore().collection("Reviews")
     private let storage = Storage.storage().reference(withPath: "images")
     private var listeners = [Int: ListenerRegistration]()
-    private var queries = [String: [PaginatedQuery]]()
-    private var user: User = User()
+    private var queries = [String: QueryGroup]()
+    private(set) var user: User = .empty
     deinit { listeners.values.forEach { $0.remove() } }
 
 // MARK: General Functions
@@ -87,12 +93,24 @@ final class DatabaseManager: NSObject {
     func removeQuery(_ key: String) {
         queries.removeValue(forKey: key)
     }
-
+    
+// This needs to be redone again, it's a mess and the information isn't being stored in the database correctly
 // MARK: UserManager
     func configure() {
 // MARK: If this fails it means it's a new user
         guard let id = Auth.auth().currentUser?.uid else { return }
         user.id = id
+        user.displayName = Auth.auth().currentUser?.displayName
+        user.userName = Auth.auth().currentUser?.email
+//        users.document(id).getDocument { [weak self] snapshot, error in
+//            if let error = error {
+//                print("Error: DatabaseManager: configure: \(error.localizedDescription)")
+//            } else if let data = snapshot?.data() {
+//                self?.user.firstName = data["firstName"] as? String ?? ""
+//                self?.user.lastName = data["lastName"] as? String ?? ""
+//                self?.user.userName = data["userName"] as? String ?? ""
+//            }
+//        }
         if listeners.count == 0 {
             listeners[0] = users.document(id).collection("saved").addSnapshotListener { [weak self] snapshot, error in
                 if let error = error {
@@ -173,6 +191,16 @@ final class DatabaseManager: NSObject {
     func isSaved(picnic: Picnic) -> Bool {
         user.saved.contains(picnic.id ?? "")
     }
+    
+    func getUser(for uid: String, completion: ((User) ->())?) {
+        users.document(uid).getDocument { snapshot, error in
+            if let error = error {
+                print("DatabaseManager: getUser \(error.localizedDescription)")
+            } else if let user = try? snapshot?.data(as: User.self) {
+                completion?(user)
+            }
+        }
+    }
 
 // MARK: Picnic Manager
     func store(picnic: Picnic, images: [UIImage], completion: @escaping () -> ()) {
@@ -239,34 +267,26 @@ final class DatabaseManager: NSObject {
     
 // MARK: Picnic Queries
     
+    /**
+     - parameters:
+        - radius: radius in Kilometers
+     */
     func addPicnicQuery(location: CLLocation, limit: Int, radius: Double, key queryKey: String) {
-        let region = Region(location: location, radius: radius)
-        queries[queryKey] = [PaginatedQuery]()
-        if let regions = region.queryRegions(location: location, radius: radius) {
-            for region in regions {
-                let query = picnics.whereField("geohash", isGreaterThanOrEqualTo: region.hash + "0").whereField("geohash", isLessThan: region.hash + "~").limit(to: limit / regions.count)
-                queries[queryKey]?.append(PaginatedQuery(query: query))
-            }
-        }
+        queries[queryKey] = QueryGroup(radius: radius, center: location)
+        let hash = Region.hashForRadius(location: location, radius: radius)
+        let query = picnics.order(by: "geohash").start(at: [hash + "0"]).end(at: [hash + "~"]).limit(to: limit)
+        queries[queryKey]?.values.append(PaginatedQuery(query: query))
     }
-// MARK: This is BADDDD- there is a much simpler solution
-//    private func generatePicnicQuery(region: Region, limit: Int) -> Query? {
-//        guard let precision = region.precision else { return nil }
-//        // messy
-//        let offset = String("000000000".dropLast(precision.rawValue))
-//        let start = region.hash.dropLast(kDefaultPrecision - precision.rawValue) + offset
-//        let criticalChar = (region.hash[precision.rawValue - 1].cString(using: .ascii)?.first!)! + 1
-//        let modifiedChar = String(bytes: [UInt8(criticalChar)], encoding: .ascii)
-//        let end = region.hash.dropLast(kDefaultPrecision - precision.rawValue + 1) + modifiedChar! + offset
-//        return picnics.whereField("geohash", isGreaterThanOrEqualTo: start).whereField("geohash", isLessThan: end).limit(to: limit)
-//    }
     
     func refresh(forPicnicQueryKey queryKey: String, completion: (([Picnic]) -> ())?) {
-        guard let queryGroup = queries[queryKey] else { return }
+        guard let queryGroup = queries[queryKey],
+              let radius = queryGroup.radius,
+              let center = queryGroup.center
+        else { return }
         DispatchQueue.global(qos: .userInitiated).async {
             var result = [Picnic]()
             let taskGroup = DispatchGroup()
-            for queryInfo in queryGroup {
+            for queryInfo in queryGroup.values {
                 taskGroup.enter()
                 queryInfo.current().getDocuments { snapshot, error in
                     if let error = error {
@@ -278,30 +298,37 @@ final class DatabaseManager: NSObject {
                 }
             }
             taskGroup.notify(qos: .userInitiated, flags: .enforceQoS, queue: .main) {
-                completion?(result)
+                completion?(result.compactMap {
+                    $0.location.distance(from: center) > radius * 1000 ? nil : $0
+                })
             }
         }
     }
     
     func nextPage(forPicnicQueryKey queryKey: String, completion: (([Picnic]) -> ())?) {
-        guard let queryGroup = queries[queryKey] else { return }
+        guard let queryGroup = queries[queryKey],
+              let radius = queryGroup.radius,
+              let center = queryGroup.center
+        else { return }
         DispatchQueue.global(qos: .userInitiated).async {
             var result = [Picnic]()
             let taskGroup = DispatchGroup()
-            for (index, paginatedQuery) in queryGroup.enumerated() {
+            for (index, paginatedQuery) in queryGroup.values.enumerated() {
                 taskGroup.enter()
                 paginatedQuery.next().getDocuments { snapshot, error in
                     if let error = error {
                         print(error.localizedDescription)
                     } else if let picnics = snapshot?.documents.compactMap({ try? $0.data(as: Picnic.self) }), let next = snapshot?.documents.last {
                         result.append(contentsOf: picnics)
-                        self.queries[queryKey]?[index].pushDocument(next)
+                        self.queries[queryKey]?.values[index].pushDocument(next)
                         taskGroup.leave()
                     }
                 }
             }
             taskGroup.notify(qos: .userInitiated, flags: .enforceQoS, queue: .main) {
-                completion?(result)
+                completion?(result.compactMap {
+                    $0.location.distance(from: center) > radius * 1000 ? nil : $0
+                })
             }
         }
     }
@@ -356,11 +383,11 @@ final class DatabaseManager: NSObject {
     func addReviewQuery(for picnic: Picnic, limit: Int, queryKey: String) {
         guard let id = picnic.id else { return }
         let query = reviews.whereField("pid", isEqualTo: id).limit(to: limit)
-        queries[queryKey] = [PaginatedQuery(query: query)]
+        queries[queryKey] = QueryGroup(values: [PaginatedQuery(query: query)])
     }
     
-    func nextPage(for queryKey: String, completion: (([Review]) -> ())?) {
-        guard let query = queries[queryKey]?[0].next() else { return }
+    func nextPage(forReviewQueryKey queryKey: String, completion: (([Review]) -> ())?) {
+        guard let query = queries[queryKey]?.values[0].next() else { return }
         
         query.getDocuments { [weak self] snapshot, error in
             if let error = error {
@@ -368,12 +395,25 @@ final class DatabaseManager: NSObject {
             } else if let reviews = snapshot?.documents.compactMap({
                 try? $0.data(as: Review.self)
             }), let next = snapshot?.documents.last {
-                self?.queries[queryKey]?[0].pushDocument(next)
+                self?.queries[queryKey]?.values[0].pushDocument(next)
                 completion?(reviews)
             }
         }
     }
     
+    func refresh(forReviewQueryKey queryKey: String, completion: (([Review]) -> ())?) {
+        guard let query = queries[queryKey]?.values[0].next() else { return }
+        
+        query.getDocuments { snapshot, error in
+            if let error = error {
+                print(error.localizedDescription)
+            } else if let reviews = snapshot?.documents.compactMap({
+                try? $0.data(as: Review.self)
+            }){
+                completion?(reviews)
+            }
+        }
+    }
     
 }
 

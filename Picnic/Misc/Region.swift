@@ -47,20 +47,6 @@ public struct Region {
     public let hash: String
     public let precision: Precision?
     
-    // MARK: Private
-    private static let bitmap = "0123456789bcdefghjkmnpqrstuvwxyz".enumerated()
-        .map {
-            ($1, String(integer: $0, radix: 2, padding: 5))
-        }
-        .reduce(into: [Character: String]()) {
-            $0[$1.0] = $1.1
-    }
-
-    private static let charmap = bitmap
-        .reduce(into: [String: Character]()) {
-            $0[$1.1] = $1.0
-    }
-    
     public static func decode(hash: String) -> (latitude: (min: Double, max: Double), longitude: (min: Double, max: Double))? {
         // For example: hash = u4pruydqqvj
         let bits = hash.map { bitmap[$0] ?? "?" }.joined(separator: "")
@@ -110,6 +96,20 @@ public struct Region {
         // arr: [u,4,p,r,u,y,d,q,q,v,j,k,p,b,...]
         return String(arr.prefix(length))
     }
+    
+    // MARK: Private
+    private static let bitmap = "0123456789bcdefghjkmnpqrstuvwxyz".enumerated()
+        .map {
+            ($1, String(integer: $0, radix: 2, padding: 5))
+        }
+        .reduce(into: [Character: String]()) {
+            $0[$1.0] = $1.1
+    }
+
+    private static let charmap = bitmap
+        .reduce(into: [String: Character]()) {
+            $0[$1.1] = $1.0
+    }
 }
 
 extension Region {
@@ -140,82 +140,6 @@ extension Region {
         let height = Span(min: data.latitude.min, max: data.latitude.max)
         self = Region(width: width, height: height, hash: hash, precision: Precision(rawValue: hash.count))
     }
-
-//    public init(latitude: Double, longitude: Double, precision: Int) {
-//
-//        var lat = Span.latitude
-//        var lng = Span.longitude
-//
-//        var hash: Array<Character> = []
-//        var parity = Parity.lng
-//        var char = 0
-//        var count = 0
-//
-//        func inc() {
-//            let mask = 0b10000 >> count
-//            char |= mask
-//        }
-//
-//        func compare(span: Span, source: Double) -> Span {
-//            let mean = span.mean
-//            let isLow = source < mean
-//            let (min, max) = isLow ? (span.min, mean) : (mean, span.max)
-//            if !isLow { inc() }
-//            return Span(min: min, max: max)
-//        }
-//
-//        repeat {
-//            switch parity {
-//            case .lng: lng = compare(span: lng, source: longitude)
-//            case .lat: lat = compare(span: lat, source: latitude)
-//            }
-//            parity.flip()
-//            count += 1
-//            if count == 5 {
-//                hash.append(charmap[char])
-//                count = 0
-//                char = 0
-//            }
-//
-//        } while hash.count < precision
-//
-//        let height = Span(min: lat.min, max: lat.max)
-//        let width = Span(min: lng.min, max: lng.min)
-//
-//        self = Region(width: width, height: height, hash: String(hash), precision: Precision(rawValue: precision))
-//    }
-
-//    public init?(hash: String) {
-//
-//        var lat = Span.latitude
-//        var lng = Span.longitude
-//
-//        var parity = Parity.lng
-//
-//        for char in hash {
-//            guard let bitmap = charmap.firstIndex(of: char) else { return nil }
-//            var mask = 0b10000
-//
-//            func compare(span: Span) -> Span {
-//                let mean = span.mean
-//                let isLow = bitmap & mask == 0
-//                let (min, max) = isLow ? (span.min, mean) : (mean, span.max)
-//                return Span(min: min, max: max)
-//            }
-//
-//            while mask != 0 {
-//                switch parity {
-//                case .lng: lng = compare(span: lng)
-//                case .lat: lat = compare(span: lat)
-//                }
-//                parity.flip()
-//                mask >>= 1
-//            }
-//        }
-//        self = Region(width: lng, height: lat, hash: hash, precision: Precision(rawValue: hash.count))
-//    }
-    
-    
 
     func north(_ region: Region, _ precision: Int) -> Region {
         let lat = region.center.latitude
@@ -274,7 +198,7 @@ extension Region {
     func northwest(_ region: Region, _ precision: Int) -> Region {
         return north(west(self, precision), precision)
     }
-// I don't think I like this
+    
     public func neighbors() -> [Region] {
         let precision = hash.count
         return [
@@ -303,17 +227,20 @@ extension Region {
 
 extension Region {
     /**
-     Converts supplied radius in kilometers to associated precision value such that a point in a region of this precision would have a (threshold) chance of having greater than (radius) distance from any given edge of the region.
+     Converts supplied radius to associated precision value such that a point in a region of this precision would have a (threshold) chance of having greater than (radius) distance from any given edge of the region.
+     - parameters:
+     - radius: Measured in kilometers
+     - threshold: Percentage chance the query won't go outside the region
      */
     static func radiusToPrecision(radius: Double, threshold: Double) -> Precision {
         let radiusInMeters = radius * 1000.0
         for precision in Precision.allCases.reversed() {
-            if precision.margin > 8 * radiusInMeters && pow(precision.margin - 2.0 * radiusInMeters, 2) / pow(precision.margin, 2) >= threshold {
-                print("called rediuaToPrecision: radius: \(radiusInMeters), returning \(precision.rawValue)")
+            if precision.margin > 8 * radiusInMeters {
+                print("called radiusToPrecision: radius: \(radiusInMeters), returning \(precision.rawValue)")
                 return precision
             }
         }
-        return .seventyEightKilometers
+        return .sixHundredThirtyKilometers
     }
 }
 
@@ -384,20 +311,69 @@ public enum Precision: Int, CaseIterable {
         init(location: CLLocation, precision: Int = kDefaultPrecision) {
             self = Region(coordinate: location.coordinate, precision: precision)
         }
-        
+        /**
+         Creates appropriate region with precision corresponding to radius (km)
+        - parameters:
+            - radius: measured in kilometers
+            - location: query location center
+         */
         init(location: CLLocation, radius: Double) {
             self = Region(coordinate: location.coordinate, precision: Region.radiusToPrecision(radius: radius, threshold: 0.8).rawValue)
         }
         /**
+         Generates the smallest hash containing all points within the query radius
+         - parameters:
+         - radius: measured in kilometers
+         - location: the center of the query circle
+         */
+        public static func hashForRadius(location: CLLocation, radius: Double) -> String {
+            let radiusLatitude = radius / 111.0
+            let radiusLongitude = radius / (cos(radiusLatitude * Double.pi / 180.0) * 111.0)
+            let coordinate = location.coordinate
+            let cornerHashes = [
+                Region.encode(latitude: coordinate.latitude + radiusLatitude, longitude: coordinate.longitude - radiusLongitude, length: 10),
+                Region.encode(latitude: coordinate.latitude + radiusLatitude, longitude: coordinate.longitude + radiusLongitude, length: 10),
+                Region.encode(latitude: coordinate.latitude - radiusLatitude, longitude: coordinate.longitude - radiusLongitude, length: 10),
+                Region.encode(latitude: coordinate.latitude - radiusLatitude, longitude: coordinate.longitude + radiusLongitude, length: 10)
+            ]
+            
+            var minimumBoundingHash: String = location.geohash()[0]
+            for i in 1...10 {
+                let prefix = cornerHashes[0].prefix(i)
+                for corner in cornerHashes {
+                    if !corner.hasPrefix(prefix) {
+                        return minimumBoundingHash
+                    }
+                }
+                minimumBoundingHash = String(prefix)
+            }
+            return minimumBoundingHash
+        }
+        
+// MARK: Might use this later to provide more specific hashes
+        private static let even: [[String]] = [
+            ["p", "r", "x", "z"],
+            ["n", "q", "w", "y"],
+            ["j", "m", "t", "v"],
+            ["h", "k", "s", "u"],
+            ["5", "7", "e", "g"],
+            ["4", "6", "d", "f"],
+            ["1", "3", "9", "c"],
+            ["0", "2", "8", "b"]
+        ]
+        
+        private static let odd: [[String]] = even.transposed()
+        
+        /**
          Returns regions containing possible locations within a radius(km) of the location
          */
         
-        func queryRegions(location: CLLocation, radius: Double) -> [Region]? {
-            guard let precision = precision else { return nil }
+        func queryRegions(location: CLLocation, radius: Double) -> [Region] {
+            guard let precision = precision else { return [self] }
             var result = [self]
             let radiusLatitude = radius / 111.0
             let radiusLongitude = radius / (cos(radiusLatitude * Double.pi / 180.0) * 111.0)
-            print("queryRegions called with coordinate: (\(location.coordinate.latitude), \(location.coordinate.longitude))\nwidth.min: \(width.min)\nradius: \(radius)\noffset: (\(radiusLatitude), \(radiusLongitude))")
+            print("queryRegions called with coordinate: (\(location.coordinate.latitude), \(location.coordinate.longitude))\nwidth: (\(width.min), \(width.max))\nradius: \(radius)\noffset: (\(radiusLatitude), \(radiusLongitude))")
             if location.coordinate.longitude < width.min + radiusLongitude {
                 result.append(west(self, precision.rawValue))
                 

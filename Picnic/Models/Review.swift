@@ -13,6 +13,7 @@ struct Review: Codable, Identifiable {
     @DocumentID var id: String?
     var pid: String
     var uid: String
+    var rating: Double
     var content: String
 // MARK: This might be bad
     var date: Timestamp

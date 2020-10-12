@@ -14,9 +14,9 @@ fileprivate let visitButtonSize: CGSize = CGSize(width: 150, height: 80)
 
 class DetailController: UIViewController {
     
-    var picnic: Picnic!
+    var picnic: Picnic = .empty
     let navigationBar = NavigationBar()
-    let preview = UIImageView()
+    let preview = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: UIScreen.main.bounds.width, height: kPreviewHeight)))
     let rating = Rating()
     let map = MKMapView()
     let scrollView = UIScrollView()
@@ -27,9 +27,7 @@ class DetailController: UIViewController {
     let visitedLabel = UILabel()
     let wouldVisitLabel = UILabel()
     let reviews = Reviews()
-//    var wouldVisitButton: VisitButton!
-//    var visitedButton: VisitButton!
-    var liked: HeartButton!
+    let liked = HeartButton(pointSize: 40)
     
 
 // MARK: What is this ????
@@ -86,9 +84,9 @@ class DetailController: UIViewController {
         preview.isUserInteractionEnabled = true
         preview.contentMode = .scaleAspectFill
         preview.clipsToBounds = true
-        preview.setGradient(colors: [.clear, UIColor.black.withAlphaComponent(0.4)])
         preview.translatesAutoresizingMaskIntoConstraints = false
         preview.setGradient(colors: [.clear, UIColor.black.withAlphaComponent(0.4)])
+        
         Managers.shared.databaseManager.image(forPicnic: picnic) { image in
             self.preview.image = image
         }
@@ -96,8 +94,7 @@ class DetailController: UIViewController {
         rating.configure(picnic: picnic)
         rating.translatesAutoresizingMaskIntoConstraints = false
         rating.mode = .displayWithCount
-        
-        liked = HeartButton(pointSize: 40)
+    
         liked.translatesAutoresizingMaskIntoConstraints = false
         liked.addTarget(self, action: #selector(likePress), for: .touchUpInside)
         
@@ -150,10 +147,13 @@ class DetailController: UIViewController {
         map.isScrollEnabled = false
         map.isZoomEnabled = false
         map.showsUserLocation = false
-// MARK: ??? no shadow visible
-        map.layer.cornerRadius = 8
-        map.layer.prepareSublayersForShadow()
-        map.layer.setShadow(radius: 5, color: .darkGray, opacity: 0.6, offset: CGSize(width: 0, height: 5))
+
+        reviews.setup()
+        Managers.shared.databaseManager.addReviewQuery(for: picnic, limit: 20, queryKey: "Reviews")
+        Managers.shared.databaseManager.nextPage(forReviewQueryKey: "Reviews") { reviews in
+            self.reviews.update(reviews: reviews)
+        }
+        reviews.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             preview.widthAnchor.constraint(equalTo: view.widthAnchor),
@@ -166,12 +166,16 @@ class DetailController: UIViewController {
             overviewDivider.heightAnchor.constraint(equalToConstant: 1),
             
             map.widthAnchor.constraint(equalToConstant: 370),
-            map.heightAnchor.constraint(equalToConstant: 220)
+            map.heightAnchor.constraint(equalToConstant: 220),
+            
+            reviews.widthAnchor.constraint(equalToConstant: 370),
+            reviews.heightAnchor.constraint(equalToConstant: 400)
         ])
         
         stackView.addArrangedSubview(overview)
         stackView.addArrangedSubview(overviewDivider)
         stackView.addArrangedSubview(map)
+        stackView.addArrangedSubview(reviews)
         
         view.bringSubviewToFront(navigationBar)
     }
@@ -189,6 +193,7 @@ class DetailController: UIViewController {
         super.viewWillDisappear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
         Managers.shared.databaseManager.removeListener(liked)
+        Managers.shared.databaseManager.removeQuery("Reviews")
     }
     
     func configure(picnic: Picnic) { self.picnic = picnic }

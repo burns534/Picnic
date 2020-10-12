@@ -81,6 +81,10 @@
 		27EB2DF12478D67B0093362C /* chilkoottrail.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 27EB2DE32478CF460093362C /* chilkoottrail.jpg */; };
 		27EB2DF22478D67B0093362C /* rainbowlake.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 27EB2DE42478CF460093362C /* rainbowlake.jpg */; };
 		27EDAED42530FAD200059EE8 /* Geohash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EDAED32530FAD200059EE8 /* Geohash.swift */; };
+		27EDAED82531FA3400059EE8 /* PicnicMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EDAED72531FA3400059EE8 /* PicnicMap.swift */; };
+		27EDAEDB253238AE00059EE8 /* FilterController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EDAEDA253238AE00059EE8 /* FilterController.swift */; };
+		27EDAEDE2532390800059EE8 /* PicnicTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EDAEDD2532390800059EE8 /* PicnicTag.swift */; };
+		27EDAEE32533D3EA00059EE8 /* ReviewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EDAEE22533D3EA00059EE8 /* ReviewCell.swift */; };
 		D8AC8EDBC77112F7C59EDAE7 /* Pods_Picnic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EAB3BBD2EC00EE4968820CCE /* Pods_Picnic.framework */; };
 /* End PBXBuildFile section */
 
@@ -161,6 +165,10 @@
 		27EB2DE32478CF460093362C /* chilkoottrail.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = chilkoottrail.jpg; sourceTree = "<group>"; };
 		27EB2DE42478CF460093362C /* rainbowlake.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = rainbowlake.jpg; sourceTree = "<group>"; };
 		27EDAED32530FAD200059EE8 /* Geohash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geohash.swift; sourceTree = "<group>"; };
+		27EDAED72531FA3400059EE8 /* PicnicMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PicnicMap.swift; sourceTree = "<group>"; };
+		27EDAEDA253238AE00059EE8 /* FilterController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterController.swift; sourceTree = "<group>"; };
+		27EDAEDD2532390800059EE8 /* PicnicTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PicnicTag.swift; sourceTree = "<group>"; };
+		27EDAEE22533D3EA00059EE8 /* ReviewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewCell.swift; sourceTree = "<group>"; };
 		3676A212A203C5BA04A5EC7B /* Pods-Picnic.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Picnic.debug.xcconfig"; path = "Target Support Files/Pods-Picnic/Pods-Picnic.debug.xcconfig"; sourceTree = "<group>"; };
 		84108CE5B3FE1025F8F37940 /* Pods-Picnic.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Picnic.release.xcconfig"; path = "Target Support Files/Pods-Picnic/Pods-Picnic.release.xcconfig"; sourceTree = "<group>"; };
 		EAB3BBD2EC00EE4968820CCE /* Pods_Picnic.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Picnic.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -295,6 +303,7 @@
 				274B052C24C3FB9100747D25 /* DetailController.swift */,
 				279A269C24D6182700D71FD1 /* NavigationBar.swift */,
 				2753CD3D252F6F8A00C4BFF5 /* Reviews.swift */,
+				27EDAEE22533D3EA00059EE8 /* ReviewCell.swift */,
 			);
 			path = "Detail View";
 			sourceTree = "<group>";
@@ -370,6 +379,8 @@
 				27B072E9247CC7BB009974BD /* CustomFlowLayout.swift */,
 				275AD1482481BCAB00EE3DBA /* LocationPopover.swift */,
 				275AD14A2482CAE300EE3DBA /* LocationLabel.swift */,
+				27EDAED72531FA3400059EE8 /* PicnicMap.swift */,
+				27EDAEDA253238AE00059EE8 /* FilterController.swift */,
 			);
 			path = Featured;
 			sourceTree = "<group>";
@@ -381,6 +392,7 @@
 				27EB2DD42478CE730093362C /* LoadData.swift */,
 				2723A5642529368B008150DC /* User.swift */,
 				27EAB153252F764D006903ED /* Review.swift */,
+				27EDAEDD2532390800059EE8 /* PicnicTag.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -582,11 +594,15 @@
 				275AD147248180F100EE3DBA /* LocationSelector.swift in Sources */,
 				279A269F24D73E4700D71FD1 /* MultipleSelectionIcon.swift in Sources */,
 				274386122478925D0029F00F /* Picnic.xcdatamodeld in Sources */,
+				27EDAEDB253238AE00059EE8 /* FilterController.swift in Sources */,
+				27EDAEDE2532390800059EE8 /* PicnicTag.swift in Sources */,
 				275AD1492481BCAB00EE3DBA /* LocationPopover.swift in Sources */,
 				279A26A924DB21F300D71FD1 /* ShortPresentationController.swift in Sources */,
+				27EDAEE32533D3EA00059EE8 /* ReviewCell.swift in Sources */,
 				274B052D24C3FB9100747D25 /* DetailController.swift in Sources */,
 				27DDBA3525040BE20061B4BC /* Cluster.swift in Sources */,
 				2725763424D0F1EB008916B7 /* Region.swift in Sources */,
+				27EDAED82531FA3400059EE8 /* PicnicMap.swift in Sources */,
 				2752092724CF494B002E8761 /* LocationManager.swift in Sources */,
 				2723A55D2527A484008150DC /* DatabaseManager.swift in Sources */,
 				279DEB6B24DB3B33003035AC /* SwipeView.swift in Sources */,

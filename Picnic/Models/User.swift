@@ -11,6 +11,12 @@ struct User: Codable, Identifiable {
     @DocumentID var id: String?
     var rated = [String: Int64]()
     var saved = [String]()
+    var displayName: String?
+    var userName: String?
+}
+
+extension User {
+    static let empty: User = User()
 }
 
 

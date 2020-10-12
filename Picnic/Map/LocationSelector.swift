@@ -9,119 +9,100 @@
 import UIKit
 import MapKit
 
-fileprivate let kLattitudeDelta = 0.2
-fileprivate let kLongitudeDelta = 0.2
+let kDefaultLongitudinalMeters: CLLocationDistance = 12_000
+private let reuseIdentifier = "cell"
 
 class LocationSelector: UIViewController {
     
     private enum AnnotationReuseID: String { case pin }
     
-    var map: MKMapView!
-    var selectedCoordinate: CLLocationCoordinate2D!
-    var navigationBar: NavigationBar!
-    var searchButton: UIButton!
-    var warningBox: UILabel!
-    var instructions: UILabel!
+    let map = MKMapView()
+    let dialogueBox = UILabel()
+    let resultsView = UITableView()
+    let searchCompleter = MKLocalSearchCompleter()
+    
+    var coordinate: CLLocationCoordinate2D?
+    var results: [MKMapItem] = []
+    var completerResults: [MKLocalSearchCompletion] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         
 // MARK: Warning Box
-        warningBox = UILabel()
-        warningBox.text = "Please select a location first"
-        warningBox.textAlignment = .center
-        warningBox.backgroundColor = .white
-        warningBox.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(warningBox)
+        dialogueBox.text = "Tap to drop pin"
+        dialogueBox.textColor = .white
+        dialogueBox.font = UIFont.systemFont(ofSize: 30, weight: .thin)
+        dialogueBox.textAlignment = .center
+        dialogueBox.backgroundColor = .clear
+        dialogueBox.translatesAutoresizingMaskIntoConstraints = false
         
 // MARK: Map
-        map = MKMapView(frame: view.frame)
-// MARK: This is bad practice and needs to be fixed
-        guard let location = Managers.shared.locationManager.location else {
-            map.setRegion(MKCoordinateRegion(), animated: true)
-            return
-        }
-        let span = MKCoordinateSpan(latitudeDelta: kLattitudeDelta, longitudeDelta: kLongitudeDelta)
-        let region = MKCoordinateRegion(center: location.coordinate, span: span)
+        map.translatesAutoresizingMaskIntoConstraints = false
+        let coordinate = Managers.shared.locationManager.coordinate
+        let region = MKCoordinateRegion(center: coordinate, latitudinalMeters: kDefaultLongitudinalMeters, longitudinalMeters: kDefaultLongitudinalMeters)
         map.setRegion(region, animated: true)
         map.showsUserLocation = true
         map.mapType = .hybrid
         map.showsCompass = true
         map.showsScale = true
         
+        searchCompleter.delegate = self
+        searchCompleter.resultTypes = .pointOfInterest
+        searchCompleter.region = map.region
+        
         let tap = UITapGestureRecognizer()
         tap.addTarget(self, action: #selector(dropPin))
         map.addGestureRecognizer(tap)
+        
+        let searchBar = UISearchBar()
+        searchBar.delegate = self
+        searchBar.sizeToFit()
+        navigationItem.titleView = searchBar
+        
+        resultsView.isHidden = true
+        resultsView.dataSource = self
+        resultsView.delegate = self
+        resultsView.backgroundColor = .white
+        resultsView.translatesAutoresizingMaskIntoConstraints = false
+        resultsView.register(UITableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
+        
+        view.addSubview(dialogueBox)
         view.addSubview(map)
-        
-        instructions = UILabel()
-        instructions.text = "Select a loction"
-        instructions.textColor = .white
-        instructions.textAlignment = .center
-        instructions.backgroundColor = .clear
-        view.addSubview(instructions)
-        
-// MARK: Navigation Bar
-        navigationBar = NavigationBar()
-        navigationBar.defaultConfiguration(left: true)
-        navigationBar.backgroundColor = .clear
-        navigationBar.leftBarButton?.addTarget(self, action: #selector(backButtonTap), for: .touchUpInside)
-        navigationBar.leftBarButton?.tintColor = .white
-        let rightButton = UIButton()
-        rightButton.setTitle("Next", for: .normal)
-        rightButton.addTarget(self, action: #selector(nextButtonHandler), for: .touchUpInside)
-        rightButton.titleLabel?.font = UIFont.systemFont(ofSize: 40, weight: .thin)
-        rightButton.setTitleColor(.white, for: .normal)
-        navigationBar.setRightBarButton(button: rightButton)
-        navigationBar.setRightButtonPadding(amount: 10)
-        
-        searchButton = UIButton()
-        searchButton.setImage(UIImage(systemName: "magnifyingglass", withConfiguration: UIImage.SymbolConfiguration(pointSize: 40, weight: .thin))?.withRenderingMode(.alwaysTemplate), for: .normal)
-        searchButton.addTarget(self, action: #selector(searchButtonHandler), for: .touchUpInside)
-        searchButton.tintColor = .white
-        navigationBar.setCenterView(view: searchButton)
-        navigationBar.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(navigationBar)
+        view.addSubview(resultsView)
 
         NSLayoutConstraint.activate([
-            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            navigationBar.widthAnchor.constraint(equalTo: view.widthAnchor),
-            navigationBar.heightAnchor.constraint(equalToConstant: 40),
+            map.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            map.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            map.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            map.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
-            warningBox.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            warningBox.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            warningBox.widthAnchor.constraint(equalTo: view.widthAnchor),
-            warningBox.heightAnchor.constraint(equalToConstant: 60)
+            resultsView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            resultsView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            resultsView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            resultsView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            dialogueBox.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            dialogueBox.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            dialogueBox.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            dialogueBox.heightAnchor.constraint(equalToConstant: 60)
         ])
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        navigationController?.setNavigationBarHidden(true, animated: true)
-        tabBarController?.tabBar.isHidden = true
-    }
-    
-    @objc func searchButtonHandler(_ sender: UIButton) {
-        // push search controller
+        navigationController?.setNavigationBarHidden(false, animated: true)
     }
     
     @objc func nextButtonHandler() {
-        guard let _ = selectedCoordinate else {
-            view.bringSubviewToFront(warningBox)
+        guard let coordinate = coordinate else {
+            dialogueBox.backgroundColor = .white
+            dialogueBox.textColor = .red
+            dialogueBox.text = "Please select a location first"
             return
         }
-// MARK: This is bad
-        if #available(iOS 14, *) {
-            let next = NewPicnicController()
-            next.configure(coordinate: selectedCoordinate)
-            navigationController?.pushViewController(next, animated: true)
-            if let featured = tabBarController?.viewControllers?.first as? Featured {
-                next.delegate = featured
-            }
-        } else {
-            fatalError()
-        }
+        let next = NewPicnicController()
+        next.configure(coordinate: coordinate)
+        navigationController?.pushViewController(next, animated: true)
     }
     
     @objc func backButtonTap(_ sender: UIButton) {
@@ -129,11 +110,13 @@ class LocationSelector: UIViewController {
     }
     
     @objc func dropPin(_ gesture: UITapGestureRecognizer) {
-        view.sendSubviewToBack(warningBox)
+        dialogueBox.backgroundColor = .clear
+        dialogueBox.textColor = .white
+        dialogueBox.text = "Tap to drop pin"
         map.removeAnnotations(map.annotations.filter { $0 is MKPointAnnotation })
         let screenLocation = gesture.location(in: map)
         let mapCoordinate = map.convert(screenLocation, toCoordinateFrom: map)
-        selectedCoordinate = mapCoordinate
+        coordinate = mapCoordinate
         let pin = MKPointAnnotation()
         pin.coordinate = mapCoordinate
         map.addAnnotation(pin)
@@ -141,10 +124,64 @@ class LocationSelector: UIViewController {
 }
 
 extension LocationSelector: UISearchBarDelegate {
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+    }
+    
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-        print("searchBarTextDidBeginEditing")
+        searchBar.setShowsCancelButton(true, animated: true)
+        resultsView.isHidden = false
+    }
+    
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        searchBar.setShowsCancelButton(false, animated: true)
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        searchCompleter.queryFragment = searchBar.text ?? ""
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+        searchCompleter.queryFragment = searchBar.text ?? ""
     }
 }
 
-extension LocationSelector: UINavigationControllerDelegate {
+extension LocationSelector: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        completerResults.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath)
+        let suggestion = completerResults[indexPath.row]
+        cell.textLabel?.text = suggestion.title
+        cell.detailTextLabel?.text = suggestion.subtitle
+        return cell
+    }
+}
+
+extension LocationSelector: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let result = completerResults[indexPath.row]
+        let request = MKLocalSearch.Request(completion: result)
+        let search = MKLocalSearch(request: request)
+        search.start { result, error in
+            if let error = error {
+                print(error.localizedDescription)
+            } else if let mapItems = result?.mapItems {
+                self.results = mapItems
+                self.map.addAnnotations(mapItems.map { $0.placemark})
+                self.resultsView.isHidden = true
+            }
+        }
+    }
+}
+
+extension LocationSelector: MKLocalSearchCompleterDelegate {
+    func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
+        completerResults = completer.results
+        resultsView.reloadData()
+    }
 }

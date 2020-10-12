@@ -16,6 +16,7 @@ final class Managers {
     
     private init() {
         databaseManager.configure()
+        locationManager.configure()
     }
 }
 

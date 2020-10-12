@@ -7,16 +7,13 @@
 //
 
 import MapKit
+import FirebaseFirestore
+import FirebaseFirestoreSwift
 
 // this is bad
 fileprivate let imageSize: CGSize = CGSize(width: 102, height: 102)
 fileprivate let kTextBoxCornerRadius: CGFloat = 5.0
 
-protocol NewPicnicControllerDelegate: AnyObject {
-    func createdPicnic(picnic: Picnic)
-}
-
-@available(iOS 14, *)
 class NewPicnicController: UIViewController {
     
     var map: MKMapView!
@@ -32,9 +29,7 @@ class NewPicnicController: UIViewController {
     var coordinate: CLLocationCoordinate2D?
     var shortPresentationController: ShortPresentationController!
     var requiredFieldModal: RequiredFieldModal!
-    
-    weak var delegate: NewPicnicControllerDelegate?
-    
+
     private let modalOffsetY: CGFloat = 500
 
     override func viewDidLoad() {
@@ -176,16 +171,37 @@ class NewPicnicController: UIViewController {
         guard let name = name.text,
         let userDescription = userDescription.text,
         let coordinate = coordinate,
-        name != "", userDescription != "" else { return }
+        let uid = Managers.shared.databaseManager.user.id,
+        name != "", userDescription != ""
+        else { return }
         let imageNames = self.images.map {_ in UUID().uuidString }
         
         coordinate.getPlacemark { placemark in
-            let picnic = Picnic(name: name, userDescription: userDescription, tags: nil, imageNames: imageNames, totalRating: Double(self.interactiveRating.rating), ratingCount: 1, wouldVisit: 0, visitCount: 1, reviews: nil, latitude: coordinate.latitude, longitude: coordinate.longitude, city: placemark.locality, state: placemark.administrativeArea, park: nil)
+            let picnic = Picnic(
+                id: nil,
+                uid: uid,
+                name: name,
+                userDescription: userDescription,
+                tags: nil,
+                imageNames: imageNames,
+                totalRating: Double(self.interactiveRating.rating),
+                ratingCount: 1,
+                wouldVisit: 0,
+                visitCount: 1,
+                coordinates: GeoPoint(
+                    latitude: coordinate.latitude,
+                    longitude: coordinate.longitude
+                ),
+                city: placemark.locality,
+                state: placemark.administrativeArea,
+                park: nil,
+                geohash: Region(coordinate: coordinate).hash
+            )
 
             // store picnic data
             Managers.shared.databaseManager.store(picnic: picnic, images: self.images) {
-                self.delegate?.createdPicnic(picnic: picnic)
                 self.navigationController?.popToRootViewController(animated: true)
+                self.tabBarController?.selectedIndex = 0
             }
         }
          
