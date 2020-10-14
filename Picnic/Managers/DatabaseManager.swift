@@ -126,6 +126,25 @@ final class DatabaseManager: NSObject {
             uploadGroup.notify(queue: .main) { completion() }
         }
     }
+    
+    private func storeImages(images: [UIImage], imageNames: [String], for pid: String, completion: @escaping () -> ()) {
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            let uploadGroup = DispatchGroup()
+            for (name, image) in zip(imageNames, images) {
+                uploadGroup.enter()
+                if let data = image.jpegData(compressionQuality: 0.7) {
+                    self?.storage.child(pid + "/\(name)").putData(data, metadata: StorageMetadata(dictionary: ["contentType": "image/jpeg"])) { metadata, error in
+                        if let error = error { print(error.localizedDescription) }
+                        uploadGroup.leave()
+                    }
+                } else { uploadGroup.leave() }
+            }
+            
+            uploadGroup.notify(queue: .main) {
+                completion()
+            }
+        }
+    }
 
     func image(forPicnic picnic: Picnic, index: Int = 0, maxSize: Int64 = 2 * 1024 * 1024, completion: @escaping (UIImage) -> ()) {
         guard let id = picnic.id, let imageNames = picnic.imageNames else { return }
@@ -282,14 +301,27 @@ final class DatabaseManager: NSObject {
     
 // MARK: ReviewManager
     
-    func submitReview(review: Review, completion: ((DocumentReference?) -> ())? = nil) {
-        print("tried")
-        let ref = try? reviews.addDocument(from: review) { error in
-            if let error = error {
-                print(error.localizedDescription)
+    func submitReview(review: Review, images: [UIImage]? = nil, completion: ((DocumentReference?) -> ())? = nil) {
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            let taskGroup = DispatchGroup()
+            taskGroup.enter()
+            let ref = try? self?.reviews.addDocument(from: review) { error in
+                if let error = error {
+                    print(error.localizedDescription)
+                }
+                taskGroup.leave()
+            }
+            
+            if let images = images, let imageNames = review.images {
+                taskGroup.enter()
+                self?.storeImages(images: images, imageNames: imageNames, for: review.pid) {
+                    taskGroup.leave()
+                }
+            }
+            taskGroup.notify(queue: .main) {
+                completion?(ref)
             }
         }
-        completion?(ref)
     }
     
     func addReviewQuery(for picnic: Picnic, limit: Int, queryKey: String) {

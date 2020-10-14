@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Photos
 
 class MultipleSelectionIcon: UIButton {
     
@@ -36,6 +37,9 @@ class MultipleSelectionIcon: UIButton {
         iconImageView = UIImageView(image: icon)
         iconImageView.translatesAutoresizingMaskIntoConstraints = false
         iconImageView.isHidden = true
+        backgroundColor = .darkWhite
+        clipsToBounds = true
+        layer.cornerRadius = 5
         addSubview(iconImageView)
         NSLayoutConstraint.activate([
             iconImageView.topAnchor.constraint(equalToSystemSpacingBelow: topAnchor, multiplier: 0.8),

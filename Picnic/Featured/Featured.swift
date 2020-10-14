@@ -128,7 +128,7 @@ extension Featured: UICollectionViewDataSource {
 extension Featured: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let detailView = DetailController()
-        detailView.configure(picnic: picnics[indexPath.item])
+        detailView.picnic = picnics[indexPath.item]
         navigationController?.pushViewController(detailView, animated: true)
     }
 }
@@ -136,7 +136,7 @@ extension Featured: UICollectionViewDelegate {
 extension Featured: PicnicMapDelegate {
     func annotationTap(picnic: Picnic) {
         let detailView = DetailController()
-        detailView.configure(picnic: picnic)
+        detailView.picnic = picnic
         navigationController?.pushViewController(detailView, animated: true)
     }
 }

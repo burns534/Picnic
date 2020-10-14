@@ -8,7 +8,7 @@
 
 import UIKit
 
-private let rowHeight: CGFloat = 200
+private let rowHeight: CGFloat = 100
 
 protocol ReviewsDelegate: AnyObject {
     func presentModal()
@@ -18,6 +18,7 @@ class Reviews: UIView {
     let tableView = UITableView()
     var reviews: [Review] = []
     weak var delegate: ReviewsDelegate?
+    private let refreshController = UIRefreshControl()
     
     func setup() {
         let header = UILabel()
@@ -26,19 +27,18 @@ class Reviews: UIView {
         header.translatesAutoresizingMaskIntoConstraints = false
         
         let addReviewButton = UIButton()
-        addReviewButton.backgroundColor = .olive
         addReviewButton.translatesAutoresizingMaskIntoConstraints = false
-        addReviewButton.setTitle("Add Review", for: .normal)
-        addReviewButton.setTitleColor(.white, for: .normal)
-        addReviewButton.titleLabel?.font = UIFont.systemFont(ofSize: 30, weight: .thin)
+        addReviewButton.setTitle("Write a review", for: .normal)
+        addReviewButton.setTitleColor(.lightOlive, for: .normal)
+        addReviewButton.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .light)
         addReviewButton.addTarget(self, action: #selector(addReview), for: .touchUpInside)
-        addReviewButton.layer.cornerRadius = 5
-        addReviewButton.clipsToBounds = true
         
         tableView.dataSource = self
         tableView.rowHeight = rowHeight
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.register(ReviewCell.self, forCellReuseIdentifier: ReviewCell.reuseID)
+        refreshController.addTarget(self, action: #selector(pullDown), for: .valueChanged)
+        tableView.refreshControl = refreshController
         
         addSubview(header)
         addSubview(addReviewButton)
@@ -68,6 +68,17 @@ class Reviews: UIView {
     
     @objc func addReview(_ sender: UIButton) {
         delegate?.presentModal()
+    }
+    
+    @objc func pullDown() {
+        Managers.shared.databaseManager.refresh(forReviewQueryKey: "Reviews") { reviews in
+            self.tableView.performBatchUpdates {
+                self.reviews = reviews
+                self.tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
+            } completion: { _ in
+                self.refreshController.endRefreshing()
+            }
+        }
     }
 }
 

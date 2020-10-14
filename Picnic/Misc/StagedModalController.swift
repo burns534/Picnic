@@ -14,6 +14,7 @@ private let barWidth: CGFloat = 3
 
 protocol StagedModalControllerDelegate: AnyObject {
     func complete()
+    func updateStage(stage: UIView)
 }
 
 class StagedModalController: UIViewController {
@@ -130,6 +131,8 @@ class StagedModalController: UIViewController {
                 circle.widthAnchor.constraint(equalToConstant: circleSize).isActive = true
                 circle.heightAnchor.constraint(equalToConstant: circleSize).isActive = true
             }
+            circles[0].backgroundColor = .olive
+            circles[0].textColor = .white
             progressBar.addArrangedSubview(circles[0])
             let bar = UIView()
             bar.translatesAutoresizingMaskIntoConstraints = false
@@ -142,7 +145,8 @@ class StagedModalController: UIViewController {
             
         }
         
-        if views.count > 3 {
+        if views.count >= 3 {
+            newView.isHidden = true
             let bar = UIView()
             bar.translatesAutoresizingMaskIntoConstraints = false
             bar.backgroundColor = .darkWhite
@@ -171,7 +175,6 @@ class StagedModalController: UIViewController {
             newView.topAnchor.constraint(equalTo: progressBar.bottomAnchor, constant: 20),
             newView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             newView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-//            newView.bottomAnchor.constraint(lessThanOrEqualTo: nextButton.topAnchor, constant: -10),
             newView.heightAnchor.constraint(equalToConstant: 200),
         ])
     }
@@ -195,7 +198,10 @@ class StagedModalController: UIViewController {
             views[selectedView].isHidden = true
             progressItems[selectedView].backgroundColor = .darkWhite
             progressItems[selectedView].textColor = .lightGray
+            views[selectedView].resignFirstResponder()
+            views[selectedView].endEditing(true)
             selectedView += 1
+            delegate?.updateStage(stage: views[selectedView])
             views[selectedView].isHidden = false
             progressItems[selectedView].backgroundColor = .olive
             progressItems[selectedView].textColor = .white

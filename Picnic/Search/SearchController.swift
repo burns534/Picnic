@@ -64,7 +64,7 @@ extension SearchController: UICollectionViewDataSource {
 extension SearchController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let detailView = DetailController()
-        detailView.configure(picnic: results[indexPath.item])
+        detailView.picnic = results[indexPath.item]
         navigationController?.pushViewController(detailView, animated: true)
     }
 }

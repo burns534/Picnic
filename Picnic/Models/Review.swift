@@ -12,11 +12,18 @@ import FirebaseFirestoreSwift
 struct Review: Codable, Identifiable {
     @DocumentID var id: String?
     var pid: String
+    var uid: String
     var rating: Float
     var content: String
     var userDisplayName: String?
     var userPhotoURL: URL?
 // MARK: This might be bad
-//    var date: Timestamp
+    var timestamp: Timestamp
     var images: [String]?
+}
+
+extension Review {
+    var date: Date {
+        timestamp.dateValue()
+    }
 }

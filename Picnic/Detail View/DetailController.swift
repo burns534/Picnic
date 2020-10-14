@@ -7,13 +7,17 @@
 //
 
 import MapKit
+import FirebaseFirestore
+import PhotosUI
+
 fileprivate let kPreviewHeight: CGFloat = 300
 let kNavigationBarFrame: CGRect = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 40)
 fileprivate let visitButtonSize: CGSize = CGSize(width: 150, height: 80)
 fileprivate let modalOffset: CGFloat = 500
+fileprivate let targetSize: CGSize = CGSize(width: 500, height: 500)
 
 class DetailController: UIViewController {
-    private(set) var picnic: Picnic = .empty
+    var picnic: Picnic = .empty
     let navigationBar = NavigationBar()
     let preview = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: UIScreen.main.bounds.width, height: kPreviewHeight)))
     let rating = Rating()
@@ -30,11 +34,10 @@ class DetailController: UIViewController {
     let reviewModal = StagedModalController()
     let reviewRating = Rating(starSize: 60)
     let reviewContentTextField = PaddedTextField()
-
-// MARK: What is this ????
-//    override var preferredStatusBarStyle: UIStatusBarStyle { style }
-//
-//    var style: UIStatusBarStyle = .default
+    let imagePickerButton = MultipleSelectionIcon()
+    var imagePicker: PHPickerViewController!
+    private var selectedImages = [UIImage]()
+    private var imageManager = PHImageManager()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -100,8 +103,45 @@ class DetailController: UIViewController {
             reviewContentTextField.bottomAnchor.constraint(equalTo: reviewContentView.bottomAnchor, constant: -20)
         ])
         
+        
+        let imagePickerStage = UIView()
+        imagePickerButton.setImage(UIImage(systemName: "plus")?.withRenderingMode(.alwaysTemplate), for: .normal)
+        imagePickerButton.tintColor = .darkGray
+        imagePickerButton.translatesAutoresizingMaskIntoConstraints = false
+        imagePickerButton.addTarget(self, action: #selector(presentPicker), for: .touchUpInside)
+        let imagePickerLabel = UILabel()
+        imagePickerLabel.translatesAutoresizingMaskIntoConstraints = false
+        imagePickerLabel.text = "Add Photos"
+        imagePickerLabel.font = UIFont.systemFont(ofSize: 30, weight: .semibold)
+        imagePickerLabel.textColor = .black
+        imagePickerLabel.textAlignment = .center
+        
+        imagePickerStage.addSubview(imagePickerLabel)
+        imagePickerStage.addSubview(imagePickerButton)
+        
+        NSLayoutConstraint.activate([
+            imagePickerLabel.topAnchor.constraint(equalTo: imagePickerStage.topAnchor),
+            imagePickerLabel.leadingAnchor.constraint(equalTo: imagePickerStage.leadingAnchor),
+            imagePickerLabel.trailingAnchor.constraint(equalTo: imagePickerStage.trailingAnchor),
+            imagePickerLabel.heightAnchor.constraint(equalToConstant: 40),
+            
+            imagePickerButton.topAnchor.constraint(equalTo: imagePickerLabel.bottomAnchor, constant: 20),
+            imagePickerButton.centerXAnchor.constraint(equalTo: imagePickerStage.centerXAnchor),
+            imagePickerButton.widthAnchor.constraint(equalToConstant: 100),
+            imagePickerButton.heightAnchor.constraint(equalToConstant: 100)
+        ])
+        
         reviewModal.addStage(reviewRatingView)
         reviewModal.addStage(reviewContentView)
+        reviewModal.addStage(imagePickerStage)
+
+        let photoLibrary = PHPhotoLibrary.shared()
+        var imagePickerConfiguration = PHPickerConfiguration(photoLibrary: photoLibrary)
+        imagePickerConfiguration.filter = .images
+        imagePickerConfiguration.selectionLimit = 10
+        imagePicker = PHPickerViewController(configuration: imagePickerConfiguration)
+        imagePicker.delegate = self
+        
         
         scrollView.showsVerticalScrollIndicator = false
         scrollView.showsHorizontalScrollIndicator = false
@@ -200,7 +240,6 @@ class DetailController: UIViewController {
         overview.font = UIFont.systemFont(ofSize: 20, weight: .thin)
         overview.textContainerInset = .zero
         overview.textContainer.lineFragmentPadding = .zero
-        overview.backgroundColor = .darkWhite
         overview.layer.cornerRadius = 5
         overview.clipsToBounds = true
         
@@ -265,10 +304,7 @@ class DetailController: UIViewController {
         Managers.shared.databaseManager.removeListener(liked)
         Managers.shared.databaseManager.removeQuery("Reviews")
     }
-    
-    func configure(picnic: Picnic) { self.picnic = picnic }
-    
-    
+
     @objc func mapTap(_ sender: UITapGestureRecognizer) {
         // push to fullscreen map view
     }
@@ -283,6 +319,19 @@ class DetailController: UIViewController {
         } else {
             Managers.shared.databaseManager.savePost(picnic: picnic)
         }
+    }
+    
+    @objc func presentPicker() {
+// TODO: Implement this
+        PHPhotoLibrary.requestAuthorization { status in
+            switch status {
+            case .authorized:
+                print("yayyyy")
+            default:
+                print("nooooo")
+            }
+        }
+        reviewModal.present(imagePicker, animated: true)
     }
 }
 
@@ -326,17 +375,58 @@ extension DetailController: UITextFieldDelegate {
 
 extension DetailController: StagedModalControllerDelegate {
     func complete() {
-        print("called")
-        guard let id = picnic.id else { return }
+        guard let id = picnic.id,
+              let uid = Managers.shared.auth.currentUser?.uid
+        else { return }
+        let imageIDList = selectedImages.map { _ in UUID().uuidString }
         let review = Review(
             id: nil,
             pid: id,
+            uid: uid,
             rating: reviewRating.rating,
             content: reviewContentTextField.text ?? "",
             userDisplayName: Managers.shared.auth.currentUser?.displayName,
             userPhotoURL: Managers.shared.auth.currentUser?.photoURL,
-            images: nil
+            timestamp: Timestamp(date: Date()),
+            images: imageIDList
         )
-        Managers.shared.databaseManager.submitReview(review: review)
+        Managers.shared.databaseManager.submitReview(review: review, images: selectedImages.count > 0 ? selectedImages: nil) { _ in
+            self.reviewModal.dismiss(animated: true)
+        }
+    }
+    
+    func updateStage(stage: UIView) {
+    }
+}
+
+extension DetailController: PHPickerViewControllerDelegate  {
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let identifiers = results.compactMap { $0.assetIdentifier }
+            let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: identifiers, options: nil)
+            let taskGroup = DispatchGroup()
+            var results: [UIImage] = []
+            for i in 0..<fetchResult.count {
+                taskGroup.enter()
+                let asset = fetchResult.object(at: i)
+                self?.imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFill, options: nil) {
+                    if let image = $0,
+                       let degraded = $1?[PHImageResultIsDegradedKey] as? Bool, !degraded {
+                        results.append(image)
+                        taskGroup.leave()
+                    }
+                }
+            }
+            taskGroup.notify(qos: .userInitiated, flags: .enforceQoS, queue: .main) {
+                self?.selectedImages = results
+                if results.count > 0 {
+                    self?.imagePickerButton.setImage(results[0], for: .normal)
+                    if results.count > 1 {
+                        self?.imagePickerButton.isMultipleSelection = true
+                    }
+                }
+                picker.dismiss(animated: true)
+            }
+        }
     }
 }

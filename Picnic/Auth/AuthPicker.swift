@@ -1,13 +1,13 @@
-////
-////  AuthPicker.swift
-////  Picnic
-////
-////  Created by Kyle Burns on 7/29/20.
-////  Copyright © 2020 Kyle Burns. All rights reserved.
-////
 //
-//import FirebaseUI
+//  AuthPicker.swift
+//  Picnic
 //
+//  Created by Kyle Burns on 7/29/20.
+//  Copyright © 2020 Kyle Burns. All rights reserved.
+//
+
+import FirebaseUI
+
 //class AuthPicker: FUIAuthPickerViewController {
 //    
 //    var buttonView: ButtonView!
@@ -58,4 +58,8 @@
 //        }
 //        dismiss(animated: true)
 //    }
+//}
+
+//class AuthPicker: FUIAuthPickerViewController {
+//    
 //}

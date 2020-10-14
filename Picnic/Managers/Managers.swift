@@ -13,15 +13,18 @@ final class Managers {
     let databaseManager = DatabaseManager()
     let locationManager = LocationManager()
     let auth = Auth.auth()
+    var handle: AuthStateDidChangeListenerHandle!
     private init() {
         databaseManager.configure()
         locationManager.configure()
-        _ = Auth.auth().addStateDidChangeListener { _, user in
+        handle = Auth.auth().addStateDidChangeListener { _, user in
             if user != nil {
                 self.databaseManager.configure()
             }
         }
     }
+    
+    deinit { Auth.auth().removeStateDidChangeListener(handle) }
 }
 
 extension Auth {

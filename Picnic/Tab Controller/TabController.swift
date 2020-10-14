@@ -76,8 +76,25 @@ class TabController: UITabBarController {
             present(authUI.authViewController(), animated: true)
         }
     }
+    
+    @objc func cancelButton() {
+        Auth.auth().signInAnonymously { result, error in
+            if let error = error {
+                print(error.localizedDescription)
+            }
+        }
+        dismiss(animated: true)
+    }
 }
 
 extension TabController: FUIAuthDelegate {
-    
+    func authPickerViewController(forAuthUI authUI: FUIAuth) -> FUIAuthPickerViewController {
+        let vc = FUIAuthPickerViewController(authUI: authUI)
+        let skipButton = UIBarButtonItem()
+        skipButton.title = "Skip"
+        skipButton.target = self
+        skipButton.action = #selector(cancelButton)
+        vc.navigationItem.leftBarButtonItem = skipButton
+        return vc
+    }
 }
