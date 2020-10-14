@@ -7,16 +7,13 @@
 //
 
 import FirebaseFirestoreSwift
-struct User: Codable, Identifiable {
-    @DocumentID var id: String?
+struct UserData {
     var rated = [String: Int64]()
     var saved = [String]()
-    var displayName: String?
-    var userName: String?
 }
 
-extension User {
-    static let empty: User = User()
+extension UserData {
+    static let empty: UserData = UserData()
 }
 
 

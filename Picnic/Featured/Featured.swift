@@ -8,16 +8,11 @@
 
 import UIKit
 import FirebaseDatabase
-
-private let reuseIdentifier = "Cell"
-
 let kFeaturedCellSize = CGSize(width: 400, height: 260)
 
 class Featured: UIViewController {
-    
     var picnics = [Picnic]()
-    var collectionView: UICollectionView!
-//    let navigationBar = NavigationBar()
+    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: CustomFlowLayout())
     let mapView = PicnicMap()
     let mapImage = UIImage(systemName: "map")?.withRenderingMode(.alwaysOriginal)
     let featuredImage = UIImage(systemName: "star")?.withRenderingMode(.alwaysTemplate)
@@ -28,7 +23,7 @@ class Featured: UIViewController {
         super.viewDidLoad()
         title = "Featured"
         refreshController.addTarget(self, action: #selector(pullDown), for: .valueChanged)
-        collectionView = UICollectionView(frame: view.frame, collectionViewLayout: CustomFlowLayout())
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.backgroundColor = .white
@@ -36,7 +31,7 @@ class Featured: UIViewController {
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.refreshControl = refreshController
-        collectionView.register(FeaturedCell.self, forCellWithReuseIdentifier: reuseIdentifier)
+        collectionView.register(FeaturedCell.self, forCellWithReuseIdentifier: FeaturedCell.reuseID)
         let location = Managers.shared.locationManager.location ?? .init()
         Managers.shared.databaseManager.addPicnicQuery(location: location, limit: kDefaultQueryLimit, radius: kDefaultQueryRadius, key: "Picnics")
         Managers.shared.databaseManager.nextPage(forPicnicQueryKey: "Picnics") { picnics in
@@ -54,6 +49,11 @@ class Featured: UIViewController {
         view.addSubview(mapView)
         
         NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: view.topAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
             mapView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             mapView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             mapView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -65,8 +65,6 @@ class Featured: UIViewController {
 
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "line.horizontal.3.decrease.circle"), style: .plain, target: self, action: #selector(filterHandler))
         navigationItem.leftBarButtonItem?.tintColor = .olive
-        
-        Managers.shared.authManager.delegate = self
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -119,7 +117,7 @@ extension Featured: UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? FeaturedCell else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeaturedCell.reuseID, for: indexPath) as? FeaturedCell else {
             return UICollectionViewCell()
         }
         cell.configure(picnic: picnics[indexPath.item])
@@ -133,10 +131,6 @@ extension Featured: UICollectionViewDelegate {
         detailView.configure(picnic: picnics[indexPath.item])
         navigationController?.pushViewController(detailView, animated: true)
     }
-}
-
-extension Featured: AuthManagerDelegate {
-    func didSignIn() { collectionView.reloadData() }
 }
 
 extension Featured: PicnicMapDelegate {

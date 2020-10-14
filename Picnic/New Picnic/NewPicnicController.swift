@@ -14,6 +14,9 @@ import FirebaseFirestoreSwift
 fileprivate let imageSize: CGSize = CGSize(width: 102, height: 102)
 fileprivate let kTextBoxCornerRadius: CGFloat = 5.0
 
+fileprivate let modalOffset: CGFloat = 500
+
+// TODO: Clean this up
 class NewPicnicController: UIViewController {
     
     var map: MKMapView!
@@ -22,15 +25,12 @@ class NewPicnicController: UIViewController {
     var category: PaddedTextField!
     var images = [UIImage]()
     var addImages: UIButton!
-    var interactiveRating: Rating!
+    let interactiveRating = Rating(starSize: 30)
     var selectedImages: MultipleSelectionIcon!
     var navigationBar: NavigationBar!
     var scrollView: UIScrollView!
     var coordinate: CLLocationCoordinate2D?
-    var shortPresentationController: ShortPresentationController!
     var requiredFieldModal: RequiredFieldModal!
-
-    private let modalOffsetY: CGFloat = 500
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,8 +70,6 @@ class NewPicnicController: UIViewController {
         view.addSubview(category)
         
 // MARK: Interactive Rating
-        interactiveRating = Rating(starSize: 30)
-        interactiveRating.delegate = self
         interactiveRating.mode = .interactable
         view.addSubview(interactiveRating)
         
@@ -153,7 +151,7 @@ class NewPicnicController: UIViewController {
         ])
         
         requiredFieldModal = RequiredFieldModal()
-        requiredFieldModal.modalOffsetY = modalOffsetY
+        requiredFieldModal.offset = modalOffset
         requiredFieldModal.delegate = self
         requiredFieldModal.transitioningDelegate = self
         requiredFieldModal.modalPresentationStyle = .custom
@@ -171,7 +169,7 @@ class NewPicnicController: UIViewController {
         guard let name = name.text,
         let userDescription = userDescription.text,
         let coordinate = coordinate,
-        let uid = Managers.shared.databaseManager.user.id,
+        let uid = Managers.shared.auth.currentUser?.uid,
         name != "", userDescription != ""
         else { return }
         let imageNames = self.images.map {_ in UUID().uuidString }
@@ -220,7 +218,6 @@ class NewPicnicController: UIViewController {
     }
 }
 // MARK: UITextFieldDelegate
-@available(iOS 14, *)
 extension NewPicnicController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         switch textField {
@@ -238,15 +235,15 @@ extension NewPicnicController: UITextFieldDelegate {
     }
 }
 
-@available(iOS 14, *)
 extension NewPicnicController: UIViewControllerTransitioningDelegate {
     func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
-        shortPresentationController = ShortPresentationController(offsetY: modalOffsetY, presentedViewController: presented, presenting: presenting)
-        return shortPresentationController
+        let pc = ShortPresentationController(presentedViewController: presented, presenting: presenting)
+        pc.offset = modalOffset
+        return pc
     }
 }
 
-@available(iOS 14, *)
+
 extension NewPicnicController: RequiredFieldModalDelegate {
     func update(name: String) {
         self.name.text = name
@@ -267,9 +264,3 @@ extension NewPicnicController: RequiredFieldModalDelegate {
     }
 }
 
-@available(iOS 14, *)
-extension NewPicnicController: RatingDelegate {
-    func updateRating(value: Float) {
-        interactiveRating.setRating(value: value)
-    }
-}

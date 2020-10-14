@@ -9,7 +9,6 @@
 import UIKit
 import Photos
 
-private let reuseIdentifier = "Cell"
 private let kPreviewFrameWidth = 414
 private let kPreviewFrameHeight = 400
 private let cellSize: CGSize = CGSize(width: 102, height: 102)
@@ -74,7 +73,7 @@ class ImagePicker: UIViewController {
         layout.minimumLineSpacing = 1.0
         layout.minimumInteritemSpacing = 0.0
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(ImageCell.self, forCellWithReuseIdentifier: reuseIdentifier)
+        collectionView.register(ImageCell.self, forCellWithReuseIdentifier: ImageCell.reuseID)
         collectionView.alwaysBounceVertical = true
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.delegate = self
@@ -276,8 +275,8 @@ extension ImagePicker: UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? ImageCell else {
-            fatalError("Error: CustomImagePickerController: collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath): could not cast UICollectionViewCell to ImageCell at indexPath \(indexPath)")
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ImageCell.reuseID, for: indexPath) as? ImageCell else {
+            return UICollectionViewCell()
         }
         let asset = fetchResult.object(at: indexPath.item)
         cell.representedAssetIdentifier = asset.localIdentifier

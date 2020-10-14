@@ -51,7 +51,6 @@ class FilterController: UIViewController {
         sliderValueLabel.text = String(Int(radiusSlider.value))
         
         interactiveRating.translatesAutoresizingMaskIntoConstraints = false
-        interactiveRating.delegate = self
         interactiveRating.mode = .interactable
         interactiveRating.style = .grayFill
 
@@ -103,10 +102,4 @@ class FilterController: UIViewController {
         sliderValueLabel.text = String(format: "%.0f", roundToTens(Double(sender.value)))
     }
 
-}
-
-extension FilterController: RatingDelegate {
-    func updateRating(value: Float) {
-        interactiveRating.setRating(value: value)
-    }
 }

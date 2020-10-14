@@ -13,12 +13,12 @@ protocol RatingDelegate: AnyObject {
     /**
      Notifies delegate of attempted rating change by the user. Delegate is responsible for validating this change
      - Parameters:
-        - rating: The attempted new rating
+        - newValue: The new value
      */
-    func updateRating(value: Float)
+    func ratingDidChange(newValue: Float)
 }
 
-// MARK: This really needs to be rewritten to capture the touch with a gesture recognizer and calculate the rating based on the position in the view
+// MARK: This really needs to be rewritten to capture the touch with a gesture recognizer and calculate the rating based on the position in the view instead of using 5 buttons...
 class Rating: UIView {
     
     enum Mode {
@@ -150,7 +150,7 @@ class Rating: UIView {
         stars[0..<Int(cgRating)].forEach { $0.fill() }
         stars[Int(cgRating)..<stars.count].forEach { $0.reset() }
 /*
-         star symbol does not go edge to edge in the image. The image leaves a small amount on the left and right of the star. Additionally, the the very corners of the stars are imperceptible when applying a small mask. Accounting for these two things, approximately a translation of approximately 1/6 the image size is needed to create correct star behavior.
+        A Star symbol does not go edge to edge in the image. The image leaves a small amount on the left and right of the star. Additionally, the the very corners of the stars are imperceptible when applying a small mask. Accounting for these two things, approximately a translation of approximately 1/6 the image size is needed to create correct star behavior.
 */
         if floor(cgRating) != cgRating {
             let mask = starSize * CGFloat(cgRating.truncatingRemainder(dividingBy: 1.0) * 0.62 + 0.15)
@@ -165,7 +165,8 @@ class Rating: UIView {
     }
 
     @objc func starPress(_ sender: StarButton) {
-        let rating = Float(stars.firstIndex(of: sender)!) + 1
-        delegate?.updateRating(value: rating)
+        cgRating = CGFloat(stars.firstIndex(of: sender)!) + 1
+        refresh()
+        delegate?.ratingDidChange(newValue: Float(cgRating))
     }
 }

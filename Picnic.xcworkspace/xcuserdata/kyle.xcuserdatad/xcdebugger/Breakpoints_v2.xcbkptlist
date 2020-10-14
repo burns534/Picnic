@@ -79,7 +79,9 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "11"
-            endingLineNumber = "11">
+            endingLineNumber = "11"
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -92,8 +94,8 @@
             filePath = "Picnic/New Picnic/NewPicnicController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "203"
-            endingLineNumber = "203"
+            startingLineNumber = "201"
+            endingLineNumber = "201"
             landmarkName = "share(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -108,8 +110,8 @@
             filePath = "Picnic/New Picnic/NewPicnicController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "202"
-            endingLineNumber = "202"
+            startingLineNumber = "200"
+            endingLineNumber = "200"
             landmarkName = "share(_:)"
             landmarkType = "7">
             <Locations>
@@ -156,8 +158,8 @@
             filePath = "Picnic/Managers/DatabaseManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "119"
-            endingLineNumber = "119"
+            startingLineNumber = "55"
+            endingLineNumber = "55"
             landmarkName = "configure()"
             landmarkType = "7">
          </BreakpointContent>
@@ -172,8 +174,8 @@
             filePath = "Picnic/Managers/DatabaseManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "80"
-            endingLineNumber = "80"
+            startingLineNumber = "31"
+            endingLineNumber = "31"
             landmarkName = "DatabaseManager"
             landmarkType = "3">
             <Locations>
@@ -252,8 +254,8 @@
             filePath = "Picnic/Image Picker/ImagePicker.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "249"
-            endingLineNumber = "249"
+            startingLineNumber = "248"
+            endingLineNumber = "248"
             landmarkName = "photoLibraryDidChange(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -268,8 +270,8 @@
             filePath = "Picnic/Image Picker/ImagePicker.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "248"
-            endingLineNumber = "248"
+            startingLineNumber = "247"
+            endingLineNumber = "247"
             landmarkName = "photoLibraryDidChange(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -284,8 +286,8 @@
             filePath = "Picnic/Managers/DatabaseManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "319"
-            endingLineNumber = "319"
+            startingLineNumber = "220"
+            endingLineNumber = "220"
             landmarkName = "nextPage(forPicnicQueryKey:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -341,22 +343,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "A8701DF1-4420-434A-9F1E-E99044BE4B76"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Picnic/Managers/DatabaseManager.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "46"
-            endingLineNumber = "46"
-            landmarkName = "current()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "DDBEE05C-4AB3-40C9-B15F-4BD66CF90FE7"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -364,8 +350,8 @@
             filePath = "Picnic/Managers/DatabaseManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "166"
-            endingLineNumber = "166"
+            startingLineNumber = "82"
+            endingLineNumber = "82"
             landmarkName = "savePost(picnic:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -380,8 +366,8 @@
             filePath = "Picnic/Managers/DatabaseManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "308"
-            endingLineNumber = "308"
+            startingLineNumber = "209"
+            endingLineNumber = "209"
             landmarkName = "nextPage(forPicnicQueryKey:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -396,8 +382,8 @@
             filePath = "Picnic/Managers/DatabaseManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "309"
-            endingLineNumber = "309"
+            startingLineNumber = "210"
+            endingLineNumber = "210"
             landmarkName = "nextPage(forPicnicQueryKey:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -428,8 +414,8 @@
             filePath = "Picnic/Featured/FilterController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "90"
-            endingLineNumber = "90"
+            startingLineNumber = "89"
+            endingLineNumber = "89"
             landmarkName = "exit(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -444,8 +430,8 @@
             filePath = "Picnic/Featured/FilterController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "91"
-            endingLineNumber = "91"
+            startingLineNumber = "90"
+            endingLineNumber = "90"
             landmarkName = "exit(_:)"
             landmarkType = "7">
          </BreakpointContent>

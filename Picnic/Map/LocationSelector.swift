@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 
 let kDefaultLongitudinalMeters: CLLocationDistance = 12_000
-private let reuseIdentifier = "cell"
+let kDefaultSearchWidth: CLLocationDistance = 32_000
 
 class LocationSelector: UIViewController {
     
@@ -20,6 +20,8 @@ class LocationSelector: UIViewController {
     let dialogueBox = UILabel()
     let resultsView = UITableView()
     let searchCompleter = MKLocalSearchCompleter()
+    let confirmButton = UIButton()
+    let searchBar = UISearchBar()
     
     var coordinate: CLLocationCoordinate2D?
     var results: [MKMapItem] = []
@@ -32,10 +34,10 @@ class LocationSelector: UIViewController {
 // MARK: Warning Box
         dialogueBox.text = "Tap to drop pin"
         dialogueBox.textColor = .white
-        dialogueBox.font = UIFont.systemFont(ofSize: 30, weight: .thin)
+        dialogueBox.font = UIFont.systemFont(ofSize: 35, weight: .light)
         dialogueBox.textAlignment = .center
-        dialogueBox.backgroundColor = .clear
         dialogueBox.translatesAutoresizingMaskIntoConstraints = false
+        dialogueBox.backgroundColor = UIColor.black.withAlphaComponent(0.4)
         
 // MARK: Map
         map.translatesAutoresizingMaskIntoConstraints = false
@@ -49,13 +51,12 @@ class LocationSelector: UIViewController {
         
         searchCompleter.delegate = self
         searchCompleter.resultTypes = .pointOfInterest
-        searchCompleter.region = map.region
+        searchCompleter.region = MKCoordinateRegion(center: coordinate, latitudinalMeters: kDefaultSearchWidth, longitudinalMeters: kDefaultSearchWidth)
         
         let tap = UITapGestureRecognizer()
         tap.addTarget(self, action: #selector(dropPin))
         map.addGestureRecognizer(tap)
         
-        let searchBar = UISearchBar()
         searchBar.delegate = self
         searchBar.sizeToFit()
         navigationItem.titleView = searchBar
@@ -65,11 +66,20 @@ class LocationSelector: UIViewController {
         resultsView.delegate = self
         resultsView.backgroundColor = .white
         resultsView.translatesAutoresizingMaskIntoConstraints = false
-        resultsView.register(UITableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
+        resultsView.register(SuggestionCell.self, forCellReuseIdentifier: SuggestionCell.reuseID)
         
-        view.addSubview(dialogueBox)
+        confirmButton.setTitle("Confirm", for: .normal)
+        confirmButton.setTitleColor(.white, for: .normal)
+        confirmButton.titleLabel?.font = UIFont.systemFont(ofSize: 35, weight: .light)
+        confirmButton.translatesAutoresizingMaskIntoConstraints = false
+        confirmButton.isHidden = true
+        confirmButton.addTarget(self, action: #selector(confirmHandler), for: .touchUpInside)
+        confirmButton.backgroundColor = UIColor.black.withAlphaComponent(0.4)
+        
         view.addSubview(map)
         view.addSubview(resultsView)
+        view.addSubview(dialogueBox)
+        view.addSubview(confirmButton)
 
         NSLayoutConstraint.activate([
             map.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -82,10 +92,15 @@ class LocationSelector: UIViewController {
             resultsView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             resultsView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
-            dialogueBox.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            dialogueBox.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             dialogueBox.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             dialogueBox.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            dialogueBox.heightAnchor.constraint(equalToConstant: 60)
+            dialogueBox.heightAnchor.constraint(equalToConstant: 60),
+            
+            confirmButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            confirmButton.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            confirmButton.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            confirmButton.heightAnchor.constraint(equalToConstant: 60)
         ])
     }
     
@@ -93,11 +108,13 @@ class LocationSelector: UIViewController {
         navigationController?.setNavigationBarHidden(false, animated: true)
     }
     
-    @objc func nextButtonHandler() {
+    @objc func confirmHandler() {
         guard let coordinate = coordinate else {
             dialogueBox.backgroundColor = .white
             dialogueBox.textColor = .red
             dialogueBox.text = "Please select a location first"
+            confirmButton.isHidden = true
+            dialogueBox.isHidden = false
             return
         }
         let next = NewPicnicController()
@@ -110,7 +127,7 @@ class LocationSelector: UIViewController {
     }
     
     @objc func dropPin(_ gesture: UITapGestureRecognizer) {
-        dialogueBox.backgroundColor = .clear
+        dialogueBox.backgroundColor = UIColor.black.withAlphaComponent(0.4)
         dialogueBox.textColor = .white
         dialogueBox.text = "Tap to drop pin"
         map.removeAnnotations(map.annotations.filter { $0 is MKPointAnnotation })
@@ -120,6 +137,8 @@ class LocationSelector: UIViewController {
         let pin = MKPointAnnotation()
         pin.coordinate = mapCoordinate
         map.addAnnotation(pin)
+        dialogueBox.isHidden = true
+        confirmButton.isHidden = false
     }
 }
 
@@ -127,6 +146,10 @@ extension LocationSelector: UISearchBarDelegate {
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
+        searchBar.endEditing(true)
+        searchBar.text = ""
+        results = []
+        resultsView.isHidden = true
     }
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
@@ -144,7 +167,19 @@ extension LocationSelector: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
-        searchCompleter.queryFragment = searchBar.text ?? ""
+        let request = MKLocalSearch.Request()
+        request.naturalLanguageQuery = searchBar.text
+        request.resultTypes = .pointOfInterest
+        request.region = MKCoordinateRegion(center: Managers.shared.locationManager.coordinate, latitudinalMeters: kDefaultSearchWidth, longitudinalMeters: kDefaultSearchWidth)
+        let search = MKLocalSearch(request: request)
+        search.start { result, error in
+            if let error = error {
+                print(error.localizedDescription)
+            } else if let mapItems = result?.mapItems {
+                self.results = mapItems
+                self.resultsView.reloadData()
+            }
+        }
     }
 }
 
@@ -154,10 +189,19 @@ extension LocationSelector: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: SuggestionCell.reuseID, for: indexPath)
         let suggestion = completerResults[indexPath.row]
-        cell.textLabel?.text = suggestion.title
-        cell.detailTextLabel?.text = suggestion.subtitle
+        let title = NSMutableAttributedString(string: suggestion.title, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 18.0)])
+        let subtitle = NSMutableAttributedString(string: suggestion.subtitle)
+        let attributes: [NSAttributedString.Key: Any] = [.font: UIFont.boldSystemFont(ofSize: 18.0)]
+        suggestion.titleHighlightRanges.forEach {
+            title.addAttributes(attributes, range: $0.rangeValue)
+        }
+        suggestion.subtitleHighlightRanges.forEach {
+            subtitle.addAttributes(attributes, range: $0.rangeValue)
+        }
+        cell.textLabel?.attributedText = title
+        cell.detailTextLabel?.attributedText = subtitle
         return cell
     }
 }
@@ -172,8 +216,25 @@ extension LocationSelector: UITableViewDelegate {
                 print(error.localizedDescription)
             } else if let mapItems = result?.mapItems {
                 self.results = mapItems
-                self.map.addAnnotations(mapItems.map { $0.placemark})
+                let annotations: [MKPointAnnotation] = mapItems.map {
+                    let annotation = MKPointAnnotation()
+                    annotation.coordinate = $0.placemark.coordinate
+                    annotation.title = $0.name
+                    annotation.subtitle = $0.placemark.title
+                    return annotation
+                }
+                self.map.addAnnotations(annotations)
+                self.confirmButton.isHidden = false
+                self.dialogueBox.isHidden = true
                 self.resultsView.isHidden = true
+                self.searchBar.resignFirstResponder()
+                self.searchBar.endEditing(true)
+                self.searchBar.text = tableView.cellForRow(at: indexPath)?.textLabel?.text
+                guard let coordinate = annotations.first?.coordinate else {
+                    return
+                }
+                self.map.setCenter(coordinate, animated: true)
+                self.coordinate = coordinate
             }
         }
     }
@@ -183,5 +244,17 @@ extension LocationSelector: MKLocalSearchCompleterDelegate {
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
         completerResults = completer.results
         resultsView.reloadData()
+    }
+}
+
+class SuggestionCell: UITableViewCell {
+    static let reuseID = "SuggestionCellReuseID"
+    
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

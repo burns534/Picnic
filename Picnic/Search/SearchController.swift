@@ -8,8 +8,6 @@
 
 import MapKit
 
-private let reuseIdentifier = "cell"
-
 class SearchController: UIViewController {
     let searchBar = UISearchBar()
     var collectionView: UICollectionView!
@@ -27,21 +25,16 @@ class SearchController: UIViewController {
         collectionView.alwaysBounceVertical = true
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
-        collectionView.register(FeaturedCell.self, forCellWithReuseIdentifier: reuseIdentifier)
-        view.addSubview(collectionView)
+        collectionView.register(FeaturedCell.self, forCellWithReuseIdentifier: FeaturedCell.reuseID)
         
-        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.sizeToFit()
         searchBar.delegate = self
         searchBar.showsCancelButton = true
-        view.addSubview(searchBar)
+        navigationItem.titleView = searchBar
         
+        view.addSubview(collectionView)
         NSLayoutConstraint.activate([
-            searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            searchBar.heightAnchor.constraint(equalToConstant: 50),
-            
-            collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
+            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
@@ -60,7 +53,7 @@ extension SearchController: UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? FeaturedCell else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeaturedCell.reuseID, for: indexPath) as? FeaturedCell else {
             return UICollectionViewCell()
         }
         cell.configure(picnic: results[indexPath.item])

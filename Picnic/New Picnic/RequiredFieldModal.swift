@@ -11,7 +11,6 @@ import UIKit
 fileprivate let imageSize: CGSize = CGSize(width: 102, height: 102)
 
 fileprivate let labelTopMargin: CGFloat = 30
-
 fileprivate let fieldTopMargin: CGFloat = 30
 
 protocol RequiredFieldModalDelegate: AnyObject {
@@ -20,9 +19,9 @@ protocol RequiredFieldModalDelegate: AnyObject {
     func update(description: String)
     func update(images: [UIImage])
 }
-@available(iOS 14, *)
+
+// MARK: FIX - Clean this up
 class RequiredFieldModal: UIViewController {
-    
     var nameInstructions: UILabel!
     var nameField: PaddedTextField!
     var ratingInstructions: UILabel!
@@ -33,8 +32,8 @@ class RequiredFieldModal: UIViewController {
     var imageSelection: MultipleSelectionIcon!
     var progressIndicator: ProgressIndicator!
     var imagePicker: ImagePicker!
-    var confirmButton: UIButton!
-    var modalOffsetY: CGFloat?
+    let confirmButton = UIButton()
+    var offset: CGFloat?
     
     private var state: ProgressIndicator.State = .one
     
@@ -42,10 +41,6 @@ class RequiredFieldModal: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillAppear), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillDisappear), name: UIResponder.keyboardWillHideNotification, object: nil)
-        
         view.backgroundColor = .white
         view.layer.cornerRadius = 20
         view.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
@@ -58,7 +53,11 @@ class RequiredFieldModal: UIViewController {
         progressIndicator.configure(viewWidth: 200)
         view.addSubview(progressIndicator)
         
-        confirmButton = UIButton()
+        let exitButton = UIButton()
+        exitButton.setImage(UIImage(systemName: "xmark"), for: .normal)
+        exitButton.addTarget(self, action: #selector(dismissModal), for: .touchUpInside)
+        exitButton.translatesAutoresizingMaskIntoConstraints = false
+        
         confirmButton.setTitle("Next", for: .normal)
         confirmButton.backgroundColor = .lightGray
         confirmButton.layer.cornerRadius = 30
@@ -107,7 +106,6 @@ class RequiredFieldModal: UIViewController {
         rating.delegate = self
         rating.mode = .interactable
         rating.style = .grayFill
-        rating.delegate = self
         rating.isHidden = true
         view.addSubview(rating)
 // The two need to be at the top of the view stack
@@ -125,6 +123,7 @@ class RequiredFieldModal: UIViewController {
         nameField.delegate = self
         nameField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
         view.addSubview(nameField)
+        view.addSubview(exitButton)
         
         view.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
         
@@ -178,17 +177,27 @@ class RequiredFieldModal: UIViewController {
             imageSelection.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             imageSelection.topAnchor.constraint(equalTo: imageLabel.bottomAnchor, constant: fieldTopMargin * 0.3),
             imageSelection.widthAnchor.constraint(equalToConstant: 160),
-            imageSelection.heightAnchor.constraint(equalTo: imageSelection.widthAnchor)
+            imageSelection.heightAnchor.constraint(equalTo: imageSelection.widthAnchor),
+            
+            exitButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 10),
+            exitButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10)
         ])
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillAppear), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillDisappear), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
     override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
     @objc func keyboardWillAppear(_ notification: Notification) {
-        guard let offset = modalOffsetY else { return }
+        guard let offset = offset else { return }
         if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
             let height = keyboardFrame.cgRectValue.height
             if view.frame.origin.y == offset {
@@ -198,7 +207,7 @@ class RequiredFieldModal: UIViewController {
     }
     
     @objc func keyboardWillDisappear(_ notification: Notification) {
-        guard let offset = modalOffsetY else { return }
+        guard let offset = offset else { return }
         if view.frame.origin.y != offset {
             view.frame.origin.y = offset
         }
@@ -269,9 +278,13 @@ class RequiredFieldModal: UIViewController {
         }
         progressIndicator.updateState(state: state)
     }
+    
+    @objc func dismissModal(_ sender: UIButton) {
+        dismiss(animated: true)
+        navigationController?.popViewController(animated: true)
+    }
 }
 
-@available(iOS 14, *)
 extension RequiredFieldModal: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         resignFirstResponder()
@@ -280,16 +293,12 @@ extension RequiredFieldModal: UITextFieldDelegate {
     }
 }
 
-@available(iOS 14, *)
 extension RequiredFieldModal: RatingDelegate {
-// MARK: look into the description for this function. needs to handle updating
-    func updateRating(value: Float) {
+    func ratingDidChange(newValue: Float) {
         confirmButton.backgroundColor = .olive
-        rating.setRating(value: value)
     }
 }
 
-@available(iOS 14, *)
 extension RequiredFieldModal: ImagePickerDelegate {
     func refreshImageSource(images: [UIImage]) {
         delegate?.update(images: images)

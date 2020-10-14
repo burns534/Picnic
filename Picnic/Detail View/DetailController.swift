@@ -7,14 +7,13 @@
 //
 
 import MapKit
-
 fileprivate let kPreviewHeight: CGFloat = 300
 let kNavigationBarFrame: CGRect = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 40)
 fileprivate let visitButtonSize: CGSize = CGSize(width: 150, height: 80)
+fileprivate let modalOffset: CGFloat = 500
 
 class DetailController: UIViewController {
-    
-    var picnic: Picnic = .empty
+    private(set) var picnic: Picnic = .empty
     let navigationBar = NavigationBar()
     let preview = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: UIScreen.main.bounds.width, height: kPreviewHeight)))
     let rating = Rating()
@@ -28,24 +27,88 @@ class DetailController: UIViewController {
     let wouldVisitLabel = UILabel()
     let reviews = Reviews()
     let liked = HeartButton(pointSize: 40)
-    
+    let reviewModal = StagedModalController()
+    let reviewRating = Rating(starSize: 60)
+    let reviewContentTextField = PaddedTextField()
 
 // MARK: What is this ????
-    override var preferredStatusBarStyle: UIStatusBarStyle { style }
-
-    var style: UIStatusBarStyle = .default
+//    override var preferredStatusBarStyle: UIStatusBarStyle { style }
+//
+//    var style: UIStatusBarStyle = .default
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+// MARK: Modal Configuration
+        reviewModal.transitioningDelegate = self
+        reviewModal.modalPresentationStyle = .custom
+        reviewModal.offset = modalOffset
+        reviewModal.delegate = self
+        
+        let reviewRatingView = UIView()
+        let reviewRatingLabel = UILabel()
+        reviewRatingLabel.translatesAutoresizingMaskIntoConstraints = false
+        reviewRatingLabel.text = "How was it?"
+        reviewRatingLabel.font = UIFont.systemFont(ofSize: 30, weight: .semibold)
+        reviewRatingLabel.textAlignment = .center
+        
+        reviewRating.translatesAutoresizingMaskIntoConstraints = false
+        reviewRating.mode = .interactable
+        reviewRating.style = .grayFill
+        reviewRatingView.addSubview(reviewRatingLabel)
+        reviewRatingView.addSubview(reviewRating)
+        
+        NSLayoutConstraint.activate([
+            reviewRatingLabel.topAnchor.constraint(equalTo: reviewRatingView.topAnchor, constant: 10),
+            reviewRatingLabel.leadingAnchor.constraint(equalTo: reviewRatingView.leadingAnchor),
+            reviewRatingLabel.trailingAnchor.constraint(equalTo: reviewRatingView.trailingAnchor),
+            reviewRatingLabel.heightAnchor.constraint(equalToConstant: 40),
+            
+            reviewRating.topAnchor.constraint(equalTo: reviewRatingLabel.bottomAnchor),
+            reviewRating.centerXAnchor.constraint(equalTo: reviewRatingView.centerXAnchor),
+            reviewRating.widthAnchor.constraint(equalToConstant: reviewRating.width),
+            reviewRating.heightAnchor.constraint(equalToConstant: reviewRating.starSize)
+        ])
+        
+        let reviewContentView = UIView()
+        let reviewContentLabel = UILabel()
+        reviewContentLabel.translatesAutoresizingMaskIntoConstraints = false
+        reviewContentLabel.text = "What did you think?"
+        reviewContentLabel.font = UIFont.systemFont(ofSize: 30, weight: .semibold)
+        reviewContentLabel.textAlignment = .center
+        
+        reviewContentTextField.translatesAutoresizingMaskIntoConstraints = false
+        reviewContentTextField.placeholder = "Enter a Description"
+        reviewContentTextField.backgroundColor = .darkWhite
+        reviewContentTextField.clipsToBounds = true
+        reviewContentTextField.layer.cornerRadius = 5
+        reviewContentTextField.contentVerticalAlignment = .top
+        reviewContentTextField.delegate = self
+        
+        reviewContentView.addSubview(reviewContentLabel)
+        reviewContentView.addSubview(reviewContentTextField)
+        
+        NSLayoutConstraint.activate([
+            reviewContentLabel.topAnchor.constraint(equalTo: reviewContentView.topAnchor),
+            reviewContentLabel.leadingAnchor.constraint(equalTo: reviewContentView.leadingAnchor),
+            reviewContentLabel.trailingAnchor.constraint(equalTo: reviewContentView.trailingAnchor),
+            reviewContentLabel.heightAnchor.constraint(equalToConstant: 40),
+            
+            reviewContentTextField.topAnchor.constraint(equalTo: reviewContentLabel.bottomAnchor, constant: 10),
+            reviewContentTextField.leadingAnchor.constraint(equalTo: reviewContentView.leadingAnchor, constant: 50),
+            reviewContentTextField.trailingAnchor.constraint(equalTo: reviewContentView.trailingAnchor, constant: -50),
+            reviewContentTextField.bottomAnchor.constraint(equalTo: reviewContentView.bottomAnchor, constant: -20)
+        ])
+        
+        reviewModal.addStage(reviewRatingView)
+        reviewModal.addStage(reviewContentView)
         
         scrollView.showsVerticalScrollIndicator = false
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.contentInsetAdjustmentBehavior = .never
-        scrollView.alwaysBounceVertical = false
-        scrollView.bounces = true
         scrollView.delegate = self
+        scrollView.bounces = false
         view.addSubview(scrollView)
         
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -85,7 +148,7 @@ class DetailController: UIViewController {
         preview.contentMode = .scaleAspectFill
         preview.clipsToBounds = true
         preview.translatesAutoresizingMaskIntoConstraints = false
-        preview.setGradient(colors: [.clear, UIColor.black.withAlphaComponent(0.4)])
+        preview.setGradient(colors: [.clear, UIColor.black.withAlphaComponent(0.2)])
         
         Managers.shared.databaseManager.image(forPicnic: picnic) { image in
             self.preview.image = image
@@ -137,6 +200,9 @@ class DetailController: UIViewController {
         overview.font = UIFont.systemFont(ofSize: 20, weight: .thin)
         overview.textContainerInset = .zero
         overview.textContainer.lineFragmentPadding = .zero
+        overview.backgroundColor = .darkWhite
+        overview.layer.cornerRadius = 5
+        overview.clipsToBounds = true
         
         map.translatesAutoresizingMaskIntoConstraints = false
         map.setRegion(MKCoordinateRegion(center: picnic.coordinates.location, span: MKCoordinateSpan(latitudeDelta: 0.03, longitudeDelta: 0.03)), animated: false)
@@ -147,8 +213,11 @@ class DetailController: UIViewController {
         map.isScrollEnabled = false
         map.isZoomEnabled = false
         map.showsUserLocation = false
+        map.layer.cornerRadius = 8
+        map.clipsToBounds = true
 
         reviews.setup()
+        reviews.delegate = self
         Managers.shared.databaseManager.addReviewQuery(for: picnic, limit: 20, queryKey: "Reviews")
         Managers.shared.databaseManager.nextPage(forReviewQueryKey: "Reviews") { reviews in
             self.reviews.update(reviews: reviews)
@@ -182,10 +251,11 @@ class DetailController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        style = .lightContent
         setNeedsStatusBarAppearanceUpdate()
         navigationController?.setNavigationBarHidden(true, animated: false)
-        Managers.shared.databaseManager.addSaveListener(picnic: picnic, listener: liked)
+        Managers.shared.databaseManager.addSaveListener(picnic: picnic, listener: liked) { liked in
+            self.liked.setActive(isActive: liked)
+        }
     }
     
     
@@ -208,7 +278,6 @@ class DetailController: UIViewController {
     }
     
     @objc func likePress(_ sender: HeartButton) {
-        print("called")
         if sender.isActive {
             Managers.shared.databaseManager.unsavePost(picnic: picnic)
         } else {
@@ -218,8 +287,8 @@ class DetailController: UIViewController {
 }
 
 extension DetailController: RatingDelegate {
-    func updateRating(value: Float) {
-        Managers.shared.databaseManager.updateRating(picnic: picnic, value: Int64(value))
+    func ratingDidChange(newValue: Float) {
+        Managers.shared.databaseManager.updateRating(picnic: picnic, value: Int64(newValue))
     }
 }
 
@@ -230,5 +299,44 @@ extension DetailController: UIScrollViewDelegate {
 
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         navigationBar.isHidden = false
+    }
+}
+
+extension DetailController: UIViewControllerTransitioningDelegate {
+    func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
+        let pc = ShortPresentationController(presentedViewController: presented, presenting: presenting)
+        pc.offset = modalOffset
+        return pc
+    }
+}
+
+extension DetailController: ReviewsDelegate {
+    func presentModal() {
+         present(reviewModal, animated: true)
+    }
+}
+
+extension DetailController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        textField.endEditing(true)
+        return true
+    }
+}
+
+extension DetailController: StagedModalControllerDelegate {
+    func complete() {
+        print("called")
+        guard let id = picnic.id else { return }
+        let review = Review(
+            id: nil,
+            pid: id,
+            rating: reviewRating.rating,
+            content: reviewContentTextField.text ?? "",
+            userDisplayName: Managers.shared.auth.currentUser?.displayName,
+            userPhotoURL: Managers.shared.auth.currentUser?.photoURL,
+            images: nil
+        )
+        Managers.shared.databaseManager.submitReview(review: review)
     }
 }

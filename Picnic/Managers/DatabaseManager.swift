@@ -14,55 +14,6 @@ import MapKit
 
 fileprivate let queryPrecision: Int = 7
 
-final class PaginatedQuery {
-    var query: Query
-    private var currentPage: Int = -1
-    private var documents: [DocumentSnapshot] = []
-    
-    public init(query: Query) {
-        self.query = query
-    }
-    
-    func pushDocument(_ doc: DocumentSnapshot) {
-        documents.append(doc)
-    }
-    
-    func next() -> Query {
-        if documents.count == 0 { return query }
-        if currentPage == documents.count - 1 {
-            return query.start(afterDocument: documents[currentPage])
-        }
-        currentPage += 1
-        return query.start(afterDocument: documents[currentPage])
-    }
-    
-    func back() -> Query {
-        if currentPage <= 1 { return query }
-        currentPage -= 1
-        return query.start(afterDocument: documents[currentPage])
-    }
-    
-    func current() -> Query {
-        if currentPage == -1 { return query }
-        return query.start(afterDocument: documents[currentPage])
-    }
-    
-    func goTo(index: Int) -> Query {
-        currentPage = index
-        return query.start(afterDocument: documents[index])
-    }
-    
-    func first() -> Query {
-        currentPage = -1
-        return query
-    }
-    
-    func reset() {
-        currentPage = -1
-        documents = []
-    }
-}
-
 struct QueryGroup {
     var values: [PaginatedQuery] = []
     var radius: Double?
@@ -76,7 +27,7 @@ final class DatabaseManager: NSObject {
     private let storage = Storage.storage().reference(withPath: "images")
     private var listeners = [Int: ListenerRegistration]()
     private var queries = [String: QueryGroup]()
-    private(set) var user: User = .empty
+    private var userData = UserData()
     deinit { listeners.values.forEach { $0.remove() } }
 
 // MARK: General Functions
@@ -94,76 +45,41 @@ final class DatabaseManager: NSObject {
         queries.removeValue(forKey: key)
     }
     
-// This needs to be redone again, it's a mess and the information isn't being stored in the database correctly
 // MARK: UserManager
     func configure() {
-// MARK: If this fails it means it's a new user
         guard let id = Auth.auth().currentUser?.uid else { return }
-        user.id = id
-        user.displayName = Auth.auth().currentUser?.displayName
-        user.userName = Auth.auth().currentUser?.email
-//        users.document(id).getDocument { [weak self] snapshot, error in
-//            if let error = error {
-//                print("Error: DatabaseManager: configure: \(error.localizedDescription)")
-//            } else if let data = snapshot?.data() {
-//                self?.user.firstName = data["firstName"] as? String ?? ""
-//                self?.user.lastName = data["lastName"] as? String ?? ""
-//                self?.user.userName = data["userName"] as? String ?? ""
-//            }
-//        }
-        if listeners.count == 0 {
-            listeners[0] = users.document(id).collection("saved").addSnapshotListener { [weak self] snapshot, error in
-                if let error = error {
-                    print(error.localizedDescription)
-                } else if let snapshot = snapshot {
-                    self?.user.saved = snapshot.documents.map { $0.documentID }
-                }
+        listeners[0] = users.document(id).collection("saved").addSnapshotListener { [weak self] snapshot, error in
+            if let error = error {
+                print(error.localizedDescription)
+            } else if let snapshot = snapshot {
+                self?.userData.saved = snapshot.documents.map { $0.documentID }
             }
-            listeners[1] = users.document(id).collection("rated").addSnapshotListener { [weak self] snapshot, error in
-                if let error = error {
-                    print(error.localizedDescription)
-                } else if let snapshot = snapshot {
-                    self?.user.rated = snapshot.documents.reduce(into: [String: Int64]()) {
-                        $0[$1.documentID] = $1.data()?["value"] as? Int64
-                    }
+        }
+        listeners[1] = users.document(id).collection("rated").addSnapshotListener { [weak self] snapshot, error in
+            if let error = error {
+                print(error.localizedDescription)
+            } else if let snapshot = snapshot {
+                self?.userData.rated = snapshot.documents.reduce(into: [String: Int64]()) {
+                    $0[$1.documentID] = $1.data()?["value"] as? Int64
                 }
             }
         }
     }
     
-    func addSaveListener(picnic: Picnic, listener: HeartButton) {
+    func addSaveListener(picnic: Picnic, listener: AnyObject, executionBlock: @escaping (Bool) -> ()) {
         guard let uid = Auth.auth().currentUser?.uid,
               let id = picnic.id else { return }
         listeners[listener.hash] = users.document(uid).collection("saved").document(id).addSnapshotListener { snapshot, error in
             if let error = error {
                 print(error.localizedDescription)
             } else if let snapshot = snapshot {
-                listener.setActive(isActive: snapshot.exists)
+                executionBlock(snapshot.exists)
             }
         }
     }
-    
-    func signIn() {
-        if user.id == nil {
-            configure()
-        }
-    }
-    
-    func logOut() {
-        do {
-            try Auth.auth().signOut()
-        } catch {
-            print(error.localizedDescription)
-            return
-        }
-    }
-    
-    func shouldRequestLogin() -> Bool {
-        Auth.auth().currentUser == nil || Auth.auth().currentUser!.isAnonymous
-    }
-    
+
     func savePost(picnic: Picnic, completion: (() -> ())? = nil) {
-        guard let id = picnic.id, let uid = user.id else { return }
+        guard let id = picnic.id, let uid = Auth.auth().currentUser?.uid else { return }
         DispatchQueue.global().async { [weak self] in
             self?.users.document(uid).collection("saved").document(id).setData(["isSaved": true]) { error in
                 if let error = error {
@@ -176,7 +92,7 @@ final class DatabaseManager: NSObject {
     }
     
     func unsavePost(picnic: Picnic, completion: (() -> ())? = nil) {
-        guard let id = picnic.id, let uid = user.id else { return }
+        guard let id = picnic.id, let uid = Auth.auth().currentUser?.uid else { return }
         DispatchQueue.global().async { [weak self] in
             self?.users.document(uid).collection("saved").document(id).delete { error in
                 if let error = error {
@@ -188,19 +104,6 @@ final class DatabaseManager: NSObject {
         }
     }
     
-    func isSaved(picnic: Picnic) -> Bool {
-        user.saved.contains(picnic.id ?? "")
-    }
-    
-    func getUser(for uid: String, completion: ((User) ->())?) {
-        users.document(uid).getDocument { snapshot, error in
-            if let error = error {
-                print("DatabaseManager: getUser \(error.localizedDescription)")
-            } else if let user = try? snapshot?.data(as: User.self) {
-                completion?(user)
-            }
-        }
-    }
 
 // MARK: Picnic Manager
     func store(picnic: Picnic, images: [UIImage], completion: @escaping () -> ()) {
@@ -236,8 +139,8 @@ final class DatabaseManager: NSObject {
     }
     
     func updateRating(picnic: Picnic, value: Int64, completion: (() -> ())? = nil) {
-        guard let uid = user.id, let id = picnic.id else { return }
-        let oldValue = user.rated[picnic.id ?? ""] ?? 0
+        guard let uid = Auth.auth().currentUser?.uid, let id = picnic.id else { return }
+        let oldValue = userData.rated[picnic.id ?? ""] ?? 0
         let taskGroup = DispatchGroup()
         taskGroup.enter()
         users.document(uid).collection("rated").document(id).updateData([
@@ -245,9 +148,8 @@ final class DatabaseManager: NSObject {
         ]) { error in
             if let error = error {
                 print(error.localizedDescription)
-            } else {
-                taskGroup.leave()
             }
+            taskGroup.leave()
         }
         taskGroup.enter()
         picnics.document(id).updateData([
@@ -256,9 +158,8 @@ final class DatabaseManager: NSObject {
         ]) { error in
             if let error = error {
                 print(error.localizedDescription)
-            } else {
-                taskGroup.leave()
             }
+            taskGroup.leave()
         }
         taskGroup.notify(queue: .main) {
             completion?()
@@ -378,7 +279,18 @@ final class DatabaseManager: NSObject {
         guard let id = picnic.id else { return }
         picnics.document(id).updateData(["visitCount": FieldValue.increment(value)])
     }
+    
 // MARK: ReviewManager
+    
+    func submitReview(review: Review, completion: ((DocumentReference?) -> ())? = nil) {
+        print("tried")
+        let ref = try? reviews.addDocument(from: review) { error in
+            if let error = error {
+                print(error.localizedDescription)
+            }
+        }
+        completion?(ref)
+    }
     
     func addReviewQuery(for picnic: Picnic, limit: Int, queryKey: String) {
         guard let id = picnic.id else { return }

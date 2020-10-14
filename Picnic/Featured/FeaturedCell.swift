@@ -13,7 +13,7 @@ fileprivate let kTitlePointSize: CGFloat = 25.0
 let kHeartFrame = CGRect(x: 0, y: 0, width: 50, height: 45)
 
 class FeaturedCell: UICollectionViewCell {
-    
+    static let reuseID = "FeaturedCellReuseID"
     var imageView: UIImageView!
     var title: UILabel!
     var rating: Rating!
@@ -67,7 +67,9 @@ class FeaturedCell: UICollectionViewCell {
     func configure(picnic: Picnic) {
         rating.configure(picnic: picnic)
         rating.mode = .displayWithCount
-        Managers.shared.databaseManager.addSaveListener(picnic: picnic, listener: like)
+        Managers.shared.databaseManager.addSaveListener(picnic: picnic, listener: like) { liked in
+            self.like.setActive(isActive: liked)
+        }
 // MARK: change this to loading wheel
         Managers.shared.databaseManager.image(forPicnic: picnic) {
             self.imageView.image = $0

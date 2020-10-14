@@ -12,10 +12,11 @@ import FirebaseFirestoreSwift
 struct Review: Codable, Identifiable {
     @DocumentID var id: String?
     var pid: String
-    var uid: String
-    var rating: Double
+    var rating: Float
     var content: String
+    var userDisplayName: String?
+    var userPhotoURL: URL?
 // MARK: This might be bad
-    var date: Timestamp
+//    var date: Timestamp
     var images: [String]?
 }

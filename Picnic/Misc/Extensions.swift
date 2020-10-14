@@ -102,6 +102,15 @@ extension CALayer {
     }
 }
 extension UIView {
+    
+    func setShadow(radius: CGFloat, color: UIColor, opacity: Float = 1.0, xOffset: CGFloat = 0, yOffset: CGFloat = 0) {
+        layer.shadowRadius = radius
+        layer.shadowColor = color.cgColor
+        layer.shadowOffset = CGSize(width: xOffset, height: yOffset)
+        layer.shadowOpacity = opacity
+        layer.shadowPath = UIBezierPath(rect: bounds).cgPath
+    }
+    
     func setShadow(radius: CGFloat, color: UIColor, opacity: Float = 1.0, offset: CGSize = .zero) {
         layer.shadowRadius = radius
         layer.shadowColor = color.cgColor

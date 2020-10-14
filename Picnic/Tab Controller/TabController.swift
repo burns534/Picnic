@@ -10,7 +10,45 @@ import UIKit
 import FirebaseUI
 import GoogleSignIn
 
+//class AnonymousAuth: NSObject, FUIAuthProvider {
+//    var providerID: String?
+//
+//    var shortName: String {
+//        "Anonymous"
+//    }
+//
+//    var signInLabel: String {
+//        "Sign in anonymously"
+//    }
+//
+//    var icon: UIImage {
+//        UIImage(systemName: "person")?.withRenderingMode(.alwaysTemplate) ?? UIImage()
+//    }
+//
+//    var buttonBackgroundColor: UIColor = .gray
+//
+//    var buttonTextColor: UIColor =
+//
+//    var buttonAlignment: FUIButtonAlignment
+//
+//    func signIn(withEmail email: String?, presenting presentingViewController: UIViewController?, completion: FUIAuthProviderSignInCompletionBlock? = nil) {
+//        <#code#>
+//    }
+//
+//    func signIn(withDefaultValue defaultValue: String?, presenting presentingViewController: UIViewController?, completion: FUIAuthProviderSignInCompletionBlock? = nil) {
+//        <#code#>
+//    }
+//
+//    func signOut() {
+//        <#code#>
+//    }
+//
+//    var accessToken: String?
+//}
+
 class TabController: UITabBarController {
+    
+    let authUI = FUIAuth.defaultAuthUI()!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,21 +64,20 @@ class TabController: UITabBarController {
         }
         
         selectedIndex = 0
-        
-        GIDSignIn.sharedInstance()?.presentingViewController = self
+        authUI.delegate = self
+        authUI.providers = [
+            FUIEmailAuth(),
+            FUIGoogleAuth()
+        ]
     }
-    // Must be presented in viewDidAppear because window hierarchy is established between viewWillAppear and viewDidAppear.
+
     override func viewDidAppear(_ animated: Bool) {
-        guard let vc = Managers.shared.authManager.authUI?.authViewController() else {
-            print("Error: TabController: viewDidAppear: viewController nil")
-            return
-        }
-        vc.isModalInPresentation = true
-        
-// MARK: Asks userManager if it should present sign in
-        if Managers.shared.databaseManager.shouldRequestLogin() {
-            present(vc, animated: true)
+        if Managers.shared.auth.shouldRequestLogin() {
+            present(authUI.authViewController(), animated: true)
         }
     }
 }
 
+extension TabController: FUIAuthDelegate {
+    
+}

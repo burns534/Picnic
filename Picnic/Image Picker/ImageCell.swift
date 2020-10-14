@@ -9,6 +9,7 @@
 import UIKit
 
 class ImageCell: UICollectionViewCell {
+    static let reuseID = "ImageCellReuseID"
     
     var imageView: UIImageView!
     var representedAssetIdentifier: String!
@@ -25,8 +26,8 @@ class ImageCell: UICollectionViewCell {
         }
     }
     
-    let circle = UIImage(systemName: "circle")!.withRenderingMode(.alwaysTemplate)
-    let circleFill = UIImage(systemName: "largecircle.fill.circle")?.withRenderingMode(.alwaysTemplate)
+    private let circle = UIImage(systemName: "circle")!.withRenderingMode(.alwaysTemplate)
+    private let circleFill = UIImage(systemName: "largecircle.fill.circle")?.withRenderingMode(.alwaysTemplate)
     
     private let toggleColor: UIColor = .systemBlue
     
