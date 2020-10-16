@@ -19,7 +19,7 @@ protocol FilterControllerDelegate: AnyObject {
 
 class FilterController: UIViewController {
     let radiusSlider = UISlider()
-    let interactiveRating = Rating(starSize: 60)
+    let interactiveRating = Rating(frame: .zero)
     let sliderValueLabel = UILabel()
     let navigationBar = NavigationBar()
     weak var delegate: FilterControllerDelegate?
@@ -52,7 +52,7 @@ class FilterController: UIViewController {
         
         interactiveRating.translatesAutoresizingMaskIntoConstraints = false
         interactiveRating.mode = .interactable
-        interactiveRating.style = .grayFill
+        interactiveRating.addTarget(self, action: #selector(ratingChange), for: .valueChanged)
 
         view.addSubview(navigationBar)
         view.addSubview(sliderValueLabel)
@@ -75,8 +75,7 @@ class FilterController: UIViewController {
             
             interactiveRating.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             interactiveRating.topAnchor.constraint(equalTo: radiusSlider.bottomAnchor, constant: 10),
-            interactiveRating.widthAnchor.constraint(equalToConstant: interactiveRating.width),
-            interactiveRating.heightAnchor.constraint(equalToConstant: interactiveRating.starSize)
+            interactiveRating.widthAnchor.constraint(equalTo: radiusSlider.widthAnchor, multiplier: 0.8)
         ])
     }
     
@@ -100,6 +99,10 @@ class FilterController: UIViewController {
 
     @objc func radiusChange(_ sender: UISlider) {
         sliderValueLabel.text = String(format: "%.0f", roundToTens(Double(sender.value)))
+    }
+    
+    @objc func ratingChange(_ sender: Rating) {
+        
     }
 
 }

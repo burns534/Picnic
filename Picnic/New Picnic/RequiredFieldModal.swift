@@ -54,7 +54,8 @@ class RequiredFieldModal: UIViewController {
         view.addSubview(progressIndicator)
         
         let exitButton = UIButton()
-        exitButton.setImage(UIImage(systemName: "xmark"), for: .normal)
+        exitButton.setImage(UIImage(systemName: "xmark.circle.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 30, weight: .thin))?.withRenderingMode(.alwaysTemplate), for: .normal)
+        exitButton.tintColor = .lightGray
         exitButton.addTarget(self, action: #selector(dismissModal), for: .touchUpInside)
         exitButton.translatesAutoresizingMaskIntoConstraints = false
         
@@ -102,11 +103,10 @@ class RequiredFieldModal: UIViewController {
         ratingInstructions.isHidden = true
         view.addSubview(ratingInstructions)
         
-        rating = Rating(starSize: 60)
-        rating.delegate = self
+        rating = Rating(frame: .zero)
         rating.mode = .interactable
-        rating.style = .grayFill
         rating.isHidden = true
+        rating.addTarget(self, action: #selector(ratingChange), for: .valueChanged)
         view.addSubview(rating)
 // The two need to be at the top of the view stack
         nameInstructions = UILabel()
@@ -145,8 +145,7 @@ class RequiredFieldModal: UIViewController {
             
             rating.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             rating.topAnchor.constraint(equalTo: ratingInstructions.bottomAnchor, constant: fieldTopMargin),
-            rating.widthAnchor.constraint(equalToConstant: rating.width),
-            rating.heightAnchor.constraint(equalToConstant: rating.starSize),
+            rating.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.7),
             
             nameInstructions.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             nameInstructions.topAnchor.constraint(equalTo: progressIndicator.bottomAnchor, constant: labelTopMargin),
@@ -244,7 +243,7 @@ class RequiredFieldModal: UIViewController {
         case .two:
             if rating.rating == 0 { return }
             state = .three
-            delegate?.update(rating: rating.rating)
+            delegate?.update(rating: Float(rating.rating))
             rating.isHidden = true
             ratingInstructions.isHidden = true
             view.sendSubviewToBack(rating)
@@ -283,6 +282,10 @@ class RequiredFieldModal: UIViewController {
         dismiss(animated: true)
         navigationController?.popViewController(animated: true)
     }
+    
+    @objc func ratingChange() {
+        confirmButton.backgroundColor = .olive
+    }
 }
 
 extension RequiredFieldModal: UITextFieldDelegate {
@@ -290,12 +293,6 @@ extension RequiredFieldModal: UITextFieldDelegate {
         resignFirstResponder()
         view.endEditing(true)
         return true
-    }
-}
-
-extension RequiredFieldModal: RatingDelegate {
-    func ratingDidChange(newValue: Float) {
-        confirmButton.backgroundColor = .olive
     }
 }
 

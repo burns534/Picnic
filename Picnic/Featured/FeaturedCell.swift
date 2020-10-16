@@ -14,19 +14,17 @@ let kHeartFrame = CGRect(x: 0, y: 0, width: 50, height: 45)
 
 class FeaturedCell: UICollectionViewCell {
     static let reuseID = "FeaturedCellReuseID"
-    var imageView: UIImageView!
-    var title: UILabel!
-    var rating: Rating!
-    var picnic: Picnic!
-    var like: HeartButton!
-    var location: UILabel!
+    let imageView = UIImageView()
+    let title = UILabel()
+    let rating = Rating(frame: .zero)
+    let like = HeartButton(pointSize: 35)
+    let location = UILabel()
+    var picnic: Picnic = .empty
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.backgroundColor = .white
-        self.contentView.translatesAutoresizingMaskIntoConstraints = false
-        // configure image
-        imageView = UIImageView(frame: frame)
+        backgroundColor = .white
+
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 10
         imageView.clipsToBounds = true
@@ -34,30 +32,47 @@ class FeaturedCell: UICollectionViewCell {
         contentView.addSubview(imageView)
         
         // configure title
-        title = UILabel(frame: frame)
         title.textColor = .white
         title.font = UIFont.systemFont(ofSize: kTitlePointSize, weight: .semibold)
-        contentView.addSubview(title)
         
-        rating = Rating()
-        contentView.addSubview(rating)
-        like = HeartButton(pointSize: 35)
         like.addTarget(self, action: #selector(likePress), for: .touchUpInside)
-        contentView.addSubview(like)
         
-        location = UILabel()
         location.textColor = .white
         contentView.addSubview(location)
+        contentView.addSubview(title)
+        contentView.addSubview(rating)
+        contentView.addSubview(like)
         
         contentView.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false
         }
+        
+        NSLayoutConstraint.activate([
+            imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            imageView.widthAnchor.constraint(equalTo: contentView.widthAnchor),
+            imageView.heightAnchor.constraint(equalTo: contentView.heightAnchor),
+            
+            rating.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -10),
+            rating.leadingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: 10),
+            rating.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.3),
+            
+            title.bottomAnchor.constraint(equalTo: rating.topAnchor),
+            title.leadingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: 10),
+            title.widthAnchor.constraint(lessThanOrEqualTo: contentView.widthAnchor),
+            
+            like.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
+            like.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -15),
+
+            location.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -10),
+            location.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
+            location.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.centerXAnchor, constant: 5)
+        ])
     }
     
     required init?(coder: NSCoder) {
         fatalError("NSCoding not supported")
     }
     
-    // this isn't working
     override func prepareForReuse() {
         imageView.image = nil
         title.text = nil
@@ -65,7 +80,7 @@ class FeaturedCell: UICollectionViewCell {
     }
     
     func configure(picnic: Picnic) {
-        rating.configure(picnic: picnic)
+        rating.rating = picnic.rating
         rating.mode = .displayWithCount
         Managers.shared.databaseManager.addSaveListener(picnic: picnic, listener: like) { liked in
             self.like.setActive(isActive: liked)
@@ -82,36 +97,6 @@ class FeaturedCell: UICollectionViewCell {
         title.text = picnic.name
 // MARK: I don't really like this
         location.text = (picnic.city ?? "") + ", " + (picnic.state ?? "")
-        
-// MARK: Constraints
-        NSLayoutConstraint.activate([
-            // supplied
-            contentView.topAnchor.constraint(equalTo: topAnchor),
-            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            contentView.heightAnchor.constraint(equalTo: heightAnchor),
-            contentView.widthAnchor.constraint(equalTo: widthAnchor),
-            
-            imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            imageView.widthAnchor.constraint(equalTo: contentView.widthAnchor),
-            imageView.heightAnchor.constraint(equalTo: contentView.heightAnchor),
-            
-            rating.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -10),
-            rating.leadingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: 10),
-            rating.widthAnchor.constraint(equalToConstant: rating.width),
-            rating.heightAnchor.constraint(equalToConstant: rating.starSize),
-            
-            title.bottomAnchor.constraint(equalTo: rating.topAnchor),
-            title.leadingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: 10),
-            title.widthAnchor.constraint(lessThanOrEqualTo: contentView.widthAnchor),
-            
-            like.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
-            like.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -15),
-
-            location.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -10),
-            location.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
-            location.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.centerXAnchor, constant: 5)
-        ])
     }
     
     @objc func likePress(_ sender: HeartButton) {

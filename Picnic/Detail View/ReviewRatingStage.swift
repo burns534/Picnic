@@ -10,8 +10,7 @@ import UIKit
 
 class ReviewRatingStage: UIView {
     
-//    let reviewRating = Rating(starSize: 60)
-    let reviewRating = TestRating(frame: .zero)
+    let reviewRating = Rating(frame: .zero)
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -35,8 +34,6 @@ class ReviewRatingStage: UIView {
         
         reviewRating.translatesAutoresizingMaskIntoConstraints = false
         reviewRating.mode = .interactable
-        reviewRating.addTarget(self, action: #selector(test), for: .valueChanged)
-//        reviewRating.style = .grayFill
         
         addSubview(reviewRatingLabel)
         addSubview(reviewRating)
@@ -49,14 +46,7 @@ class ReviewRatingStage: UIView {
 // TODO: Make Rating more compatible with constraints
             reviewRating.topAnchor.constraint(equalTo: reviewRatingLabel.bottomAnchor),
             reviewRating.centerXAnchor.constraint(equalTo: centerXAnchor),
-            reviewRating.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.7),
-            reviewRating.heightAnchor.constraint(equalTo: reviewRating.widthAnchor, multiplier: 0.20)
-//            reviewRating.widthAnchor.constraint(equalToConstant: reviewRating.width),
-//            reviewRating.heightAnchor.constraint(equalToConstant: reviewRating.starSize)
+            reviewRating.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.7)
         ])
-    }
-    
-    @objc func test(_ sender: TestRating) {
-        print("i got called :))))")
     }
 }

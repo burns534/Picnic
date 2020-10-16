@@ -8,7 +8,7 @@
 
 import UIKit
 
-open class TestRating: UIControl {
+open class Rating: UIControl {
     static let config = UIImage.SymbolConfiguration(weight: .thin)
     
     public enum RatingMode {
@@ -20,7 +20,20 @@ open class TestRating: UIControl {
     
     open var rating: Double = 0.0 {
         didSet {
-            
+            let intRating = Int(rating)
+            stars.forEach { $0.layer.mask = nil }
+            stars[0..<intRating].forEach { $0.tintColor = .systemYellow }
+            stars[intRating..<stars.count].forEach { $0.tintColor = .darkWhite }
+            if mode != .interactable {
+                if rating.rounded() != rating {
+                    let percent = CGFloat(rating - rating.rounded())
+                    let starFrame = stars[intRating].frame
+                    let mask = CALayer()
+                    mask.backgroundColor = UIColor.black.cgColor
+                    mask.frame = CGRect(x: starFrame.width * percent, y: 0, width: starFrame.width * (1 - percent), height: starFrame.height)
+                    stars[intRating].layer.mask = mask
+                }
+            }
         }
     }
     
@@ -58,8 +71,9 @@ open class TestRating: UIControl {
     private func createSubviews() {
         backgroundColor = .clear
         isUserInteractionEnabled = true
+        
         stackView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.alignment = .center
+        stackView.alignment = .fill
         stackView.axis = .horizontal
         stackView.distribution = .fillEqually
         stackView.isUserInteractionEnabled = false
@@ -67,6 +81,7 @@ open class TestRating: UIControl {
         addSubview(stackView)
         
         NSLayoutConstraint.activate([
+            heightAnchor.constraint(equalTo: widthAnchor, multiplier: 0.18),
             stackView.topAnchor.constraint(equalTo: topAnchor),
             stackView.leadingAnchor.constraint(equalTo: leadingAnchor),
             stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
@@ -78,8 +93,6 @@ open class TestRating: UIControl {
             starView.tintColor = defaultColor
             starView.translatesAutoresizingMaskIntoConstraints = false
             stackView.addArrangedSubview(starView)
-            starView.heightAnchor.constraint(equalTo: stackView.heightAnchor).isActive = true
-            starView.widthAnchor.constraint(equalTo: starView.heightAnchor).isActive = true
             stars.append(starView)
         }
         
@@ -96,11 +109,7 @@ open class TestRating: UIControl {
         sendActions(for: .valueChanged)
         
         if let index = stars.firstIndex(where: { $0.bounds.contains(touch.location(in: $0))
-        }) {
-            for i in 0..<stars.count {
-                stars[i].tintColor = i <= index ? highlightColor : defaultColor
-            }
-        }
+        }) { rating = Double(index + 1) }
         return false
     }
 }

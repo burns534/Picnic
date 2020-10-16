@@ -18,7 +18,7 @@ class DetailController: UIViewController {
     let navigationBar = NavigationBar()
 // FIXME: This is bad
     let preview = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: UIScreen.main.bounds.width, height: previewHeightMultiplier * UIScreen.main.bounds.height)))
-    let rating = Rating()
+    let rating = Rating(frame: .zero)
     let map = MKMapView()
     let scrollView = UIScrollView()
     let stackView = UIStackView()
@@ -82,9 +82,10 @@ class DetailController: UIViewController {
             self.preview.image = image
         }
         
-        rating.configure(picnic: picnic)
+        rating.rating = picnic.rating
         rating.translatesAutoresizingMaskIntoConstraints = false
         rating.mode = .displayWithCount
+        rating.addTarget(self, action: #selector(ratingHandler), for: .valueChanged)
     
         liked.translatesAutoresizingMaskIntoConstraints = false
         liked.addTarget(self, action: #selector(likePress), for: .touchUpInside)
@@ -108,10 +109,9 @@ class DetailController: UIViewController {
             nameLabel.bottomAnchor.constraint(equalTo: preview.bottomAnchor, constant: -5),
             nameLabel.trailingAnchor.constraint(lessThanOrEqualTo: liked.leadingAnchor, constant: -5),
             nameLabel.heightAnchor.constraint(equalToConstant: 40),
-// TODO: Here too
+            
             rating.leadingAnchor.constraint(equalTo: preview.leadingAnchor, constant: 10),
-            rating.widthAnchor.constraint(equalToConstant: rating.width),
-            rating.heightAnchor.constraint(equalToConstant: rating.starSize),
+            rating.widthAnchor.constraint(equalTo: preview.widthAnchor, multiplier: 0.15),
             rating.bottomAnchor.constraint(equalTo: nameLabel.topAnchor)
         ])
         
@@ -208,11 +208,9 @@ class DetailController: UIViewController {
             Managers.shared.databaseManager.savePost(picnic: picnic)
         }
     }
-}
-
-extension DetailController: RatingDelegate {
-    func ratingDidChange(newValue: Float) {
-        Managers.shared.databaseManager.updateRating(picnic: picnic, value: Int64(newValue))
+    
+    @objc func ratingHandler(_ sender: Rating) {
+        Managers.shared.databaseManager.updateRating(picnic: picnic, value: Int64(sender.rating))
     }
 }
 

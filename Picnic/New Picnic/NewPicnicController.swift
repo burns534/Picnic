@@ -25,7 +25,7 @@ class NewPicnicController: UIViewController {
     var category: PaddedTextField!
     var images = [UIImage]()
     var addImages: UIButton!
-    let interactiveRating = Rating(starSize: 30)
+    let interactiveRating = Rating(frame: .zero)
     var selectedImages: MultipleSelectionIcon!
     var navigationBar: NavigationBar!
     var scrollView: UIScrollView!
@@ -141,8 +141,7 @@ class NewPicnicController: UIViewController {
             
             interactiveRating.topAnchor.constraint(equalTo: category.bottomAnchor, constant: 5),
             interactiveRating.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15),
-            interactiveRating.widthAnchor.constraint(equalToConstant: interactiveRating.width),
-            interactiveRating.heightAnchor.constraint(equalToConstant: interactiveRating.starSize),
+            interactiveRating.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.3),
             
             selectedImages.topAnchor.constraint(equalTo: interactiveRating.bottomAnchor, constant: 15),
             selectedImages.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15),
@@ -248,9 +247,9 @@ extension NewPicnicController: RequiredFieldModalDelegate {
     func update(name: String) {
         self.name.text = name
     }
-    
+// FIXME: This should be a double
     func update(rating: Float) {
-        self.interactiveRating.setRating(value: rating)
+        self.interactiveRating.rating = Double(rating)
     }
     
     func update(description: String) {

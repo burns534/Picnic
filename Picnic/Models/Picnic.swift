@@ -40,4 +40,8 @@ extension Picnic {
     var location: CLLocation {
         CLLocation(latitude: coordinates.latitude, longitude: coordinates.longitude)
     }
+    
+    var rating: Double {
+        totalRating / Double(ratingCount)
+    }
 }

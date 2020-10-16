@@ -22,7 +22,6 @@ class ReviewCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         rating.mode = .display
-        rating.style = .grayFill
         
         profileIcon.clipsToBounds = true
         profileIcon.layer.cornerRadius = profileSize / 2.0
@@ -72,8 +71,7 @@ class ReviewCell: UITableViewCell {
             
             rating.centerYAnchor.constraint(equalTo: profileIcon.centerYAnchor),
             rating.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            rating.widthAnchor.constraint(equalToConstant: rating.width),
-            rating.heightAnchor.constraint(equalToConstant: rating.starSize),
+            rating.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.4),
             
             content.topAnchor.constraint(equalTo: timestamp.bottomAnchor),
             content.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
@@ -87,7 +85,7 @@ class ReviewCell: UITableViewCell {
     }
     
     func configure(review: Review) {
-        rating.setRating(value: Float(review.rating))
+        rating.rating = review.rating
         userNameLabel.text = review.userDisplayName
         content.text = review.content
         let dateFormatter = DateFormatter()
