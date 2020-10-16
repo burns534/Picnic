@@ -12,11 +12,6 @@ private let circleSize: CGFloat = 30
 private let barSize: CGFloat = 20
 private let barWidth: CGFloat = 3
 
-protocol StagedModalControllerDelegate: AnyObject {
-    func complete()
-    func updateStage(stage: UIView)
-}
-
 class StagedModalController: UIViewController {
     
     var selectedView: Int = 0
@@ -25,8 +20,6 @@ class StagedModalController: UIViewController {
     private let progressBar = UIStackView()
     private let nextButton = UIButton()
     private var progressItems: [UILabel] = []
-    
-    weak var delegate: StagedModalControllerDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,7 +63,7 @@ class StagedModalController: UIViewController {
             nextButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
             nextButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 50),
             nextButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -50),
-            nextButton.heightAnchor.constraint(equalToConstant: 50)
+            nextButton.heightAnchor.constraint(equalTo: nextButton.widthAnchor, multiplier: 0.16)
         ])
     }
     
@@ -173,13 +166,13 @@ class StagedModalController: UIViewController {
         
         NSLayoutConstraint.activate([
             newView.topAnchor.constraint(equalTo: progressBar.bottomAnchor, constant: 20),
-            newView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            newView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            newView.heightAnchor.constraint(equalToConstant: 200),
+            newView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            newView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            newView.bottomAnchor.constraint(equalTo: nextButton.topAnchor, constant: -10)
         ])
     }
     
-    @objc func exit() {
+    @objc private func exit() {
         dismiss(animated: true)
         if selectedView != 0 {
             views[selectedView].isHidden = true
@@ -201,7 +194,6 @@ class StagedModalController: UIViewController {
             views[selectedView].resignFirstResponder()
             views[selectedView].endEditing(true)
             selectedView += 1
-            delegate?.updateStage(stage: views[selectedView])
             views[selectedView].isHidden = false
             progressItems[selectedView].backgroundColor = .olive
             progressItems[selectedView].textColor = .white
@@ -209,9 +201,11 @@ class StagedModalController: UIViewController {
                 nextButton.setTitle("Submit", for: .normal)
             }
         } else {
-            delegate?.complete()
             exit()
+            confirmationHandler()
         }
     }
+    
+    func confirmationHandler() { }
 
 }

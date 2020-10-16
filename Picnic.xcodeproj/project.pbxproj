@@ -60,6 +60,11 @@
 		27BFC414248318E200A3C968 /* MapIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BFC413248318E200A3C968 /* MapIcon.swift */; };
 		27BFC4182486D12700A3C968 /* loading.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 27BFC4172486D12700A3C968 /* loading.jpg */; };
 		27BFC41A2486E7FB00A3C968 /* Rating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BFC4192486E7FB00A3C968 /* Rating.swift */; };
+		27DC3AA82538E43A00F628B9 /* ImagePickerStage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27DC3AA72538E43A00F628B9 /* ImagePickerStage.swift */; };
+		27DC3AAB2538E5A900F628B9 /* ReviewContentStage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27DC3AAA2538E5A900F628B9 /* ReviewContentStage.swift */; };
+		27DC3AAE2538E6F800F628B9 /* ReviewRatingStage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27DC3AAD2538E6F800F628B9 /* ReviewRatingStage.swift */; };
+		27DC3AB12538E80200F628B9 /* ReviewCreationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27DC3AB02538E80200F628B9 /* ReviewCreationController.swift */; };
+		27DC3AB5253928B200F628B9 /* TestRating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27DC3AB4253928B200F628B9 /* TestRating.swift */; };
 		27DDBA3525040BE20061B4BC /* Cluster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27DDBA3425040BE20061B4BC /* Cluster.swift */; };
 		27EAB154252F764D006903ED /* Review.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EAB153252F764D006903ED /* Review.swift */; };
 		27EB2DC32478CA4E0093362C /* FeaturedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EB2DC22478CA4E0093362C /* FeaturedCell.swift */; };
@@ -145,6 +150,11 @@
 		27BFC413248318E200A3C968 /* MapIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapIcon.swift; sourceTree = "<group>"; };
 		27BFC4172486D12700A3C968 /* loading.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = loading.jpg; sourceTree = "<group>"; };
 		27BFC4192486E7FB00A3C968 /* Rating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rating.swift; sourceTree = "<group>"; };
+		27DC3AA72538E43A00F628B9 /* ImagePickerStage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerStage.swift; sourceTree = "<group>"; };
+		27DC3AAA2538E5A900F628B9 /* ReviewContentStage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewContentStage.swift; sourceTree = "<group>"; };
+		27DC3AAD2538E6F800F628B9 /* ReviewRatingStage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewRatingStage.swift; sourceTree = "<group>"; };
+		27DC3AB02538E80200F628B9 /* ReviewCreationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewCreationController.swift; sourceTree = "<group>"; };
+		27DC3AB4253928B200F628B9 /* TestRating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestRating.swift; sourceTree = "<group>"; };
 		27DDBA3425040BE20061B4BC /* Cluster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cluster.swift; sourceTree = "<group>"; };
 		27EAB153252F764D006903ED /* Review.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Review.swift; sourceTree = "<group>"; };
 		27EB2DC22478CA4E0093362C /* FeaturedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedCell.swift; sourceTree = "<group>"; };
@@ -296,6 +306,7 @@
 				2753CD3A252E864C00C4BFF5 /* VisitButton.swift */,
 				27EDAED32530FAD200059EE8 /* Geohash.swift */,
 				27EDAEE52534E65400059EE8 /* StagedModalController.swift */,
+				27DC3AB4253928B200F628B9 /* TestRating.swift */,
 			);
 			path = Misc;
 			sourceTree = "<group>";
@@ -307,6 +318,10 @@
 				279A269C24D6182700D71FD1 /* NavigationBar.swift */,
 				2753CD3D252F6F8A00C4BFF5 /* Reviews.swift */,
 				27EDAEE22533D3EA00059EE8 /* ReviewCell.swift */,
+				27DC3AA72538E43A00F628B9 /* ImagePickerStage.swift */,
+				27DC3AAA2538E5A900F628B9 /* ReviewContentStage.swift */,
+				27DC3AAD2538E6F800F628B9 /* ReviewRatingStage.swift */,
+				27DC3AB02538E80200F628B9 /* ReviewCreationController.swift */,
 			);
 			path = "Detail View";
 			sourceTree = "<group>";
@@ -613,10 +628,12 @@
 				27B072EF247CCC94009974BD /* TabController.swift in Sources */,
 				27407AD424C4004F00AE7AAF /* FloatingMenu.swift in Sources */,
 				279DEB7124DCA4C4003035AC /* PaddedTextField.swift in Sources */,
+				27DC3AA82538E43A00F628B9 /* ImagePickerStage.swift in Sources */,
 				2753CD3B252E864C00C4BFF5 /* VisitButton.swift in Sources */,
 				2716B5B22491A83A0092A622 /* MapSearchResultsController.swift in Sources */,
 				2752092324C4EF12002E8761 /* SpinnerWheel.swift in Sources */,
 				279F160825007C4F00BA6B0F /* PaddedTextView.swift in Sources */,
+				27DC3AAB2538E5A900F628B9 /* ReviewContentStage.swift in Sources */,
 				2753CD3E252F6F8A00C4BFF5 /* Reviews.swift in Sources */,
 				27BFC41A2486E7FB00A3C968 /* Rating.swift in Sources */,
 				2725763724D1F492008916B7 /* AuthPicker.swift in Sources */,
@@ -633,14 +650,17 @@
 				2716B5B0249186E80092A622 /* PlaceAnnotation.swift in Sources */,
 				27EB2DC62478CC1D0093362C /* Picnic.swift in Sources */,
 				279DEB7324DDBA07003035AC /* Divider.swift in Sources */,
+				27DC3AB12538E80200F628B9 /* ReviewCreationController.swift in Sources */,
 				279A269824D4BE2700D71FD1 /* Profile.swift in Sources */,
 				2743860F2478925D0029F00F /* SceneDelegate.swift in Sources */,
 				2756C28B247F2BCA0070D61A /* NewPicnicController.swift in Sources */,
 				279A268C24D34BFB00D71FD1 /* SignInButton.swift in Sources */,
 				27B072E8247CC66B009974BD /* Featured.swift in Sources */,
 				2752092524C53BED002E8761 /* ImageScrollView.swift in Sources */,
+				27DC3AB5253928B200F628B9 /* TestRating.swift in Sources */,
 				27EDAED42530FAD200059EE8 /* Geohash.swift in Sources */,
 				27EAB154252F764D006903ED /* Review.swift in Sources */,
+				27DC3AAE2538E6F800F628B9 /* ReviewRatingStage.swift in Sources */,
 				274B052124BF928100747D25 /* ImageCell.swift in Sources */,
 				279A269024D35C6B00D71FD1 /* ButtonView.swift in Sources */,
 				27EDAEE62534E65400059EE8 /* StagedModalController.swift in Sources */,

@@ -13,7 +13,7 @@ struct Review: Codable, Identifiable {
     @DocumentID var id: String?
     var pid: String
     var uid: String
-    var rating: Float
+    var rating: Double
     var content: String
     var userDisplayName: String?
     var userPhotoURL: URL?

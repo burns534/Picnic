@@ -32,7 +32,8 @@ class Featured: UIViewController {
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.refreshControl = refreshController
         collectionView.register(FeaturedCell.self, forCellWithReuseIdentifier: FeaturedCell.reuseID)
-        let location = Managers.shared.locationManager.location ?? .init()
+        let location = Managers.shared.locationManager.safeLocation
+        print(location)
         Managers.shared.databaseManager.addPicnicQuery(location: location, limit: kDefaultQueryLimit, radius: kDefaultQueryRadius, key: "Picnics")
         Managers.shared.databaseManager.nextPage(forPicnicQueryKey: "Picnics") { picnics in
             self.collectionView.performBatchUpdates {

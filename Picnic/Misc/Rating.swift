@@ -170,3 +170,4 @@ class Rating: UIView {
         delegate?.ratingDidChange(newValue: Float(cgRating))
     }
 }
+

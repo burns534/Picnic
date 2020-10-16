@@ -16,7 +16,7 @@ class LocationManager: CLLocationManager {
     }
 
     var coordinate: CLLocationCoordinate2D {
-        location?.coordinate ?? kCLLocationCoordinate2DInvalid
+        location?.coordinate ?? CLLocationCoordinate2D()
     }
     
     var safeLocation: CLLocation {

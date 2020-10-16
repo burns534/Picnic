@@ -30,8 +30,8 @@ class SettingsController: UIViewController {
         NSLayoutConstraint.activate([
             logoutButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             logoutButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            logoutButton.widthAnchor.constraint(equalToConstant: 60),
-            logoutButton.heightAnchor.constraint(equalToConstant: 30)
+            logoutButton.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.14),
+            logoutButton.heightAnchor.constraint(equalTo: logoutButton.widthAnchor, multiplier: 0.5)
         ])
     }
     

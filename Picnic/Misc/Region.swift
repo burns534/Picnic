@@ -410,7 +410,7 @@ public enum Precision: Int, CaseIterable {
             if let (lat, lon) = Geohash.decode(hash: geohash) {
                 self = CLLocationCoordinate2DMake((lat.min + lat.max) / 2, (lon.min + lon.max) / 2)
             } else {
-                self = kCLLocationCoordinate2DInvalid
+                self = CLLocationCoordinate2D()
             }
         }
 

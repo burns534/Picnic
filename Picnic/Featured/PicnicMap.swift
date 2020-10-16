@@ -8,6 +8,8 @@
 
 import MapKit
 
+fileprivate let annotationSize: CGFloat = 70
+
 protocol PicnicMapDelegate: AnyObject {
     func annotationTap(picnic: Picnic)
 }
@@ -23,6 +25,7 @@ class PicnicMap: UIView {
         map.setRegion(MKCoordinateRegion(center: Managers.shared.locationManager.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5)), animated: false)
         map.showsScale = true
         map.showsCompass = true
+        map.showsUserLocation = true
         addSubview(map)
         NSLayoutConstraint.activate([
             map.topAnchor.constraint(equalTo: topAnchor),
@@ -59,7 +62,7 @@ extension PicnicMap: MKMapViewDelegate {
 }
 
 class PicnicAnnotation: NSObject, MKAnnotation {
-    @objc dynamic var coordinate: CLLocationCoordinate2D = kCLLocationCoordinate2DInvalid
+    @objc dynamic var coordinate = CLLocationCoordinate2D()
     var title: String?
     var picnic: Picnic
     
@@ -76,18 +79,18 @@ class CustomAnnotationView: MKAnnotationView {
     var imageView: UIImageView!
    
     func configure(annotation: PicnicAnnotation) {
-        frame.size = CGSize(width: 70, height: 70)
+        frame.size = CGSize(width: annotationSize, height: annotationSize)
         imageView = UIImageView(frame: frame)
         canShowCallout = true
         isEnabled = true
         Managers.shared.databaseManager.image(forPicnic: annotation.picnic) { image in
             self.imageView.image = image
         }
-        layer.cornerRadius = 10
-        layer.borderWidth = 2
+        layer.cornerRadius = annotationSize / 7.0
+        layer.borderWidth = annotationSize / 35.0
         layer.borderColor = UIColor.white.cgColor
         backgroundColor = .clear
-        imageView.layer.cornerRadius = 10
+        imageView.layer.cornerRadius = annotationSize / 7.0
         imageView.clipsToBounds = true
         addSubview(imageView)
         
