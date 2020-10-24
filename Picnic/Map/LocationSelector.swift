@@ -118,7 +118,7 @@ class LocationSelector: UIViewController {
             return
         }
         let next = NewPicnicController()
-        next.configure(coordinate: coordinate)
+        next.coordinate = coordinate
         navigationController?.pushViewController(next, animated: true)
     }
     

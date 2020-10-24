@@ -22,7 +22,7 @@ class ReviewCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         rating.mode = .display
-        
+        rating.style = .wireframe
         profileIcon.clipsToBounds = true
         profileIcon.layer.cornerRadius = profileSize / 2.0
         profileIcon.layer.borderWidth = 1

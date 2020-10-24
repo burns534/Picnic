@@ -14,21 +14,22 @@ fileprivate let targetSize: CGSize = CGSize(width: 500, height: 500)
 
 class ReviewCreationController: StagedModalController {
     
-    let reviewRatingStage = ReviewRatingStage(frame: .zero)
-    let reviewContentStage = ReviewContentStage(frame: .zero)
+    let ratingStage = RatingStage(frame: .zero)
+    let contentStage = ContentStage(frame: .zero)
     let imagePickerStage = ImagePickerStage(frame: .zero)
     var imagePicker: PHPickerViewController!
-    var picnic: Picnic = .empty
     private let imageManager = PHImageManager()
-    private var selectedImages = [UIImage]()
+    
+    var picnic: Picnic = .empty
+    var selectedImages = [UIImage]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         imagePickerStage.imagePickerButton.addTarget(self, action: #selector(presentPicker), for: .touchUpInside)
         
-        addStage(reviewRatingStage)
-        addStage(reviewContentStage)
+        addStage(ratingStage)
+        addStage(contentStage)
         addStage(imagePickerStage)
         
         let photoLibrary = PHPhotoLibrary.shared()
@@ -61,8 +62,8 @@ class ReviewCreationController: StagedModalController {
             id: nil,
             pid: id,
             uid: uid,
-            rating: reviewRatingStage.reviewRating.rating,
-            content: reviewContentStage.reviewContentTextField.text ?? "",
+            rating: ratingStage.rating.rating,
+            content: contentStage.contentTextField.text ?? "",
             userDisplayName: Managers.shared.auth.currentUser?.displayName,
             userPhotoURL: Managers.shared.auth.currentUser?.photoURL,
             timestamp: Timestamp(date: Date()),

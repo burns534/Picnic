@@ -43,7 +43,7 @@ class ImagePickerStage: UIView {
             imagePickerLabel.heightAnchor.constraint(equalTo: heightAnchor, multiplier: kStagedModalLabelHeightMultiplier),
             imagePickerLabel.widthAnchor.constraint(equalTo: widthAnchor, multiplier: kStagedModalLabelWidthMultiplier),
             
-            imagePickerButton.topAnchor.constraint(equalTo: imagePickerLabel.bottomAnchor, constant: 20),
+            imagePickerButton.topAnchor.constraint(equalTo: imagePickerLabel.bottomAnchor, constant: 5),
             imagePickerButton.centerXAnchor.constraint(equalTo: centerXAnchor),
             imagePickerButton.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.4),
             imagePickerButton.heightAnchor.constraint(equalTo: imagePickerButton.widthAnchor)

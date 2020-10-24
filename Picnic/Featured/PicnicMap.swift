@@ -96,7 +96,12 @@ class CustomAnnotationView: MKAnnotationView {
         
 
         let button = UIButton(type: .infoLight)
-        button.tintColor = .olive
+        button.tintColor = .organic
         rightCalloutAccessoryView = button
+    }
+    
+    override func prepareForReuse() {
+        imageView.removeFromSuperview()
+        imageView = nil
     }
 }

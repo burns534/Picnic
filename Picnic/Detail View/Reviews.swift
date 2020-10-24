@@ -8,7 +8,7 @@
 
 import UIKit
 
-private let rowHeight: CGFloat = 100
+private let rowHeightRatio: CGFloat = 0.15
 
 protocol ReviewsDelegate: AnyObject {
     func presentModal()
@@ -18,9 +18,17 @@ class Reviews: UIView {
     let tableView = UITableView()
     var reviews: [Review] = []
     weak var delegate: ReviewsDelegate?
-    private let refreshController = UIRefreshControl()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        createSubviews()
+    }
     
-    func setup() {
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func createSubviews() {
         let header = UILabel()
         header.text = "Reviews"
         header.font = UIFont.systemFont(ofSize: 30, weight: .semibold)
@@ -29,16 +37,14 @@ class Reviews: UIView {
         let addReviewButton = UIButton()
         addReviewButton.translatesAutoresizingMaskIntoConstraints = false
         addReviewButton.setTitle("Write a review", for: .normal)
-        addReviewButton.setTitleColor(.lightOlive, for: .normal)
+        addReviewButton.setTitleColor(.organic, for: .normal)
         addReviewButton.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .light)
         addReviewButton.addTarget(self, action: #selector(addReview), for: .touchUpInside)
         
         tableView.dataSource = self
-        tableView.rowHeight = rowHeight
+        tableView.delegate = self
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.register(ReviewCell.self, forCellReuseIdentifier: ReviewCell.reuseID)
-        refreshController.addTarget(self, action: #selector(pullDown), for: .valueChanged)
-        tableView.refreshControl = refreshController
         
         addSubview(header)
         addSubview(addReviewButton)
@@ -69,17 +75,6 @@ class Reviews: UIView {
     @objc func addReview(_ sender: UIButton) {
         delegate?.presentModal()
     }
-    
-    @objc func pullDown() {
-        Managers.shared.databaseManager.refresh(forReviewQueryKey: "Reviews") { reviews in
-            self.tableView.performBatchUpdates {
-                self.reviews = reviews
-                self.tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
-            } completion: { _ in
-                self.refreshController.endRefreshing()
-            }
-        }
-    }
 }
 
 extension Reviews: UITableViewDataSource {
@@ -93,5 +88,12 @@ extension Reviews: UITableViewDataSource {
         }
         cell.configure(review: reviews[indexPath.row])
         return cell
+    }
+}
+
+// TODO: Make these sized to fit content
+extension Reviews: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        UIScreen.main.bounds.height * rowHeightRatio
     }
 }

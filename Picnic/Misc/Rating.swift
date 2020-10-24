@@ -1,173 +1,160 @@
-////
-////  Rating.swift
-////  Picnic
-////
-////  Created by Kyle Burns on 6/2/20.
-////  Copyright © 2020 Kyle Burns. All rights reserved.
-////
 //
-//import UIKit
+//  Rating.swift
+//  Picnic
 //
-//// will display rating and number of ratings with stars
-//protocol RatingDelegate: AnyObject {
-//    /**
-//     Notifies delegate of attempted rating change by the user. Delegate is responsible for validating this change
-//     - Parameters:
-//        - newValue: The new value
-//     */
-//    func ratingDidChange(newValue: Float)
-//}
+//  Created by Kyle Burns on 10/15/20.
+//  Copyright © 2020 Kyle Burns. All rights reserved.
 //
-//// MARK: This really needs to be rewritten to capture the touch with a gesture recognizer and calculate the rating based on the position in the view instead of using 5 buttons...
-//class Rating: UIView {
-//
-//    enum Mode {
-//        case interactable, display, displayWithCount
-//    }
-//
-//    var stars = [StarButton]()
-//
-//    var starSize: CGFloat = StarButton.defaultStarSize
-//    var spacing: CGFloat = 1
-//    var rating: Float { Float(cgRating) }
-//    var width: CGFloat {
-//        5 * starSize + 4 * spacing
-//    }
-//    var ratingCountLabel: UILabel?
-//    var ratingCount: Int = 0
-//    private var cgRating: CGFloat = 0
-//    var style: StarButton.Style = .yellowFrame {
-//        didSet {
-//            switch style {
-//            case .grayFill:
-//                defaultColor = .darkWhite
-//                highlightcolor = .systemYellow
-//                stars.forEach { $0.style = .grayFill }
-//            case .yellowFrame:
-//                defaultColor = .systemYellow
-//                highlightcolor = .systemYellow
-//                stars.forEach { $0.style = .yellowFrame }
-//            }
-//        }
-//    }
-//
-//    var mode: Mode = .displayWithCount {
-//        didSet {
-//            switch mode {
-//            case .interactable:
-//                isUserInteractionEnabled = true
-//                ratingCountLabel?.isHidden = true
-//            case .display:
-//                isUserInteractionEnabled = false
-//                ratingCountLabel?.isHidden = true
-//            case .displayWithCount:
-//                configureRatingCount()
-//                isUserInteractionEnabled = false
-//                ratingCountLabel?.isHidden = false
-//            }
-//        }
-//    }
-//
-//    var highlightcolor: UIColor = .systemYellow {
-//        didSet {
-//            stars.forEach { $0.highlightcolor = highlightcolor }
-//        }
-//    }
-//    var defaultColor: UIColor = .darkWhite {
-//        didSet {
-//            stars.forEach { $0.defaultColor = defaultColor }
-//        }
-//    }
-//
-//    weak var delegate: RatingDelegate?
-//
-//// MARK: For rating
-//    init(rating: CGFloat = 0, starSize: CGFloat = StarButton.defaultStarSize, spacing: CGFloat = 1) {
-//        self.starSize = starSize
-//        self.spacing = spacing
-//        self.cgRating = rating
-//        super.init(frame: .zero)
-//        setup()
-//        refresh()
-//    }
-//
-//    required init?(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
-//
-//    func configure(picnic: Picnic) {
-//        cgRating = CGFloat(picnic.totalRating / Double(picnic.ratingCount))
-//        ratingCount = picnic.ratingCount
-//        if mode != .interactable { refresh() }
-//    }
-//
-//// MARK: I don't like this
-//    private func configureRatingCount() {
-//        if ratingCountLabel != nil {
-//            let ratingString = ratingCount > 1000 ? String(format: "%.1fk", Float(ratingCount) / 1000.0) : String(ratingCount)
-//            ratingCountLabel!.text = "(" + ratingString + ")"
-//            return
-//        }
-//
-//        ratingCountLabel = UILabel()
-//        var ratingString: String
-//        if ratingCount > 1000 {
-//            let reduced: Float = Float(ratingCount) / 1000.0
-//            ratingString = String(format: "%.1fk", reduced)
-//        } else {
-//            ratingString = "\(ratingCount)"
-//        }
-//        ratingCountLabel!.text = "(" + ratingString + ")"
-//        ratingCountLabel!.translatesAutoresizingMaskIntoConstraints = false
-//        ratingCountLabel!.textAlignment = .center
-//        ratingCountLabel!.textColor = .white
-//        addSubview(ratingCountLabel!)
-//
-//        ratingCountLabel!.leadingAnchor.constraint(equalTo: stars.last!.trailingAnchor, constant: 5).isActive = true
-//        ratingCountLabel!.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-//    }
-//
-//    private func setup() {
-//        isUserInteractionEnabled = false
-//        for i in 0..<5 {
-//            let star = StarButton()
-//            star.configure(color: .systemYellow, size: starSize)
-//            star.translatesAutoresizingMaskIntoConstraints = false
-//            star.addTarget(self, action: #selector(starPress), for: .touchUpInside)
-//            addSubview(star)
-//
-//            NSLayoutConstraint.activate([
-//                star.centerYAnchor.constraint(equalTo: centerYAnchor),
-//                star.leadingAnchor.constraint(equalTo: i == 0 ? leadingAnchor : stars.last!.trailingAnchor, constant: spacing),
-//                star.widthAnchor.constraint(equalToConstant: starSize),
-//                star.heightAnchor.constraint(equalToConstant: starSize)
-//            ])
-//            stars.append(star)
-//        }
-//    }
-//
-//    private func refresh() {
-//        stars[0..<Int(cgRating)].forEach { $0.fill() }
-//        stars[Int(cgRating)..<stars.count].forEach { $0.reset() }
-///*
-//        A Star symbol does not go edge to edge in the image. The image leaves a small amount on the left and right of the star. Additionally, the the very corners of the stars are imperceptible when applying a small mask. Accounting for these two things, approximately a translation of approximately 1/6 the image size is needed to create correct star behavior.
-//*/
-//        if floor(cgRating) != cgRating {
-//            let mask = starSize * CGFloat(cgRating.truncatingRemainder(dividingBy: 1.0) * 0.62 + 0.15)
-//            stars[Int(cgRating)].setMask(maskWidth: mask)
-//        }
-//    }
-//
-//    func setRating(value: Float, incrementRatingCount: Bool = false) {
-//        cgRating = CGFloat(value)
-//        refresh()
-//        if incrementRatingCount { ratingCount += 1 }
-//    }
-//
-//    @objc func starPress(_ sender: StarButton) {
-//        cgRating = CGFloat(stars.firstIndex(of: sender)!) + 1
-//        refresh()
-//        delegate?.ratingDidChange(newValue: Float(cgRating))
-//    }
-//}
-//
+
+import UIKit
+
+fileprivate let heightToWidth: CGFloat = 0.17
+
+open class Rating: UIControl {
+    public static let config = UIImage.SymbolConfiguration(weight: .thin)
+    static let starFill = UIImage(systemName: "star.fill", withConfiguration: config)?.withRenderingMode(.alwaysTemplate)
+    static let star = UIImage(systemName: "star", withConfiguration: config)?.withRenderingMode(.alwaysTemplate)
+    
+    public enum RatingMode {
+        case interactable, display, displayWithCount
+    }
+    
+    public enum Style: String {
+        case wireframe = "star"
+        case fill = "star.fill"
+        var backImage: UIImage? {
+            switch self {
+            case .fill:
+                return starFill
+            case .wireframe:
+                return star
+            }
+        }
+        
+        var frontImage: UIImage? {
+            switch self {
+            case .fill:
+                return starFill
+            case .wireframe:
+                return starFill
+            }
+        }
+    }
+    
+    open var highlightColor: UIColor = .systemYellow
+    open var defaultColor: UIColor = .darkWhite
+    open var rating: Double = 0.0 {
+        didSet {
+            refactorStars(rating: rating)
+        }
+    }
+    
+    open var ratingCount: Int = 0 {
+        didSet {
+            ratingCountLabel.text = ratingCount > 1000 ? String(format: "(%.1fk)", Float(ratingCount) / 1000.0) : String(format: "(%d)", ratingCount)
+        }
+    }
+    
+    open var mode: RatingMode = .display {
+        didSet {
+            isUserInteractionEnabled = mode == .interactable
+            if mode == .displayWithCount {
+                stackView.addArrangedSubview(ratingCountLabel)
+            } else {
+                stackView.removeArrangedSubview(ratingCountLabel)
+            }
+        }
+    }
+    
+    open var style: Style = .fill {
+        didSet {
+            switch style {
+            case .fill: defaultColor = .darkWhite
+            case .wireframe: defaultColor = .systemYellow
+            }
+            refactorStars(rating: rating)
+        }
+    }
+    
+    private var stars = [StarImage]()
+    private let ratingCountLabel = UILabel()
+    private let stackView = UIStackView()
+    
+    override public init(frame: CGRect) {
+        super.init(frame: frame)
+        createSubviews()
+    }
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func createSubviews() {
+        backgroundColor = .clear
+        isUserInteractionEnabled = true
+        translatesAutoresizingMaskIntoConstraints = false
+        
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.alignment = .fill
+        stackView.axis = .horizontal
+        stackView.distribution = .fillEqually
+        stackView.isUserInteractionEnabled = false
+        stackView.spacing = 2
+        addSubview(stackView)
+        
+        NSLayoutConstraint.activate([
+            heightAnchor.constraint(equalTo: widthAnchor, multiplier: heightToWidth),
+            stackView.topAnchor.constraint(equalTo: topAnchor),
+            stackView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            stackView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+        
+        for _ in 0..<5 {
+            let starView = StarImage(frame: CGRect(origin: .zero, size: bounds.size))
+            starView.backgroundColor = .clear
+            starView.tintColor = defaultColor
+            starView.translatesAutoresizingMaskIntoConstraints = false
+            stackView.addArrangedSubview(starView)
+            stars.append(starView)
+            starView.heightAnchor.constraint(equalTo: stackView.heightAnchor).isActive = true
+            starView.centerYAnchor.constraint(equalTo: stackView.centerYAnchor).isActive = true
+        }
+        
+        ratingCountLabel.translatesAutoresizingMaskIntoConstraints = false
+        ratingCountLabel.adjustsFontSizeToFitWidth = true
+        ratingCountLabel.minimumScaleFactor = 0.3
+        ratingCountLabel.textAlignment = .center
+        ratingCountLabel.textColor = .white
+        stackView.addArrangedSubview(ratingCountLabel)
+    }
+    
+    open override func beginTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
+        super.beginTracking(touch, with: event)
+        sendActions(for: .valueChanged)
+        
+        if let index = stars.firstIndex(where: { $0.bounds.contains(touch.location(in: $0))
+        }) { rating = Double(index + 1) }
+        return false
+    }
+
+    private func refactorStars(rating: Double) {
+        let intRating = Int(floor(rating))
+        stars[0..<intRating].forEach {
+            $0.tintColor = highlightColor
+            $0.image = style.frontImage
+            $0.removeOverlay()
+        }
+        stars[intRating..<stars.count].forEach {
+            $0.tintColor = defaultColor
+            $0.image = style.backImage
+            $0.removeOverlay()
+        }
+        if mode != .interactable {
+            if rating.rounded() != rating {
+                let ratio = CGFloat(rating - floor(rating))
+                stars[intRating].setOverlay(image: style.frontImage, ratio: ratio)
+            }
+        }
+    }
+}

@@ -10,11 +10,11 @@ import UIKit
 /**
     Measured in Kilometers
  */
-let kDefaultQueryRadius: Double = 20.0
+let kDefaultQueryRadius: Double = 100.0
 let kDefaultQueryLimit: Int = 50
 
 protocol FilterControllerDelegate: AnyObject {
-    func refreshDataSource(picnics: [Picnic])
+    func filterChange()
 }
 
 class FilterController: UIViewController {
@@ -41,14 +41,15 @@ class FilterController: UIViewController {
         navigationBar.setRightBarButton(button: resetButton)
         
         radiusSlider.translatesAutoresizingMaskIntoConstraints = false
-        radiusSlider.minimumTrackTintColor = .olive
+        radiusSlider.minimumTrackTintColor = .organic
         radiusSlider.minimumValue = 0.0
         radiusSlider.maximumValue = 200.0
         radiusSlider.value = Float(kDefaultQueryRadius)
         radiusSlider.addTarget(self, action: #selector(radiusChange), for: .valueChanged)
+        radiusSlider.addTarget(self, action: #selector(radiusSet), for: .editingDidEnd)
         sliderValueLabel.translatesAutoresizingMaskIntoConstraints = false
         sliderValueLabel.font = UIFont.systemFont(ofSize: 20, weight: .light)
-        sliderValueLabel.text = String(Int(radiusSlider.value))
+        sliderValueLabel.text = String(format: "%d miles", Int(radiusSlider.value))
         
         interactiveRating.translatesAutoresizingMaskIntoConstraints = false
         interactiveRating.mode = .interactable
@@ -79,30 +80,33 @@ class FilterController: UIViewController {
         ])
     }
     
-    private func roundToTens(_ x : Double) -> Double {
-        10 * (x / 10.0).rounded()
+    private func roundToTens(_ x : Float) -> Double {
+        Double(10 * (x / 10.0).rounded())
     }
     
     @objc func exit(_ sender: UIButton) {
-        guard let location = Managers.shared.locationManager.location else { return }
-        Managers.shared.databaseManager.removeQuery("Picnics")
-        Managers.shared.databaseManager.addPicnicQuery(location: location, limit: kDefaultQueryLimit, radius: roundToTens(Double(radiusSlider.value * 1.609)), key: "Picnics")
-        Managers.shared.databaseManager.nextPage(forPicnicQueryKey: "Picnics") { picnics in
-            self.delegate?.refreshDataSource(picnics: picnics)
-            self.dismiss(animated: true)
-        }
+        dismiss(animated: true)
     }
     
     @objc func reset(_ sender: UIButton) {
         radiusSlider.value = Float(kDefaultQueryRadius)
+        sliderValueLabel.text = String(format: "%d miles", Int(radiusSlider.value))
+        Managers.shared.databaseManager.picnicQuery("Picnics")?.reset()
+        delegate?.filterChange()
     }
 
     @objc func radiusChange(_ sender: UISlider) {
-        sliderValueLabel.text = String(format: "%.0f", roundToTens(Double(sender.value)))
+        sliderValueLabel.text = String(format: "%.0f miles", roundToTens(sender.value))
+    }
+    
+    @objc func radiusSet(_ sender: UISlider) {
+        Managers.shared.databaseManager.picnicQuery("Picnics")?.setRadius(radius: Double(sender.value))
+        delegate?.filterChange()
     }
     
     @objc func ratingChange(_ sender: Rating) {
-        
+        Managers.shared.databaseManager.picnicQuery("Picnics")?.setRating(rating: sender.rating)
+        delegate?.filterChange()
     }
 
 }

@@ -35,32 +35,22 @@ extension UIImageView {
     }
 }
 
-//extension UITextField {
-//
-//    enum Padding {
-//        case standard, extra, thin, none
-//    }
-//
-//    func setPadding(_ padding: UITextField.Padding) {
-//        var amount: CGFloat
-//        switch padding {
-//        case .standard:
-//            amount = 10
-//        case .extra:
-//            amount = 20
-//        case .thin:
-//            amount = 5
-//        case .none:
-//            amount = 0
-//        }
-//        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: amount, height: self.frame.size.height))
-//        leftView = paddingView
-//        leftViewMode = .always
-//        rightView = paddingView
-//        rightViewMode = .always
-//
-//    }
-//}
+extension UIImage {
+    func tint(color: UIColor) -> UIImage {
+        let maskImage = cgImage
+        let bounds = CGRect(origin: .zero, size: size)
+
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { context in
+            let cgContext = context.cgContext
+            cgContext.translateBy(x: 0, y: size.height)
+            cgContext.scaleBy(x: 1.0, y: -1.0)
+            cgContext.clip(to: bounds, mask: maskImage!)
+            color.setFill()
+            cgContext.fill(bounds)
+        }
+    }
+}
 
 extension Collection where Self.Iterator.Element: RandomAccessCollection {
     /**
@@ -119,10 +109,14 @@ extension UIView {
         layer.shadowPath = UIBezierPath(rect: bounds).cgPath
     }
     
-    func setGradient(colors: [UIColor]) {
+    func setGradient(colors: [UIColor], bounds: CGRect? = nil) {
         let gradient = CAGradientLayer()
         gradient.colors = colors.map { $0.cgColor }
-        gradient.frame = bounds
+        if let bounds = bounds {
+            gradient.frame = bounds
+        } else {
+            gradient.frame = self.bounds
+        }
         layer.insertSublayer(gradient, at: 0)
     }
 }
@@ -136,6 +130,11 @@ extension String {
 extension CGSize {
     static func +(left: CGSize, right: CGSize) -> CGSize {
         return CGSize(width: left.width + right.width, height: left.height + right.height)
+    }
+    
+    static func + (lhs: CGSize, rhs: Int) -> CGSize {
+        let r = CGFloat(rhs)
+        return CGSize(width: lhs.width + r, height: lhs.height + r)
     }
     
     static func /(left: CGSize, right: Int) -> CGSize {
@@ -211,5 +210,11 @@ extension MKCoordinateRegion {
         let minLong = center.longitude - 0.5 * span.longitudeDelta
         let maxLong = center.longitude + 0.5 * span.longitudeDelta
         return (minLat, maxLat, minLong, maxLong)
+    }
+}
+
+extension CGFloat {
+    func isEqualTo(_ rhs: CGFloat) -> Bool {
+        (rhs - self) < CGFloat.leastNonzeroMagnitude
     }
 }

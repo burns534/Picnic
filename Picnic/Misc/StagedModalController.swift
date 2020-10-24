@@ -12,41 +12,48 @@ private let circleSize: CGFloat = 30
 private let barSize: CGFloat = 20
 private let barWidth: CGFloat = 3
 
-class StagedModalController: UIViewController {
-    
-    var selectedView: Int = 0
-    var views: [UIView] = []
-    var offset: CGFloat = 0.0
+open class StagedModalController: UIViewController {
+    static let config = UIImage.SymbolConfiguration(pointSize: 30, weight: .thin)
+    static let checkmark = UIImage(systemName: "checkmark", withConfiguration: config)?.withRenderingMode(.alwaysTemplate)
+    open var selectedView: Int = 0
+    open var views: [UIView] = []
+    open var offset: CGFloat = 0.0
+    open var progressItemDefaultBackgroundColor = UIColor.darkWhite
+    open var progressItemDefaultTextColor = UIColor.gray
+    open var progressItemSelectedBackgroundColor = UIColor.organic
+    open var progressItemSelectedTextColor = UIColor.white
     private let progressBar = UIStackView()
     private let nextButton = UIButton()
     private var progressItems: [UILabel] = []
+    private let checkmarkView = UIImageView(image: checkmark)
 
-    override func viewDidLoad() {
+    open override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
-        view.clipsToBounds = true
+        view.backgroundColor = progressItemSelectedTextColor
         view.layer.cornerRadius = 10
         view.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
-        view.setShadow(radius: 5, color: .gray, opacity: 0.6, offset: .zero)
-        
+        view.setShadow(radius: 5, color: progressItemDefaultTextColor, opacity: 0.6, offset: .zero)
+        checkmarkView.translatesAutoresizingMaskIntoConstraints = false
         progressBar.translatesAutoresizingMaskIntoConstraints = false
         progressBar.alignment = .center
         progressBar.axis = .horizontal
         progressBar.distribution = .equalSpacing
         progressBar.spacing = 5
+        let tgr = UITapGestureRecognizer(target: self, action: #selector(progressBarTap))
+        progressBar.addGestureRecognizer(tgr)
         view.addSubview(progressBar)
 
         let exitButton = UIButton()
         exitButton.translatesAutoresizingMaskIntoConstraints = false
-        exitButton.setImage(UIImage(systemName: "xmark.circle.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 30, weight: .thin))?.withRenderingMode(.alwaysTemplate), for: .normal)
+        exitButton.setImage(UIImage(systemName: "xmark.circle.fill", withConfiguration: StagedModalController.config)?.withRenderingMode(.alwaysTemplate), for: .normal)
         exitButton.tintColor = .lightGray
         exitButton.addTarget(self, action: #selector(exit), for: .touchUpInside)
         view.addSubview(exitButton)
         
         nextButton.translatesAutoresizingMaskIntoConstraints = false
         nextButton.setTitle("Next", for: .normal)
-        nextButton.setTitleColor(.white, for: .normal)
-        nextButton.backgroundColor = .olive
+        nextButton.setTitleColor(progressItemSelectedTextColor, for: .normal)
+        nextButton.backgroundColor = progressItemSelectedBackgroundColor
         nextButton.addTarget(self, action: #selector(nextHandler), for: .touchUpInside)
         nextButton.clipsToBounds = true
         nextButton.layer.cornerRadius = 5
@@ -67,13 +74,13 @@ class StagedModalController: UIViewController {
         ])
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillAppear), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillDisappear), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
+    open override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
@@ -82,14 +89,15 @@ class StagedModalController: UIViewController {
     @objc func keyboardWillAppear(_ notification: Notification) {
         if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
             let height = keyboardFrame.cgRectValue.height
-            if view.frame.origin.y == offset {
+// MARK: custom equality relation for CGFloat required because of precision issues
+            if view.frame.origin.y.isEqualTo(offset) {
                 view.frame.origin.y -= height
             }
         }
     }
     
     @objc func keyboardWillDisappear(_ notification: Notification) {
-        if view.frame.origin.y != offset {
+        if !view.frame.origin.y.isEqualTo(offset) {
             view.frame.origin.y = offset
         }
     }
@@ -107,61 +115,13 @@ class StagedModalController: UIViewController {
         view.addSubview(newView)
         if views.count == 2 {
             newView.isHidden = true
-            let circles = [
-                UILabel(frame: CGRect(origin: .zero, size: CGSize(width: circleSize, height: circleSize))),
-                UILabel(frame: CGRect(origin: .zero, size: CGSize(width: circleSize, height: circleSize)))
-                ]
-            circles[0].text = "\(1)"
-            circles[1].text = "\(2)"
-            circles.forEach { circle in
-                circle.textAlignment = .center
-                circle.textColor = .gray
-                circle.backgroundColor = .darkWhite
-                circle.translatesAutoresizingMaskIntoConstraints = false
-                circle.layer.cornerRadius = circleSize / 2
-                circle.clipsToBounds = true
-                circle.setShadow(radius: 5, color: .lightGray, opacity: 0.6, xOffset: 5)
-                circle.widthAnchor.constraint(equalToConstant: circleSize).isActive = true
-                circle.heightAnchor.constraint(equalToConstant: circleSize).isActive = true
-            }
-            circles[0].backgroundColor = .olive
-            circles[0].textColor = .white
-            progressBar.addArrangedSubview(circles[0])
-            let bar = UIView()
-            bar.translatesAutoresizingMaskIntoConstraints = false
-            bar.backgroundColor = .darkWhite
-            bar.widthAnchor.constraint(equalToConstant: barSize).isActive = true
-            bar.heightAnchor.constraint(equalToConstant: barWidth).isActive = true
-            progressBar.addArrangedSubview(bar)
-            progressBar.addArrangedSubview(circles[1])
-            progressItems.append(contentsOf: circles)
-            
-        }
-        
-        if views.count >= 3 {
+            initializeProgressBar()
+        } else if views.count > 2 {
             newView.isHidden = true
-            let bar = UIView()
-            bar.translatesAutoresizingMaskIntoConstraints = false
-            bar.backgroundColor = .darkWhite
-            bar.widthAnchor.constraint(equalToConstant: barSize).isActive = true
-            bar.heightAnchor.constraint(equalToConstant: barWidth).isActive = true
-            progressBar.addArrangedSubview(bar)
-        
-            let circle = UILabel(frame: CGRect(origin: .zero, size: CGSize(width: circleSize, height: circleSize)))
-            circle.textAlignment = .center
-            circle.textColor = .gray
-            circle.backgroundColor = .darkWhite
-            circle.text = "\(views.count)"
-            circle.translatesAutoresizingMaskIntoConstraints = false
-            circle.layer.cornerRadius = circleSize / 2
-            circle.clipsToBounds = true
-            circle.setShadow(radius: 5, color: .lightGray, opacity: 0.6, xOffset: 5)
-            circle.widthAnchor.constraint(equalToConstant: circleSize).isActive = true
-            circle.heightAnchor.constraint(equalToConstant: circleSize).isActive = true
-            
+            progressBar.addArrangedSubview(generateBar())
+            let circle = generateCircle(views.count)
             progressBar.addArrangedSubview(circle)
             progressItems.append(circle)
-        
         }
         
         NSLayoutConstraint.activate([
@@ -172,16 +132,114 @@ class StagedModalController: UIViewController {
         ])
     }
     
+    func pushStage(_ newView: UIView) {
+        newView.translatesAutoresizingMaskIntoConstraints = false
+        views.first?.isHidden = true
+        views.insert(newView, at: 0)
+        view.addSubview(newView)
+        if views.count == 2 {
+            initializeProgressBar()
+        } else if views.count > 2 {
+            let circle = generateCircle(1)
+            circle.textColor = progressItemSelectedTextColor
+            circle.backgroundColor = progressItemSelectedBackgroundColor
+            progressItems.first?.textColor = progressItemDefaultTextColor
+            progressItems.first?.backgroundColor = progressItemDefaultBackgroundColor
+            progressBar.insertArrangedSubview(generateBar(), at: 0)
+            progressBar.insertArrangedSubview(circle, at: 0)
+            progressItems.insert(circle, at: 0)
+            for i in 0..<progressItems.count {
+                progressItems[i].text = String(i + 1)
+            }
+        }
+        
+        NSLayoutConstraint.activate([
+            newView.topAnchor.constraint(equalTo: progressBar.bottomAnchor, constant: 20),
+            newView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            newView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            newView.bottomAnchor.constraint(equalTo: nextButton.topAnchor, constant: -10)
+        ])
+    }
+    
+    func insertStage(_ newView: UIView, at index: Int) {
+        newView.translatesAutoresizingMaskIntoConstraints = false
+        if index == 0 { views.first?.isHidden = true }
+        else { newView.isHidden = true }
+        views.insert(newView, at: index)
+        view.addSubview(newView)
+        if views.count == 2 {
+            initializeProgressBar()
+        } else if views.count > 2 {
+            let circle = generateCircle(index + 1)
+            if index == 0 {
+                progressItems.first?.textColor = progressItemDefaultTextColor
+                progressItems.first?.backgroundColor = progressItemDefaultBackgroundColor
+                circle.textColor = progressItemSelectedTextColor
+                circle.backgroundColor = progressItemSelectedBackgroundColor
+            } else {
+                circle.textColor = progressItemDefaultTextColor
+                circle.backgroundColor = progressItemDefaultBackgroundColor
+            }
+            progressBar.insertArrangedSubview(generateBar(), at: 2 * index)
+            progressBar.insertArrangedSubview(circle, at: 2 * index)
+            progressItems.insert(circle, at: index)
+            for i in 0..<progressItems.count {
+                progressItems[i].text = String(i + 1)
+            }
+        }
+        
+        NSLayoutConstraint.activate([
+            newView.topAnchor.constraint(equalTo: progressBar.bottomAnchor, constant: 20),
+            newView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            newView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            newView.bottomAnchor.constraint(equalTo: nextButton.topAnchor, constant: -10)
+        ])
+    }
+// TODO: Make last progressItem display a checkmark instead of number
+    private func initializeProgressBar() {
+        let circle0 = generateCircle(1)
+        circle0.backgroundColor = progressItemSelectedBackgroundColor
+        circle0.textColor = progressItemSelectedTextColor
+        let circle1 = generateCircle(2)
+        progressBar.addArrangedSubview(circle0)
+        progressBar.addArrangedSubview(generateBar())
+        progressBar.addArrangedSubview(circle1)
+        progressItems.append(contentsOf: [circle0, circle1])
+    }
+    
+    private func generateBar() -> UIView {
+        let bar = UIView()
+        bar.translatesAutoresizingMaskIntoConstraints = false
+        bar.backgroundColor = progressItemDefaultBackgroundColor
+        bar.widthAnchor.constraint(equalToConstant: barSize).isActive = true
+        bar.heightAnchor.constraint(equalToConstant: barWidth).isActive = true
+        return bar
+    }
+    
+    private func generateCircle(_ count: Int) -> UILabel {
+        let circle = UILabel(frame: CGRect(origin: .zero, size: CGSize(width: circleSize, height: circleSize)))
+        circle.textAlignment = .center
+        circle.textColor = progressItemDefaultTextColor
+        circle.backgroundColor = progressItemDefaultBackgroundColor
+        circle.translatesAutoresizingMaskIntoConstraints = false
+        circle.layer.cornerRadius = circleSize / 2
+        circle.clipsToBounds = true
+        circle.text = String(count)
+        circle.widthAnchor.constraint(equalToConstant: circleSize).isActive = true
+        circle.heightAnchor.constraint(equalToConstant: circleSize).isActive = true
+        return circle
+    }
+    
     @objc private func exit() {
         dismiss(animated: true)
         if selectedView != 0 {
             views[selectedView].isHidden = true
-            progressItems[selectedView].backgroundColor = .darkWhite
-            progressItems[selectedView].textColor = .lightGray
+            progressItems[selectedView].backgroundColor = progressItemDefaultBackgroundColor
+            progressItems[selectedView].textColor = progressItemDefaultTextColor
             selectedView = 0
             views[selectedView].isHidden = false
-            progressItems[selectedView].backgroundColor = .olive
-            progressItems[selectedView].textColor = .white
+            progressItems[selectedView].backgroundColor = progressItemSelectedBackgroundColor
+            progressItems[selectedView].textColor = progressItemSelectedTextColor
             nextButton.setTitle("Next", for: .normal)
         }
     }
@@ -189,20 +247,35 @@ class StagedModalController: UIViewController {
     @objc func nextHandler() {
         if selectedView < views.count - 1 {
             views[selectedView].isHidden = true
-            progressItems[selectedView].backgroundColor = .darkWhite
-            progressItems[selectedView].textColor = .lightGray
+            progressItems[selectedView].backgroundColor = progressItemDefaultBackgroundColor
+            progressItems[selectedView].textColor = progressItemDefaultTextColor
             views[selectedView].resignFirstResponder()
             views[selectedView].endEditing(true)
             selectedView += 1
             views[selectedView].isHidden = false
-            progressItems[selectedView].backgroundColor = .olive
-            progressItems[selectedView].textColor = .white
+            progressItems[selectedView].backgroundColor = progressItemSelectedBackgroundColor
+            progressItems[selectedView].textColor = progressItemSelectedTextColor
             if selectedView == views.count - 1 {
-                nextButton.setTitle("Submit", for: .normal)
+                nextButton.setTitle("Confirm", for: .normal)
             }
         } else {
             exit()
             confirmationHandler()
+        }
+    }
+    
+    @objc func progressBarTap(_ gesture: UITapGestureRecognizer) {
+        let location = gesture.location(in: progressBar)
+        for (index, item) in progressItems.enumerated() {
+            if item.frame.contains(location) {
+                views[selectedView].isHidden = true
+                progressItems[selectedView].textColor = progressItemDefaultTextColor
+                progressItems[selectedView].backgroundColor = progressItemDefaultBackgroundColor
+                selectedView = index
+                views[index].isHidden = false
+                progressItems[index].textColor = progressItemSelectedTextColor
+                progressItems[index].backgroundColor = progressItemSelectedBackgroundColor
+            }
         }
     }
     

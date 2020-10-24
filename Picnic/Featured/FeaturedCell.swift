@@ -28,12 +28,14 @@ class FeaturedCell: UICollectionViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 10
         imageView.clipsToBounds = true
-        imageView.setGradient(colors: [.clear, UIColor.black.withAlphaComponent(0.4)])
+        imageView.setGradient(colors: [.clear, UIColor.black.withAlphaComponent(0.4)], bounds: bounds)
         contentView.addSubview(imageView)
         
         // configure title
         title.textColor = .white
         title.font = UIFont.systemFont(ofSize: kTitlePointSize, weight: .semibold)
+        title.adjustsFontSizeToFitWidth = true
+        title.minimumScaleFactor = 0.8
         
         like.addTarget(self, action: #selector(likePress), for: .touchUpInside)
         
@@ -49,8 +51,8 @@ class FeaturedCell: UICollectionViewCell {
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
             imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            imageView.widthAnchor.constraint(equalTo: contentView.widthAnchor),
-            imageView.heightAnchor.constraint(equalTo: contentView.heightAnchor),
+            imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             
             rating.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -10),
             rating.leadingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: 10),
@@ -58,7 +60,7 @@ class FeaturedCell: UICollectionViewCell {
             
             title.bottomAnchor.constraint(equalTo: rating.topAnchor),
             title.leadingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: 10),
-            title.widthAnchor.constraint(lessThanOrEqualTo: contentView.widthAnchor),
+            title.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor, constant: -10),
             
             like.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
             like.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -15),
@@ -82,6 +84,7 @@ class FeaturedCell: UICollectionViewCell {
     func configure(picnic: Picnic) {
         rating.rating = picnic.rating
         rating.mode = .displayWithCount
+        rating.style = .wireframe
         Managers.shared.databaseManager.addSaveListener(picnic: picnic, listener: like) { liked in
             self.like.setActive(isActive: liked)
         }

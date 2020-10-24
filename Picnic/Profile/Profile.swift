@@ -10,6 +10,8 @@ import UIKit
 
 class Profile: UIViewController {
     
+    let profileView = ProfileView(frame: .zero)
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         

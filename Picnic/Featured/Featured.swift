@@ -33,8 +33,7 @@ class Featured: UIViewController {
         collectionView.refreshControl = refreshController
         collectionView.register(FeaturedCell.self, forCellWithReuseIdentifier: FeaturedCell.reuseID)
         let location = Managers.shared.locationManager.safeLocation
-        print(location)
-        Managers.shared.databaseManager.addPicnicQuery(location: location, limit: kDefaultQueryLimit, radius: kDefaultQueryRadius, key: "Picnics")
+        Managers.shared.databaseManager.addPicnicQuery(params: [.location: location], key: "Picnics")
         Managers.shared.databaseManager.nextPage(forPicnicQueryKey: "Picnics") { picnics in
             self.collectionView.performBatchUpdates {
                 self.picnics = picnics
@@ -61,32 +60,41 @@ class Featured: UIViewController {
             mapView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         
+        navigationController?.navigationBar.isTranslucent = false
+        navigationController?.navigationBar.shadowImage = nil
+        navigationController?.navigationBar.setBackgroundImage(nil, for: .default)
+        navigationController?.navigationBar.tintColor = .systemBlue
+        
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: mapImage, style: .plain, target: self, action: #selector(toggleHandler))
-        navigationItem.rightBarButtonItem?.tintColor = .olive
+        navigationItem.rightBarButtonItem?.tintColor = .organic
 
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "line.horizontal.3.decrease.circle"), style: .plain, target: self, action: #selector(filterHandler))
-        navigationItem.leftBarButtonItem?.tintColor = .olive
+        navigationItem.leftBarButtonItem?.tintColor = .organic
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: true)
         tabBarController?.tabBar.isHidden = false
     }
     
     @objc func pullDown(_ sender: Any) {
+        refresh { self.refreshController.endRefreshing() }
+    }
+    
+    func refresh(completion: (() -> ())? = nil) {
         Managers.shared.databaseManager.refresh(forPicnicQueryKey: "Picnics") { picnics in
             self.collectionView.performBatchUpdates {
                 self.picnics = picnics
-                self.collectionView.reloadSections(IndexSet(integer: 0))
+                if !self.mapView.isHidden {
+                    self.mapView.update(picnics: picnics)
+                    self.collectionView.reloadData()
+                } else {
+                    self.collectionView.reloadSections(IndexSet(integer: 0))
+                }
             } completion: { _ in
-                self.refreshController.endRefreshing()
+                completion?()
             }
         }
-    }
-    
-    @objc func rightBarButton() {
-        navigationController?.pushViewController(LocationSelector(), animated: true)
     }
     
     @objc func toggleHandler(_ sender: UIButton) {
@@ -143,17 +151,8 @@ extension Featured: PicnicMapDelegate {
 }
 
 extension Featured: FilterControllerDelegate {
-    func refreshDataSource(picnics: [Picnic]) {
-        self.picnics = picnics
-        if !mapView.isHidden {
-            collectionView.reloadData()
-            mapView.update(picnics: picnics)
-        } else {
-            collectionView.performBatchUpdates {
-                collectionView.reloadSections(IndexSet(integer: 0))
-            }
-        }
-        
+    func filterChange() {
+        refresh()
     }
 }
 
