@@ -89,8 +89,16 @@ class FeaturedCell: UICollectionViewCell {
             self.like.setActive(isActive: liked)
         }
 // MARK: change this to loading wheel
-        Managers.shared.databaseManager.image(forPicnic: picnic) {
-            self.imageView.image = $0
+        Managers.shared.databaseManager.image(forPicnic: picnic) { [weak self] image in
+            self?.imageView.image = image
+            self?.imageView.setGradient(colors: [
+                .clear,
+                UIColor.black.withAlphaComponent(0.3)
+            ])
+            self?.imageView.setGradient(colors: [
+                UIColor.black.withAlphaComponent(0.3),
+                .clear
+            ])
         }
         
 // apply shadow to cell

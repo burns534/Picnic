@@ -26,6 +26,7 @@ final class DatabaseManager: NSObject {
     private var listeners = [Int: ListenerRegistration]()
     private var picnicQueries = [String: PicnicQuery]()
     private var reviewQueries = [String: PaginatedQuery]()
+    private var userPostQueries = [String: UserPostQuery]()
     private var userData = UserData()
     deinit { listeners.values.forEach { $0.remove() } }
 
@@ -84,8 +85,8 @@ final class DatabaseManager: NSObject {
 
     func savePost(picnic: Picnic, completion: (() -> ())? = nil) {
         guard let id = picnic.id, let uid = Auth.auth().currentUser?.uid else { return }
-        DispatchQueue.global().async { [weak self] in
-            self?.users.document(uid).collection("saved").document(id).setData(["isSaved": true]) { error in
+        DispatchQueue.global().async { [self] in
+            users.document(uid).collection("saved").document(id).setData(["timestamp": Timestamp(date: Date())]) { error in
                 if let error = error {
                     print(error.localizedDescription)
                 } else {
@@ -97,8 +98,8 @@ final class DatabaseManager: NSObject {
     
     func unsavePost(picnic: Picnic, completion: (() -> ())? = nil) {
         guard let id = picnic.id, let uid = Auth.auth().currentUser?.uid else { return }
-        DispatchQueue.global().async { [weak self] in
-            self?.users.document(uid).collection("saved").document(id).delete { error in
+        DispatchQueue.global().async { [self] in
+            users.document(uid).collection("saved").document(id).delete { error in
                 if let error = error {
                     print(error.localizedDescription)
                 } else {
@@ -279,14 +280,25 @@ final class DatabaseManager: NSObject {
         guard let id = picnic.id else { return }
         picnics.document(id).updateData(["visitCount": FieldValue.increment(value)])
     }
+    /**
+     Add query for user posts
+     */
+    func addUserPostQuery(for key: String) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        userPostQueries[key] = UserPostQuery(collection: users.document(uid).collection("saved"), limit: kDefaultQueryLimit)
+    }
+    
+    func nextPage(for key: String, completion: @escaping ([Picnic]) -> ()) {
+        
+    }
     
 // MARK: ReviewManager
     
     func submitReview(review: Review, images: [UIImage]? = nil, completion: ((DocumentReference?) -> ())? = nil) {
-        DispatchQueue.global(qos: .utility).async { [weak self] in
+        DispatchQueue.global(qos: .utility).async { [self] in
             let taskGroup = DispatchGroup()
             taskGroup.enter()
-            let ref = try? self?.reviews.addDocument(from: review) { error in
+            let ref = try? reviews.addDocument(from: review) { error in
                 if let error = error {
                     print(error.localizedDescription)
                 }
@@ -295,13 +307,13 @@ final class DatabaseManager: NSObject {
             
             if let images = images, let imageNames = review.images {
                 taskGroup.enter()
-                self?.storeImages(images: images, imageNames: imageNames, for: review.pid) {
+                storeImages(images: images, imageNames: imageNames, for: review.pid) {
                     taskGroup.leave()
                 }
             }
             
             taskGroup.enter()
-            self?.updateRating(pid: review.pid, value: Int64(review.rating)) {
+            updateRating(pid: review.pid, value: Int64(review.rating)) {
                 taskGroup.leave()
             }
             
@@ -313,8 +325,8 @@ final class DatabaseManager: NSObject {
     
     func addReviewQuery(for picnic: Picnic, limit: Int, queryKey: String) {
         guard let id = picnic.id else { return }
-        let query = reviews.whereField("pid", isEqualTo: id).limit(to: limit)
-        reviewQueries[queryKey] = PaginatedQuery(query: query)
+        let query = reviews.whereField("pid", isEqualTo: id)
+        reviewQueries[queryKey] = PaginatedQuery(query: query, limit: limit)
     }
     
     func nextPage(forReviewQueryKey queryKey: String, completion: (([Review]) -> ())?) {

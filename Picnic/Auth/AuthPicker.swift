@@ -26,7 +26,7 @@ import FirebaseUI
 //        
 //        if (!authUI.shouldHideCancelButton) {
 //            let cancelButton = UIBarButtonItem(title: "Skip", style: .plain, target: self, action: #selector(skipButtonHandler))
-//            cancelButton.tintColor = .organic
+//            cancelButton.tintColor = .olive
 //            navigationItem.leftBarButtonItem = cancelButton
 //        }
 //        

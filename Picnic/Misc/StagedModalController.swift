@@ -20,7 +20,7 @@ open class StagedModalController: UIViewController {
     open var offset: CGFloat = 0.0
     open var progressItemDefaultBackgroundColor = UIColor.darkWhite
     open var progressItemDefaultTextColor = UIColor.gray
-    open var progressItemSelectedBackgroundColor = UIColor.organic
+    open var progressItemSelectedBackgroundColor = UIColor.olive
     open var progressItemSelectedTextColor = UIColor.white
     private let progressBar = UIStackView()
     private let nextButton = UIButton()

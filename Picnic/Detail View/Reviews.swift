@@ -37,7 +37,7 @@ class Reviews: UIView {
         let addReviewButton = UIButton()
         addReviewButton.translatesAutoresizingMaskIntoConstraints = false
         addReviewButton.setTitle("Write a review", for: .normal)
-        addReviewButton.setTitleColor(.organic, for: .normal)
+        addReviewButton.setTitleColor(.olive, for: .normal)
         addReviewButton.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .light)
         addReviewButton.addTarget(self, action: #selector(addReview), for: .touchUpInside)
         

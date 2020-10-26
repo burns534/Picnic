@@ -14,10 +14,17 @@ class Profile: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        title = "Profile"
         view.backgroundColor = .white
 
-        // Do any additional setup after loading the view.
+        profileView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(profileView)
+        NSLayoutConstraint.activate([
+            profileView.topAnchor.constraint(equalTo: view.topAnchor),
+            profileView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            profileView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            profileView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
     
 

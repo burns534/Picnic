@@ -104,13 +104,38 @@ class PicnicTagCell: UICollectionViewCell {
             label.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ])
         
-        contentView.backgroundColor = UIColor.organic.withAlphaComponent(0.7)
+        contentView.backgroundColor = UIColor.olive.withAlphaComponent(0.7)
         contentView.layer.cornerRadius = 10
         contentView.layer.borderWidth = 1
-        contentView.layer.borderColor = UIColor.organic.cgColor
+        contentView.layer.borderColor = UIColor.olive.cgColor
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }
+
+//class TagViewTest: UIStackView {
+//    var tags: [PicnicTag] = []
+//
+//    private var labels: [String] {
+//        tags.map { $0.prettyString }
+//    }
+//    private var stackViews: [UIStackView] = []
+//
+//    init(tags: [PicnicTag]) {
+//        super.init(frame: frame)
+//        spacing = 5
+//        distribution = .equalSpacing
+//        axis = .vertical
+//        alignment = .center
+//        self.tags = tags
+//        labels.forEach { string in
+//
+//        }
+//    }
+//
+//    required init(coder: NSCoder) {
+//        fatalError("init(coder:) has not been implemented")
+//    }
+//}

@@ -17,7 +17,6 @@ struct Review: Codable, Identifiable {
     var content: String
     var userDisplayName: String?
     var userPhotoURL: URL?
-// MARK: This might be bad
     var timestamp: Timestamp
     var images: [String]?
 }

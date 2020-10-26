@@ -35,20 +35,24 @@ class DetailController: UIViewController {
         view.addSubview(detailView)
         
         NSLayoutConstraint.activate([
-            detailView.topAnchor.constraint(equalTo: view.topAnchor),
+            detailView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             detailView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             detailView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             detailView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+        let rightBarButtonItem = UIBarButtonItem(systemItem: .action)
+        rightBarButtonItem.target = self
+        rightBarButtonItem.action = #selector(options)
+        navigationItem.rightBarButtonItem = rightBarButtonItem
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setNeedsStatusBarAppearanceUpdate()
-        navigationController?.navigationBar.isTranslucent = true
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        navigationController?.navigationBar.tintColor = .white
+//        navigationController?.navigationBar.isTranslucent = true
+//        navigationController?.navigationBar.shadowImage = UIImage()
+//        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+//        navigationController?.navigationBar.tintColor = .white
         navigationController?.interactivePopGestureRecognizer?.delegate = self
         Managers.shared.databaseManager.addSaveListener(picnic: picnic, listener: detailView.liked) { liked in
             self.detailView.liked.setActive(isActive: liked)
@@ -63,7 +67,9 @@ class DetailController: UIViewController {
     }
 
     @objc func mapTap(_ sender: UITapGestureRecognizer) {
-        navigationController?.pushViewController(MapViewController(), animated: true)
+        let mc = MapViewController()
+        mc.picnic = picnic
+        navigationController?.pushViewController(mc, animated: true)
     }
     
     @objc func likePress(_ sender: HeartButton) {
@@ -72,6 +78,24 @@ class DetailController: UIViewController {
         } else {
             Managers.shared.databaseManager.savePost(picnic: picnic)
         }
+    }
+    
+    @objc func options() {
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        actionSheet.addAction(UIAlertAction(title: "Share", style: .default, handler: nil))
+        actionSheet.addAction(UIAlertAction(title: "Get Directions", style: .default, handler: { alert in
+            let item = MKMapItem(placemark: MKPlacemark(coordinate: self.picnic.coordinate))
+            item.name = self.picnic.name
+            item.openInMaps(launchOptions: [
+                MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDriving,
+                MKLaunchOptionsShowsTrafficKey: true
+            ])
+        }))
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
+            actionSheet.dismiss(animated: true)
+        }))
+        
+        present(actionSheet, animated: true)
     }
 }
 

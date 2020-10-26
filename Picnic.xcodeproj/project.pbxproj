@@ -11,7 +11,7 @@
 		2723A5552527A42C008150DC /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2723A5542527A42C008150DC /* AuthManager.swift */; };
 		2723A5592527A461008150DC /* Managers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2723A5582527A461008150DC /* Managers.swift */; };
 		2723A55D2527A484008150DC /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2723A55C2527A484008150DC /* DatabaseManager.swift */; };
-		2723A5652529368B008150DC /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2723A5642529368B008150DC /* User.swift */; };
+		2723A5652529368B008150DC /* UserData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2723A5642529368B008150DC /* UserData.swift */; };
 		2725763424D0F1EB008916B7 /* Region.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2725763324D0F1EB008916B7 /* Region.swift */; };
 		2725763724D1F492008916B7 /* AuthPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2725763624D1F492008916B7 /* AuthPicker.swift */; };
 		27407AD424C4004F00AE7AAF /* FloatingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27407AD324C4004F00AE7AAF /* FloatingMenu.swift */; };
@@ -28,6 +28,7 @@
 		2752092324C4EF12002E8761 /* SpinnerWheel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2752092224C4EF12002E8761 /* SpinnerWheel.swift */; };
 		2752092724CF494B002E8761 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2752092624CF494B002E8761 /* LocationManager.swift */; };
 		2753CD3E252F6F8A00C4BFF5 /* Reviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2753CD3D252F6F8A00C4BFF5 /* Reviews.swift */; };
+		27545DC925464AEF003C6D7A /* UserPostQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27545DC825464AEF003C6D7A /* UserPostQuery.swift */; };
 		2756C28B247F2BCA0070D61A /* NewPicnicController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2756C28A247F2BCA0070D61A /* NewPicnicController.swift */; };
 		275AD147248180F100EE3DBA /* LocationSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275AD146248180F100EE3DBA /* LocationSelector.swift */; };
 		275AD1492481BCAB00EE3DBA /* LocationPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275AD1482481BCAB00EE3DBA /* LocationPopover.swift */; };
@@ -100,7 +101,7 @@
 		2723A5542527A42C008150DC /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		2723A5582527A461008150DC /* Managers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Managers.swift; sourceTree = "<group>"; };
 		2723A55C2527A484008150DC /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
-		2723A5642529368B008150DC /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		2723A5642529368B008150DC /* UserData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserData.swift; sourceTree = "<group>"; };
 		2725763324D0F1EB008916B7 /* Region.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Region.swift; sourceTree = "<group>"; };
 		2725763624D1F492008916B7 /* AuthPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthPicker.swift; sourceTree = "<group>"; };
 		27407AD324C4004F00AE7AAF /* FloatingMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingMenu.swift; sourceTree = "<group>"; };
@@ -119,6 +120,7 @@
 		2752092224C4EF12002E8761 /* SpinnerWheel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerWheel.swift; sourceTree = "<group>"; };
 		2752092624CF494B002E8761 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		2753CD3D252F6F8A00C4BFF5 /* Reviews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reviews.swift; sourceTree = "<group>"; };
+		27545DC825464AEF003C6D7A /* UserPostQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPostQuery.swift; sourceTree = "<group>"; };
 		2756C28A247F2BCA0070D61A /* NewPicnicController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPicnicController.swift; sourceTree = "<group>"; };
 		275AD146248180F100EE3DBA /* LocationSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSelector.swift; sourceTree = "<group>"; };
 		275AD1482481BCAB00EE3DBA /* LocationPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPopover.swift; sourceTree = "<group>"; };
@@ -209,6 +211,7 @@
 				2723A55C2527A484008150DC /* DatabaseManager.swift */,
 				27EDAEE925365FDF00059EE8 /* PaginatedQuery.swift */,
 				27DC3AD9253F3DEE00F628B9 /* PicnicQuery.swift */,
+				27545DC825464AEF003C6D7A /* UserPostQuery.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -410,7 +413,7 @@
 			children = (
 				27EB2DC52478CC1D0093362C /* Picnic.swift */,
 				27EB2DD42478CE730093362C /* LoadData.swift */,
-				2723A5642529368B008150DC /* User.swift */,
+				2723A5642529368B008150DC /* UserData.swift */,
 				27EAB153252F764D006903ED /* Review.swift */,
 				27EDAEDD2532390800059EE8 /* PicnicTag.swift */,
 				27DC3AD1253D0A8D00F628B9 /* TagContainer.swift */,
@@ -647,7 +650,7 @@
 				274B051F24AD308900747D25 /* ImagePicker.swift in Sources */,
 				27EB2DD52478CE730093362C /* LoadData.swift in Sources */,
 				27B072EA247CC7BB009974BD /* CustomFlowLayout.swift in Sources */,
-				2723A5652529368B008150DC /* User.swift in Sources */,
+				2723A5652529368B008150DC /* UserData.swift in Sources */,
 				27DC3ADA253F3DEE00F628B9 /* PicnicQuery.swift in Sources */,
 				279A269D24D6182700D71FD1 /* NavigationBar.swift in Sources */,
 				279A268624D25BA700D71FD1 /* SettingsController.swift in Sources */,
@@ -669,6 +672,7 @@
 				274B052124BF928100747D25 /* ImageCell.swift in Sources */,
 				279A269024D35C6B00D71FD1 /* ButtonView.swift in Sources */,
 				27EDAEE62534E65400059EE8 /* StagedModalController.swift in Sources */,
+				27545DC925464AEF003C6D7A /* UserPostQuery.swift in Sources */,
 				27BFC412248317C300A3C968 /* Extensions.swift in Sources */,
 				27EB2DC32478CA4E0093362C /* FeaturedCell.swift in Sources */,
 				27BFC414248318E200A3C968 /* MapIcon.swift in Sources */,

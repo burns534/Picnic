@@ -22,8 +22,8 @@ class DetailView: UIView {
     let preview = UIImageView()
     let name = UILabel()
     let rating = Rating(frame: .zero)
-    var tagView = TagView()
-    
+    let tagView = TagView()
+ 
     override init(frame: CGRect) {
         super.init(frame: frame)
         createSubviews()
@@ -36,6 +36,7 @@ class DetailView: UIView {
     func createSubviews() {
         backgroundColor = .white
         translatesAutoresizingMaskIntoConstraints = false
+// TODO: Add refresh controller to scrollview (also must refresh reviews)
         let scrollView = UIScrollView()
         scrollView.showsVerticalScrollIndicator = false
         scrollView.showsHorizontalScrollIndicator = false
@@ -70,11 +71,6 @@ class DetailView: UIView {
         overview.textContainer.lineFragmentPadding = 0
         overview.layer.cornerRadius = 5
         overview.clipsToBounds = true
-        
-        let tagLabel = UILabel()
-        tagLabel.text = "Tags"
-        tagLabel.font = UIFont.systemFont(ofSize: 25, weight: .semibold)
-        tagLabel.translatesAutoresizingMaskIntoConstraints = false
 
         mapView.translatesAutoresizingMaskIntoConstraints = false
         mapView.isScrollEnabled = false
@@ -92,7 +88,6 @@ class DetailView: UIView {
         scrollView.addSubview(preview)
         scrollView.addSubview(overviewLabel)
         scrollView.addSubview(overview)
-        scrollView.addSubview(tagLabel)
         scrollView.addSubview(tagView)
         scrollView.addSubview(mapView)
         scrollView.addSubview(reviews)
@@ -129,12 +124,8 @@ class DetailView: UIView {
             overview.topAnchor.constraint(equalTo: overviewLabel.bottomAnchor),
             overview.widthAnchor.constraint(equalTo: scrollView.widthAnchor, multiplier: 0.9),
             
-            tagLabel.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 20),
-            tagLabel.topAnchor.constraint(equalTo: overview.bottomAnchor, constant: 10),
-            
-            tagView.topAnchor.constraint(equalTo: tagLabel.bottomAnchor, constant: 10),
+            tagView.topAnchor.constraint(equalTo: overview.bottomAnchor, constant: 10),
             tagView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 20),
-// TODO: Make this autosize itself based on its content
             tagView.widthAnchor.constraint(equalTo: scrollView.widthAnchor, multiplier: 0.9),
             
             mapView.topAnchor.constraint(equalTo: tagView.bottomAnchor, constant: 10),
@@ -156,19 +147,23 @@ class DetailView: UIView {
             preview.image = image
         } else {
             Managers.shared.databaseManager.image(forPicnic: picnic) { [weak self] image in
-            self?.preview.image = image
+                self?.preview.image = image
+                self?.preview.setGradient(colors: [
+                    .clear,
+                    UIColor.black.withAlphaComponent(0.3)
+                ])
             }
         }
-// FIXME: I don't think the gradient works
-        preview.setGradient(colors: [.clear, UIColor.black.withAlphaComponent(0.3)])
-        preview.setGradient(colors: [UIColor.black.withAlphaComponent(0.3), .clear])
         tagView.tags = picnic.tags?.tags ?? []
+        if tagView.tags.count == 0 {
+            
+        }
         name.text = picnic.name
         rating.rating = picnic.rating
         let region = MKCoordinateRegion(center: picnic.coordinates.location, latitudinalMeters: mapPrecision, longitudinalMeters: mapPrecision)
         mapView.setRegion(region, animated: false)
         let loc = MKPointAnnotation()
-        loc.coordinate = picnic.coordinates.location
+        loc.coordinate = picnic.coordinate
         loc.title = picnic.name
         mapView.addAnnotation(loc)
         overview.text = picnic.userDescription

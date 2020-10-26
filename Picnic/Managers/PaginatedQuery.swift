@@ -9,13 +9,18 @@
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-final class PaginatedQuery {
+class PaginatedQuery {
     var query: Query
     private var currentPage: Int = -1
     private var documents: [DocumentSnapshot] = []
     
-    public init(query: Query) {
-        self.query = query
+    public init(query: Query, limit: Int) {
+        self.query = query.limit(to: limit)
+    }
+    
+    var current: Query {
+        if currentPage == -1 { return query }
+        return query.start(afterDocument: documents[currentPage])
     }
     
     func pushDocument(_ doc: DocumentSnapshot) {
@@ -34,11 +39,6 @@ final class PaginatedQuery {
     func back() -> Query {
         if currentPage <= 1 { return query }
         currentPage -= 1
-        return query.start(afterDocument: documents[currentPage])
-    }
-    
-    func current() -> Query {
-        if currentPage == -1 { return query }
         return query.start(afterDocument: documents[currentPage])
     }
     

@@ -14,7 +14,7 @@ class Featured: UIViewController {
     var picnics = [Picnic]()
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: CustomFlowLayout())
     let mapView = PicnicMap()
-    let mapImage = UIImage(systemName: "map")?.withRenderingMode(.alwaysOriginal)
+    let mapImage = UIImage(systemName: "map")?.withRenderingMode(.alwaysTemplate)
     let featuredImage = UIImage(systemName: "star")?.withRenderingMode(.alwaysTemplate)
     
     private let refreshController = UIRefreshControl()
@@ -66,10 +66,9 @@ class Featured: UIViewController {
         navigationController?.navigationBar.tintColor = .systemBlue
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: mapImage, style: .plain, target: self, action: #selector(toggleHandler))
-        navigationItem.rightBarButtonItem?.tintColor = .organic
 
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "line.horizontal.3.decrease.circle"), style: .plain, target: self, action: #selector(filterHandler))
-        navigationItem.leftBarButtonItem?.tintColor = .organic
+        navigationController?.navigationBar.tintColor = .black
     }
     
     override func viewWillAppear(_ animated: Bool) {

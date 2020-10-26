@@ -96,7 +96,7 @@ class CustomAnnotationView: MKAnnotationView {
         
 
         let button = UIButton(type: .infoLight)
-        button.tintColor = .organic
+        button.tintColor = .olive
         rightCalloutAccessoryView = button
     }
     

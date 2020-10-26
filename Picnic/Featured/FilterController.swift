@@ -41,7 +41,7 @@ class FilterController: UIViewController {
         navigationBar.setRightBarButton(button: resetButton)
         
         radiusSlider.translatesAutoresizingMaskIntoConstraints = false
-        radiusSlider.minimumTrackTintColor = .organic
+        radiusSlider.minimumTrackTintColor = .olive
         radiusSlider.minimumValue = 0.0
         radiusSlider.maximumValue = 200.0
         radiusSlider.value = Float(kDefaultQueryRadius)

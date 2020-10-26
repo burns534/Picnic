@@ -13,7 +13,8 @@ final class Managers {
     let databaseManager = DatabaseManager()
     let locationManager = LocationManager()
     let auth = Auth.auth()
-    var handle: AuthStateDidChangeListenerHandle!
+    private var handle: AuthStateDidChangeListenerHandle!
+    private var profileImage: UIImage?
     private init() {
         databaseManager.configure()
         locationManager.configure()
@@ -25,6 +26,23 @@ final class Managers {
     }
     
     deinit { Auth.auth().removeStateDidChangeListener(handle) }
+    
+    func getProfileImage(completion: @escaping (UIImage?) -> ()){
+        if profileImage == nil {
+            DispatchQueue.global(qos: .default).async { [self] in
+                if let url = Auth.auth().currentUser?.photoURL,
+                   let data = try? Data(contentsOf: url),
+                   let image = UIImage(data: data) {
+                    DispatchQueue.main.async {
+                        completion(image)
+                    }
+                    profileImage = image
+                }
+            }
+        } else {
+            completion(self.profileImage)
+        }
+    }
 }
 
 extension Auth {

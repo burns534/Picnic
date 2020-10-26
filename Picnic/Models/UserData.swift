@@ -6,10 +6,12 @@
 //  Copyright © 2020 Kyle Burns. All rights reserved.
 //
 
-import FirebaseFirestoreSwift
-struct UserData {
+import UIKit
+
+class UserData {
     var rated = [String: Int64]()
     var saved = [String]()
+    var profileImage: UIImage?
 }
 
 extension UserData {
