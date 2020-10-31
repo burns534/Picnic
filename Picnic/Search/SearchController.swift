@@ -72,14 +72,14 @@ extension SearchController: UICollectionViewDelegate {
 extension SearchController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         guard let text = searchBar.text else { return }
-        Managers.shared.databaseManager.query(name: text) {
+        PicnicManager.default.query(byName: text) {
             self.results = $0
             self.collectionView.reloadData()
         }
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        Managers.shared.databaseManager.query(name: searchText) {
+        PicnicManager.default.query(byName: searchText) {
             self.results = $0
             self.collectionView.reloadData()
         }

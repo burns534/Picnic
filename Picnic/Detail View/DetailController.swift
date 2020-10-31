@@ -25,8 +25,8 @@ class DetailController: UIViewController {
         detailView.configure(picnic: picnic, image: nil)
         detailView.liked.addTarget(self, action: #selector(likePress), for: .touchUpInside)
         detailView.reviews.delegate = self
-        Managers.shared.databaseManager.addReviewQuery(for: picnic, limit: 20, queryKey: "Reviews")
-        Managers.shared.databaseManager.nextPage(forReviewQueryKey: "Reviews") { reviews in
+        ReviewManager.default.addReviewQuery(for: "Reviews", limit: 20, picnic: picnic)
+        ReviewManager.default.nextPage(for: "Reviews") { reviews in
             self.detailView.reviews.update(reviews: reviews)
         }
         detailView.tagView.isScrollEnabled = false
@@ -54,7 +54,7 @@ class DetailController: UIViewController {
 //        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
 //        navigationController?.navigationBar.tintColor = .white
         navigationController?.interactivePopGestureRecognizer?.delegate = self
-        Managers.shared.databaseManager.addSaveListener(picnic: picnic, listener: detailView.liked) { liked in
+        UserManager.default.addSaveListener(picnic: picnic, listener: detailView.liked) { liked in
             self.detailView.liked.setActive(isActive: liked)
         }
     }
@@ -62,8 +62,8 @@ class DetailController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        Managers.shared.databaseManager.removeListener(detailView.liked)
-        Managers.shared.databaseManager.removeQuery("Reviews")
+        UserManager.default.removeSaveListener(listener: detailView.liked)
+        ReviewManager.default.removeQuery("Reviews")
     }
 
     @objc func mapTap(_ sender: UITapGestureRecognizer) {
@@ -74,9 +74,9 @@ class DetailController: UIViewController {
     
     @objc func likePress(_ sender: HeartButton) {
         if sender.isActive {
-            Managers.shared.databaseManager.unsavePost(picnic: picnic)
+            UserManager.default.unsavePost(picnic: picnic)
         } else {
-            Managers.shared.databaseManager.savePost(picnic: picnic)
+            UserManager.default.savePost(picnic: picnic)
         }
     }
     

@@ -71,6 +71,9 @@ class DetailView: UIView {
         overview.textContainer.lineFragmentPadding = 0
         overview.layer.cornerRadius = 5
         overview.clipsToBounds = true
+        
+        tagView.mode = .display
+        tagView.translatesAutoresizingMaskIntoConstraints = false
 
         mapView.translatesAutoresizingMaskIntoConstraints = false
         mapView.isScrollEnabled = false
@@ -146,9 +149,9 @@ class DetailView: UIView {
         if let image = image {
             preview.image = image
         } else {
-            Managers.shared.databaseManager.image(forPicnic: picnic) { [weak self] image in
-                self?.preview.image = image
-                self?.preview.setGradient(colors: [
+            PicnicManager.default.image(forPicnic: picnic) { [self] image in
+                preview.image = image
+                preview.setGradient(colors: [
                     .clear,
                     UIColor.black.withAlphaComponent(0.3)
                 ])

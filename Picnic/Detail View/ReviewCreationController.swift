@@ -62,14 +62,14 @@ class ReviewCreationController: StagedModalController {
             id: nil,
             pid: id,
             uid: uid,
-            rating: ratingStage.rating.rating,
+            rating: Int64(ratingStage.rating.rating),
             content: contentStage.contentTextField.text ?? "",
             userDisplayName: Managers.shared.auth.currentUser?.displayName,
             userPhotoURL: Managers.shared.auth.currentUser?.photoURL,
             timestamp: Timestamp(date: Date()),
-            images: imageIDList
+            imageNames: imageIDList
         )
-        Managers.shared.databaseManager.submitReview(review: review, images: selectedImages.count > 0 ? selectedImages: nil) { _ in
+        ReviewManager.default.submitReview(review: review, images: selectedImages.count > 0 ? selectedImages: nil) {
 // TODO: This might be bad, look into it
             self.dismiss(animated: true)
         }
@@ -78,15 +78,15 @@ class ReviewCreationController: StagedModalController {
 
 extension ReviewCreationController: PHPickerViewControllerDelegate  {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            let identifiers = results.compactMap { $0.assetIdentifier }
-            let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: identifiers, options: nil)
-            let taskGroup = DispatchGroup()
-            var results: [UIImage] = []
-            for i in 0..<fetchResult.count {
+        let identifiers = results.compactMap { $0.assetIdentifier }
+        let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: identifiers, options: nil)
+        let taskGroup = DispatchGroup()
+        var results: [UIImage] = []
+        for i in 0..<fetchResult.count {
+            DispatchQueue.global(qos: .userInitiated).async { [self] in
                 taskGroup.enter()
                 let asset = fetchResult.object(at: i)
-                self?.imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFill, options: nil) {
+                imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFill, options: nil) {
                     if let image = $0,
                        let degraded = $1?[PHImageResultIsDegradedKey] as? Bool, !degraded {
                         results.append(image)
@@ -94,16 +94,17 @@ extension ReviewCreationController: PHPickerViewControllerDelegate  {
                     }
                 }
             }
-            taskGroup.notify(qos: .userInitiated, flags: .enforceQoS, queue: .main) {
-                self?.selectedImages = results
-                if results.count > 0 {
-                    self?.imagePickerStage.imagePickerButton.setImage(results[0], for: .normal)
-                    if results.count > 1 {
-                        self?.imagePickerStage.imagePickerButton.isMultipleSelection = true
-                    }
+        }
+        
+        taskGroup.notify(qos: .userInitiated, flags: .enforceQoS, queue: .main) { [self] in
+            selectedImages = results
+            if results.count > 0 {
+                imagePickerStage.imagePickerButton.setImage(results[0], for: .normal)
+                if results.count > 1 {
+                    imagePickerStage.imagePickerButton.isMultipleSelection = true
                 }
-                picker.dismiss(animated: true)
             }
+            picker.dismiss(animated: true)
         }
     }
 }

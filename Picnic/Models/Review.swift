@@ -13,12 +13,12 @@ struct Review: Codable, Identifiable {
     @DocumentID var id: String?
     var pid: String
     var uid: String
-    var rating: Double
+    var rating: Int64
     var content: String
     var userDisplayName: String?
     var userPhotoURL: URL?
     var timestamp: Timestamp
-    var images: [String]?
+    var imageNames: [String]?
 }
 
 extension Review {

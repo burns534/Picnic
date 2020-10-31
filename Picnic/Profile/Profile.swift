@@ -18,6 +18,8 @@ class Profile: UIViewController {
         view.backgroundColor = .white
 
         profileView.translatesAutoresizingMaskIntoConstraints = false
+        profileView.posts.delegate = self
+        profileView.delegate = self
         view.addSubview(profileView)
         NSLayoutConstraint.activate([
             profileView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -25,17 +27,41 @@ class Profile: UIViewController {
             profileView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             profileView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+        
+        UserManager.default.addSavedPostQuery(for: "Saved") { picnics in
+            self.profileView.posts.refresh(picnics: picnics)
+        }
+        UserManager.default.addUserPostQuery(for: "UserPosts")
+    }
+
+}
+
+extension Profile: PicnicCollectionViewDelegate {
+    func refresh(completion: @escaping ([Picnic]) -> ()) {
+        UserManager.default.refreshQuery(forSavedQuery: "Saved") {
+            completion($0)
+        }
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? FeaturedCell else { return }
+        let detailView = DetailController()
+        detailView.picnic = cell.picnic
+        present(detailView, animated: true)
     }
-    */
+}
 
+extension Profile: ProfileViewDelegate {
+    func selectionChange(selection: ProfileView.Selection) {
+        switch selection {
+        case .saved:
+            UserManager.default.refreshQuery(forSavedQuery: "Saved") {
+                self.profileView.posts.refresh(picnics: $0)
+            }
+        case .userPosts:
+            UserManager.default.refreshQuery(forUserPostQuery: "UserPosts") {
+                self.profileView.posts.refresh(picnics: $0)
+            }
+        }
+    }
 }

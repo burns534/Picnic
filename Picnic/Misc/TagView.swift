@@ -8,12 +8,45 @@
 
 import UIKit
 
+protocol TagViewSelectionDelegate: AnyObject {
+    func didSelectTag(tags: [PicnicTag], at indexPath: IndexPath)
+    func didDeslectTag(tags: [PicnicTag], at indexPath: IndexPath)
+}
+
 class TagView: UICollectionView, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    enum Mode {
+        case selection, display
+    }
+    
     private var labels: [String] {
         tags.map { $0.prettyString }
     }
 
     var tags: [PicnicTag] = []
+    var defaultColor: UIColor = .lightGray
+    var selectionColor: UIColor = .olive
+    
+    var mode: Mode = .selection {
+        didSet {
+            isUserInteractionEnabled = mode == .selection
+            visibleCells.forEach { cell in
+                switch mode {
+                case .display:
+                    cell.contentView.backgroundColor = self.selectionColor
+                case .selection:
+                    cell.contentView.backgroundColor = cell.isSelected ? selectionColor : defaultColor
+                }
+            }
+        }
+    }
+    
+    var selectedItems: [PicnicTag] {
+        indexPathsForSelectedItems?.map {
+            PicnicTag.allCases[$0.item]
+        } ?? []
+    }
+    
+    weak var selectionDelegate: TagViewSelectionDelegate?
     
     override var intrinsicContentSize: CGSize {
         collectionViewLayout.collectionViewContentSize
@@ -26,7 +59,6 @@ class TagView: UICollectionView, UICollectionViewDataSource, UICollectionViewDel
         dataSource = self
         delegate = self
         backgroundColor = .white
-        translatesAutoresizingMaskIntoConstraints = false
         allowsMultipleSelection = true
         register(PicnicTagCell.self, forCellWithReuseIdentifier: PicnicTagCell.reuseID)
     }
@@ -49,18 +81,22 @@ class TagView: UICollectionView, UICollectionViewDataSource, UICollectionViewDel
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let cell = collectionView.cellForItem(at: indexPath) as? PicnicTagCell {
             UIView.animate(withDuration: 0.1) {
-                cell.alpha = 0.8
+//                cell.alpha = 0.8
                 cell.transform = .init(scaleX: 0.95, y: 0.95)
+                cell.contentView.backgroundColor = self.selectionColor
             }
+            selectionDelegate?.didSelectTag(tags: selectedItems, at: indexPath)
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         if let cell = collectionView.cellForItem(at: indexPath) as? PicnicTagCell {
             UIView.animate(withDuration: 0.1) {
-                cell.alpha = 1.0
+//                cell.alpha = 1.0
                 cell.transform = .identity
+                cell.contentView.backgroundColor = self.defaultColor
             }
+            selectionDelegate?.didDeslectTag(tags: selectedItems, at: indexPath)
         }
     }
     
@@ -82,6 +118,9 @@ class TagView: UICollectionView, UICollectionViewDataSource, UICollectionViewDel
             return UICollectionViewCell()
         }
         cell.label.text = labels[indexPath.item]
+        let color = mode == .selection ? selectionColor : defaultColor
+        cell.contentView.layer.borderColor = color.cgColor
+        cell.contentView.backgroundColor = color.withAlphaComponent(0.8)
         return cell
     }
 }
@@ -104,38 +143,11 @@ class PicnicTagCell: UICollectionViewCell {
             label.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ])
         
-        contentView.backgroundColor = UIColor.olive.withAlphaComponent(0.7)
         contentView.layer.cornerRadius = 10
         contentView.layer.borderWidth = 1
-        contentView.layer.borderColor = UIColor.olive.cgColor
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }
-
-//class TagViewTest: UIStackView {
-//    var tags: [PicnicTag] = []
-//
-//    private var labels: [String] {
-//        tags.map { $0.prettyString }
-//    }
-//    private var stackViews: [UIStackView] = []
-//
-//    init(tags: [PicnicTag]) {
-//        super.init(frame: frame)
-//        spacing = 5
-//        distribution = .equalSpacing
-//        axis = .vertical
-//        alignment = .center
-//        self.tags = tags
-//        labels.forEach { string in
-//
-//        }
-//    }
-//
-//    required init(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
-//}

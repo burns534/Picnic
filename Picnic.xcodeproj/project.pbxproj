@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		270FAAB6254DBBDB00F7FEDE /* PicnicCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270FAAB5254DBBDB00F7FEDE /* PicnicCollectionView.swift */; };
 		2716B5B0249186E80092A622 /* PlaceAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2716B5AF249186E80092A622 /* PlaceAnnotation.swift */; };
 		2723A5552527A42C008150DC /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2723A5542527A42C008150DC /* AuthManager.swift */; };
 		2723A5592527A461008150DC /* Managers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2723A5582527A461008150DC /* Managers.swift */; };
@@ -14,6 +15,7 @@
 		2723A5652529368B008150DC /* UserData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2723A5642529368B008150DC /* UserData.swift */; };
 		2725763424D0F1EB008916B7 /* Region.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2725763324D0F1EB008916B7 /* Region.swift */; };
 		2725763724D1F492008916B7 /* AuthPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2725763624D1F492008916B7 /* AuthPicker.swift */; };
+		27328E9A25473D0B00C1AA8D /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27328E9925473D0B00C1AA8D /* UserManager.swift */; };
 		27407AD424C4004F00AE7AAF /* FloatingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27407AD324C4004F00AE7AAF /* FloatingMenu.swift */; };
 		2743860D2478925D0029F00F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2743860C2478925D0029F00F /* AppDelegate.swift */; };
 		2743860F2478925D0029F00F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2743860E2478925D0029F00F /* SceneDelegate.swift */; };
@@ -28,11 +30,13 @@
 		2752092324C4EF12002E8761 /* SpinnerWheel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2752092224C4EF12002E8761 /* SpinnerWheel.swift */; };
 		2752092724CF494B002E8761 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2752092624CF494B002E8761 /* LocationManager.swift */; };
 		2753CD3E252F6F8A00C4BFF5 /* Reviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2753CD3D252F6F8A00C4BFF5 /* Reviews.swift */; };
-		27545DC925464AEF003C6D7A /* UserPostQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27545DC825464AEF003C6D7A /* UserPostQuery.swift */; };
+		27545DC925464AEF003C6D7A /* SavedPostQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27545DC825464AEF003C6D7A /* SavedPostQuery.swift */; };
 		2756C28B247F2BCA0070D61A /* NewPicnicController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2756C28A247F2BCA0070D61A /* NewPicnicController.swift */; };
 		275AD147248180F100EE3DBA /* LocationSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275AD146248180F100EE3DBA /* LocationSelector.swift */; };
 		275AD1492481BCAB00EE3DBA /* LocationPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275AD1482481BCAB00EE3DBA /* LocationPopover.swift */; };
 		275AD14B2482CAE300EE3DBA /* LocationLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275AD14A2482CAE300EE3DBA /* LocationLabel.swift */; };
+		2768E00725477BEA007AA2C3 /* PicnicManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2768E00625477BEA007AA2C3 /* PicnicManager.swift */; };
+		2768E00A25479F86007AA2C3 /* ReviewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2768E00925479F86007AA2C3 /* ReviewManager.swift */; };
 		279A268624D25BA700D71FD1 /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279A268524D25BA700D71FD1 /* SettingsController.swift */; };
 		279A268A24D34AED00D71FD1 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279A268924D34AED00D71FD1 /* Colors.swift */; };
 		279A268C24D34BFB00D71FD1 /* SignInButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279A268B24D34BFB00D71FD1 /* SignInButton.swift */; };
@@ -97,6 +101,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		270FAAB5254DBBDB00F7FEDE /* PicnicCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PicnicCollectionView.swift; sourceTree = "<group>"; };
 		2716B5AF249186E80092A622 /* PlaceAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceAnnotation.swift; sourceTree = "<group>"; };
 		2723A5542527A42C008150DC /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		2723A5582527A461008150DC /* Managers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Managers.swift; sourceTree = "<group>"; };
@@ -104,6 +109,7 @@
 		2723A5642529368B008150DC /* UserData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserData.swift; sourceTree = "<group>"; };
 		2725763324D0F1EB008916B7 /* Region.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Region.swift; sourceTree = "<group>"; };
 		2725763624D1F492008916B7 /* AuthPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthPicker.swift; sourceTree = "<group>"; };
+		27328E9925473D0B00C1AA8D /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
 		27407AD324C4004F00AE7AAF /* FloatingMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingMenu.swift; sourceTree = "<group>"; };
 		274386092478925D0029F00F /* Picnic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Picnic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2743860C2478925D0029F00F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -120,11 +126,13 @@
 		2752092224C4EF12002E8761 /* SpinnerWheel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerWheel.swift; sourceTree = "<group>"; };
 		2752092624CF494B002E8761 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		2753CD3D252F6F8A00C4BFF5 /* Reviews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reviews.swift; sourceTree = "<group>"; };
-		27545DC825464AEF003C6D7A /* UserPostQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPostQuery.swift; sourceTree = "<group>"; };
+		27545DC825464AEF003C6D7A /* SavedPostQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedPostQuery.swift; sourceTree = "<group>"; };
 		2756C28A247F2BCA0070D61A /* NewPicnicController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPicnicController.swift; sourceTree = "<group>"; };
 		275AD146248180F100EE3DBA /* LocationSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSelector.swift; sourceTree = "<group>"; };
 		275AD1482481BCAB00EE3DBA /* LocationPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPopover.swift; sourceTree = "<group>"; };
 		275AD14A2482CAE300EE3DBA /* LocationLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationLabel.swift; sourceTree = "<group>"; };
+		2768E00625477BEA007AA2C3 /* PicnicManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PicnicManager.swift; sourceTree = "<group>"; };
+		2768E00925479F86007AA2C3 /* ReviewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewManager.swift; sourceTree = "<group>"; };
 		279A268524D25BA700D71FD1 /* SettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
 		279A268924D34AED00D71FD1 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		279A268B24D34BFB00D71FD1 /* SignInButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInButton.swift; sourceTree = "<group>"; };
@@ -211,7 +219,10 @@
 				2723A55C2527A484008150DC /* DatabaseManager.swift */,
 				27EDAEE925365FDF00059EE8 /* PaginatedQuery.swift */,
 				27DC3AD9253F3DEE00F628B9 /* PicnicQuery.swift */,
-				27545DC825464AEF003C6D7A /* UserPostQuery.swift */,
+				27545DC825464AEF003C6D7A /* SavedPostQuery.swift */,
+				27328E9925473D0B00C1AA8D /* UserManager.swift */,
+				2768E00625477BEA007AA2C3 /* PicnicManager.swift */,
+				2768E00925479F86007AA2C3 /* ReviewManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -404,6 +415,7 @@
 				275AD14A2482CAE300EE3DBA /* LocationLabel.swift */,
 				27EDAED72531FA3400059EE8 /* PicnicMap.swift */,
 				27EDAEDA253238AE00059EE8 /* FilterController.swift */,
+				270FAAB5254DBBDB00F7FEDE /* PicnicCollectionView.swift */,
 			);
 			path = Featured;
 			sourceTree = "<group>";
@@ -621,6 +633,7 @@
 				279A269F24D73E4700D71FD1 /* MultipleSelectionIcon.swift in Sources */,
 				274386122478925D0029F00F /* Picnic.xcdatamodeld in Sources */,
 				27EDAEDB253238AE00059EE8 /* FilterController.swift in Sources */,
+				270FAAB6254DBBDB00F7FEDE /* PicnicCollectionView.swift in Sources */,
 				27EDAEDE2532390800059EE8 /* PicnicTag.swift in Sources */,
 				275AD1492481BCAB00EE3DBA /* LocationPopover.swift in Sources */,
 				279A26A924DB21F300D71FD1 /* ShortPresentationController.swift in Sources */,
@@ -640,6 +653,7 @@
 				279DEB7124DCA4C4003035AC /* PaddedTextField.swift in Sources */,
 				27DC3AA82538E43A00F628B9 /* ImagePickerStage.swift in Sources */,
 				27DC3ABD253B3C8E00F628B9 /* PicnicNameStage.swift in Sources */,
+				2768E00A25479F86007AA2C3 /* ReviewManager.swift in Sources */,
 				2752092324C4EF12002E8761 /* SpinnerWheel.swift in Sources */,
 				27DC3AE1253FA5BB00F628B9 /* TagView.swift in Sources */,
 				279F160825007C4F00BA6B0F /* PaddedTextView.swift in Sources */,
@@ -659,6 +673,7 @@
 				2743860D2478925D0029F00F /* AppDelegate.swift in Sources */,
 				2716B5B0249186E80092A622 /* PlaceAnnotation.swift in Sources */,
 				27EB2DC62478CC1D0093362C /* Picnic.swift in Sources */,
+				27328E9A25473D0B00C1AA8D /* UserManager.swift in Sources */,
 				27DC3AB12538E80200F628B9 /* ReviewCreationController.swift in Sources */,
 				279A269824D4BE2700D71FD1 /* Profile.swift in Sources */,
 				2743860F2478925D0029F00F /* SceneDelegate.swift in Sources */,
@@ -672,8 +687,9 @@
 				274B052124BF928100747D25 /* ImageCell.swift in Sources */,
 				279A269024D35C6B00D71FD1 /* ButtonView.swift in Sources */,
 				27EDAEE62534E65400059EE8 /* StagedModalController.swift in Sources */,
-				27545DC925464AEF003C6D7A /* UserPostQuery.swift in Sources */,
+				27545DC925464AEF003C6D7A /* SavedPostQuery.swift in Sources */,
 				27BFC412248317C300A3C968 /* Extensions.swift in Sources */,
+				2768E00725477BEA007AA2C3 /* PicnicManager.swift in Sources */,
 				27EB2DC32478CA4E0093362C /* FeaturedCell.swift in Sources */,
 				27BFC414248318E200A3C968 /* MapIcon.swift in Sources */,
 			);

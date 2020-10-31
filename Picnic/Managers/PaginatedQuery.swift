@@ -9,8 +9,8 @@
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-class PaginatedQuery {
-    var query: Query
+open class PaginatedQuery {
+    open var query: Query
     private var currentPage: Int = -1
     private var documents: [DocumentSnapshot] = []
     

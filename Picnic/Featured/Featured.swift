@@ -11,36 +11,24 @@ import FirebaseDatabase
 let kFeaturedCellSize = CGSize(width: 400, height: 260)
 
 class Featured: UIViewController {
-    var picnics = [Picnic]()
-    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: CustomFlowLayout())
+    private var picnics: [Picnic] = []
+    let picnicCollectionView = PicnicCollectionView(frame: .zero)
     let mapView = PicnicMap()
-    let mapImage = UIImage(systemName: "map")?.withRenderingMode(.alwaysTemplate)
-    let featuredImage = UIImage(systemName: "star")?.withRenderingMode(.alwaysTemplate)
-    
-    private let refreshController = UIRefreshControl()
-    
+    private let mapImage = UIImage(systemName: "map")?.withRenderingMode(.alwaysTemplate)
+    private let featuredImage = UIImage(systemName: "star")?.withRenderingMode(.alwaysTemplate)
+
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Featured"
-        refreshController.addTarget(self, action: #selector(pullDown), for: .valueChanged)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.backgroundColor = .white
-        collectionView.alwaysBounceVertical = true
-        collectionView.showsVerticalScrollIndicator = false
-        collectionView.showsHorizontalScrollIndicator = false
-        collectionView.refreshControl = refreshController
-        collectionView.register(FeaturedCell.self, forCellWithReuseIdentifier: FeaturedCell.reuseID)
+        picnicCollectionView.translatesAutoresizingMaskIntoConstraints = false
+        picnicCollectionView.delegate = self
         let location = Managers.shared.locationManager.safeLocation
-        Managers.shared.databaseManager.addPicnicQuery(params: [.location: location], key: "Picnics")
-        Managers.shared.databaseManager.nextPage(forPicnicQueryKey: "Picnics") { picnics in
-            self.collectionView.performBatchUpdates {
-                self.picnics = picnics
-                self.collectionView.reloadSections(IndexSet(integer: 0))
-            }
+        PicnicManager.default.addPicnicQuery(params: [.location: location], key: "Picnics")
+        PicnicManager.default.nextPage(for: "Picnics") { picnics in
+            self.picnics = picnics
+            self.picnicCollectionView.refresh(picnics: picnics)
         }
-        view.addSubview(collectionView)
+        view.addSubview(picnicCollectionView)
 
         mapView.delegate = self
         mapView.translatesAutoresizingMaskIntoConstraints = false
@@ -49,10 +37,10 @@ class Featured: UIViewController {
         view.addSubview(mapView)
         
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.topAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            picnicCollectionView.topAnchor.constraint(equalTo: view.topAnchor),
+            picnicCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            picnicCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            picnicCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
             mapView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             mapView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -76,35 +64,18 @@ class Featured: UIViewController {
         tabBarController?.tabBar.isHidden = false
     }
     
-    @objc func pullDown(_ sender: Any) {
-        refresh { self.refreshController.endRefreshing() }
-    }
     
-    func refresh(completion: (() -> ())? = nil) {
-        Managers.shared.databaseManager.refresh(forPicnicQueryKey: "Picnics") { picnics in
-            self.collectionView.performBatchUpdates {
-                self.picnics = picnics
-                if !self.mapView.isHidden {
-                    self.mapView.update(picnics: picnics)
-                    self.collectionView.reloadData()
-                } else {
-                    self.collectionView.reloadSections(IndexSet(integer: 0))
-                }
-            } completion: { _ in
-                completion?()
-            }
-        }
-    }
     
     @objc func toggleHandler(_ sender: UIButton) {
         if mapView.isHidden {
+            mapView.update(picnics: picnics)
             navigationItem.rightBarButtonItem?.image = featuredImage
             mapView.isHidden = false
         } else {
+            picnicCollectionView.refresh(picnics: picnics)
             navigationItem.rightBarButtonItem?.image = mapImage
             mapView.isHidden = true
         }
-        mapView.update(picnics: picnics)
     }
     
     @objc func filterHandler(_ sender: UIBarButtonItem) {
@@ -114,30 +85,18 @@ class Featured: UIViewController {
     }
 }
 
-extension Featured: UICollectionViewDataSource {
-    
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        1
-    }
-   
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        picnics.count
-    }
-
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeaturedCell.reuseID, for: indexPath) as? FeaturedCell else {
-            return UICollectionViewCell()
-        }
-        cell.configure(picnic: picnics[indexPath.item])
-        return cell
-    }
-}
-
-extension Featured: UICollectionViewDelegate {
+extension Featured: PicnicCollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let detailView = DetailController()
         detailView.picnic = picnics[indexPath.item]
         navigationController?.pushViewController(detailView, animated: true)
+    }
+    
+    func refresh(completion: @escaping ([Picnic]) -> ()) {
+        PicnicManager.default.refreshPage(for: "Picnics") {
+            self.picnics = $0
+            completion($0)
+        }
     }
 }
 
@@ -151,7 +110,14 @@ extension Featured: PicnicMapDelegate {
 
 extension Featured: FilterControllerDelegate {
     func filterChange() {
-        refresh()
+        PicnicManager.default.refreshPage(for: "Picnics") { picnics in
+            self.picnics = picnics
+            if self.mapView.isHidden {
+                self.picnicCollectionView.refresh(picnics: picnics)
+            } else {
+                self.mapView.update(picnics: picnics)
+            }
+        }
     }
 }
 

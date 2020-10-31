@@ -8,7 +8,7 @@
 
 import FirebaseFirestore
 
-final class UserPostQuery: PaginatedQuery {
+final class SavedPostQuery: PaginatedQuery {
     init(collection: CollectionReference, limit: Int) {
         super.init(query: collection.order(by: "timestamp"), limit: limit)
     }

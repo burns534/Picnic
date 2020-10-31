@@ -57,7 +57,7 @@ class NewPicnicController: UIViewController {
             picnic.state = placemark.administrativeArea
             picnic.uid = uid
             
-            Managers.shared.databaseManager.store(picnic: picnic, images: self.images) {
+            PicnicManager.default.store(picnic: picnic, images: self.images) {
                 self.navigationController?.popToRootViewController(animated: true)
                 self.tabBarController?.selectedIndex = 0
             }

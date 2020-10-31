@@ -7,19 +7,21 @@
 //
 
 import Foundation
-
+/* This ended up being uneccessary because firestore has such weak querying. I couldn't create the necessary compound queries so the necessary filtering is now performed client-side when needed.
+ Basically this could be replaced with an array
+ */
 struct TagContainer: Codable {
     var trail: Bool = false
     var waterfall: Bool = false
     var lake: Bool = false
     var river: Bool = false
     var kidFriendly: Bool = false
-    var wheelchairAccessible: Bool = false
     var walking: Bool = false
     var hiking: Bool = false
     var running: Bool = false
     var forest: Bool = false
     var view: Bool = false
+    var wheelchairAccessible: Bool = false
     var bugs: Bool = false
     var overgrown: Bool = false
     var wildflowers: Bool = false
@@ -41,5 +43,15 @@ struct TagContainer: Codable {
         PicnicTag.allCases.compactMap {
             self[keyPath: $0.keyPath] ? $0 : nil
         }
+    }
+    
+    func satisfies(_ tags: [PicnicTag]) -> Bool {
+        for tag in tags {
+            if !self[keyPath: tag.keyPath] {
+                return false
+            }
+        }
+        print("Returning true")
+        return true
     }
 }

@@ -46,10 +46,10 @@ class ImagePicker: UIViewController {
         if fetchResult.count != 0 {
             PHImageManager.default().requestImage(for: fetchResult.object(at: 0), targetSize: CGSize(width: 800, height: 1200), contentMode: .aspectFit, options: nil) { image, _ in
                 if image != nil {
-                    DispatchQueue.main.async { [weak self] in
-                        self?.preview.image = image
-                        self?.collectionView.performBatchUpdates {
-                            self?.collectionView.reloadSections(IndexSet(integer: 0))
+                    DispatchQueue.main.async { [self] in
+                        preview.image = image
+                        collectionView.performBatchUpdates {
+                            collectionView.reloadSections(IndexSet(integer: 0))
                         }
                     }
                 }

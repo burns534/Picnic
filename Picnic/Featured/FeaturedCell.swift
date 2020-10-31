@@ -78,26 +78,22 @@ class FeaturedCell: UICollectionViewCell {
     override func prepareForReuse() {
         imageView.image = nil
         title.text = nil
-        Managers.shared.databaseManager.removeListener(like)
+        UserManager.default.removeSaveListener(listener: like)
     }
     
     func configure(picnic: Picnic) {
         rating.rating = picnic.rating
         rating.mode = .displayWithCount
         rating.style = .wireframe
-        Managers.shared.databaseManager.addSaveListener(picnic: picnic, listener: like) { liked in
+        UserManager.default.addSaveListener(picnic: picnic, listener: like) { liked in
             self.like.setActive(isActive: liked)
         }
 // MARK: change this to loading wheel
-        Managers.shared.databaseManager.image(forPicnic: picnic) { [weak self] image in
-            self?.imageView.image = image
-            self?.imageView.setGradient(colors: [
+        PicnicManager.default.image(forPicnic: picnic) { [self] image in
+            imageView.image = image
+            imageView.setGradient(colors: [
                 .clear,
-                UIColor.black.withAlphaComponent(0.3)
-            ])
-            self?.imageView.setGradient(colors: [
-                UIColor.black.withAlphaComponent(0.3),
-                .clear
+                UIColor.black.withAlphaComponent(0.2)
             ])
         }
         
@@ -112,9 +108,9 @@ class FeaturedCell: UICollectionViewCell {
     
     @objc func likePress(_ sender: HeartButton) {
         if sender.isActive {
-            Managers.shared.databaseManager.unsavePost(picnic: picnic)
+            UserManager.default.unsavePost(picnic: picnic)
         } else {
-            Managers.shared.databaseManager.savePost(picnic: picnic)
+            UserManager.default.savePost(picnic: picnic)
         }
     }
 }

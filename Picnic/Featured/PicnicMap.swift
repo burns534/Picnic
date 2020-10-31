@@ -83,7 +83,7 @@ class CustomAnnotationView: MKAnnotationView {
         imageView = UIImageView(frame: frame)
         canShowCallout = true
         isEnabled = true
-        Managers.shared.databaseManager.image(forPicnic: annotation.picnic) { image in
+        PicnicManager.default.image(forPicnic: annotation.picnic) { image in
             self.imageView.image = image
         }
         layer.cornerRadius = annotationSize / 7.0

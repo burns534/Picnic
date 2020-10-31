@@ -9,9 +9,22 @@
 import UIKit
 
 class UserData {
-    var rated = [String: Int64]()
-    var saved = [String]()
+    private var rated = [String: Int64]()
+//    private var saved = [String]()
     var profileImage: UIImage?
+    var userBio: String?
+    
+    func getRating(for key: String) -> Int64 {
+        rated[key] ?? 0
+    }
+    
+    func setRated(_ dictionary: [String: Int64]) {
+        rated = dictionary
+    }
+//
+//    func getSaved(for key: String) -> Bool {
+//        saved[key] != nil
+//    }
 }
 
 extension UserData {

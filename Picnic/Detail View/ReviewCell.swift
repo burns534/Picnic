@@ -85,19 +85,19 @@ class ReviewCell: UITableViewCell {
     }
     
     func configure(review: Review) {
-        rating.rating = review.rating
+        rating.rating = Double(review.rating)
         userNameLabel.text = review.userDisplayName
         content.text = review.content
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
         dateFormatter.timeStyle = .none
         timestamp.text = dateFormatter.string(from: review.date)
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        DispatchQueue.global(qos: .userInitiated).async { [self] in
             if let url = review.userPhotoURL,
                let data = try? Data(contentsOf: url),
                let image = UIImage(data: data) {
                 DispatchQueue.main.async {
-                    self?.profileIcon.image = image
+                    profileIcon.image = image
                 }
             }
         }

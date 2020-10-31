@@ -32,6 +32,8 @@ class PicnicTagStage: UIView {
         instructions.textAlignment = .center
         instructions.font = UIFont.systemFont(ofSize: 30, weight: .semibold)
         instructions.translatesAutoresizingMaskIntoConstraints = false
+        tagView.mode = .selection
+        tagView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(tagView)
         addSubview(instructions)
         

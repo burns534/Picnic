@@ -131,10 +131,9 @@ open class Rating: UIControl {
     
     open override func beginTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
         super.beginTracking(touch, with: event)
-        sendActions(for: .valueChanged)
-        
         if let index = stars.firstIndex(where: { $0.bounds.contains(touch.location(in: $0))
         }) { rating = Double(index + 1) }
+        sendActions(for: .valueChanged)
         return false
     }
 

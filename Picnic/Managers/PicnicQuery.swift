@@ -24,6 +24,10 @@ class PicnicQuery: PaginatedQuery {
         params[.location] as? CLLocation ?? CLLocation()
     }
     
+    var tags: [PicnicTag]? {
+        params[.tags] as? [PicnicTag]
+    }
+    
     init(collection: CollectionReference, params: [QueryParameter: Any]) {
         self.params = params
         baseQuery = collection.order(by: "geohash")
@@ -41,7 +45,6 @@ class PicnicQuery: PaginatedQuery {
     
     func setTags(tags: [PicnicTag]) {
         params[.tags] = tags
-        configureQuery()
     }
     
     func setRating(rating: Double) {
@@ -57,11 +60,6 @@ class PicnicQuery: PaginatedQuery {
         if let rating = params[.rating] {
             query = query.whereField("rating", isEqualTo: rating)
         }
-        if let tags = params[.tags] as? [PicnicTag] {
-            for tag in tags {
-                query = query.whereField("tags." + tag.rawValue, isEqualTo: true)
-            }
-        }
     }
     
     override func reset() {
@@ -69,6 +67,7 @@ class PicnicQuery: PaginatedQuery {
         params[.radius] = kDefaultQueryRadius
         params[.rating] = nil
         params[.tags] = nil
+        configureQuery()
     }
 }
 

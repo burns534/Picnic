@@ -9,7 +9,8 @@
 import MapKit
 
 class LocationManager: CLLocationManager {
-    func configure() {
+    override init() {
+        super.init()
         requestAlwaysAuthorization()
         startUpdatingLocation()
         desiredAccuracy = kCLLocationAccuracyBest

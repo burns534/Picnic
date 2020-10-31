@@ -5,7 +5,7 @@
 //  Created by Kyle Burns on 10/10/20.
 //  Copyright © 2020 Kyle Burns. All rights reserved.
 //
-
+// TODO: Add tags to reviews
 import UIKit
 /**
     Measured in Kilometers
@@ -22,7 +22,9 @@ class FilterController: UIViewController {
     let interactiveRating = Rating(frame: .zero)
     let sliderValueLabel = UILabel()
     let navigationBar = NavigationBar()
+    let tagView = TagView(tags: PicnicTag.allCases)
     weak var delegate: FilterControllerDelegate?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -52,13 +54,19 @@ class FilterController: UIViewController {
         sliderValueLabel.text = String(format: "%d miles", Int(radiusSlider.value))
         
         interactiveRating.translatesAutoresizingMaskIntoConstraints = false
+        interactiveRating.style = .fill
         interactiveRating.mode = .interactable
         interactiveRating.addTarget(self, action: #selector(ratingChange), for: .valueChanged)
+        
+        tagView.mode = .selection
+        tagView.selectionDelegate = self
+        tagView.translatesAutoresizingMaskIntoConstraints = false
 
         view.addSubview(navigationBar)
         view.addSubview(sliderValueLabel)
         view.addSubview(radiusSlider)
         view.addSubview(interactiveRating)
+        view.addSubview(tagView)
         
         NSLayoutConstraint.activate([
             navigationBar.topAnchor.constraint(equalTo: view.topAnchor),
@@ -76,7 +84,12 @@ class FilterController: UIViewController {
             
             interactiveRating.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             interactiveRating.topAnchor.constraint(equalTo: radiusSlider.bottomAnchor, constant: 10),
-            interactiveRating.widthAnchor.constraint(equalTo: radiusSlider.widthAnchor, multiplier: 0.8)
+            interactiveRating.widthAnchor.constraint(equalTo: radiusSlider.widthAnchor, multiplier: 0.8),
+            
+            tagView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            tagView.topAnchor.constraint(equalTo: interactiveRating.bottomAnchor, constant: 10),
+            tagView.leadingAnchor.constraint(equalTo: radiusSlider.leadingAnchor),
+            tagView.trailingAnchor.constraint(equalTo: radiusSlider.trailingAnchor)
         ])
     }
     
@@ -91,7 +104,7 @@ class FilterController: UIViewController {
     @objc func reset(_ sender: UIButton) {
         radiusSlider.value = Float(kDefaultQueryRadius)
         sliderValueLabel.text = String(format: "%d miles", Int(radiusSlider.value))
-        Managers.shared.databaseManager.picnicQuery("Picnics")?.reset()
+        PicnicManager.default.picnicQuery("Picnics")?.reset()
         delegate?.filterChange()
     }
 
@@ -100,13 +113,24 @@ class FilterController: UIViewController {
     }
     
     @objc func radiusSet(_ sender: UISlider) {
-        Managers.shared.databaseManager.picnicQuery("Picnics")?.setRadius(radius: Double(sender.value))
+        PicnicManager.default.picnicQuery("Picnics")?.setRadius(radius: Double(sender.value))
         delegate?.filterChange()
     }
     
     @objc func ratingChange(_ sender: Rating) {
-        Managers.shared.databaseManager.picnicQuery("Picnics")?.setRating(rating: sender.rating)
+        PicnicManager.default.picnicQuery("Picnics")?.setRating(rating: sender.rating)
         delegate?.filterChange()
     }
+}
 
+extension FilterController: TagViewSelectionDelegate {
+    func didSelectTag(tags: [PicnicTag], at indexPath: IndexPath) {
+        PicnicManager.default.picnicQuery("Picnics")?.setTags(tags: tags)
+        delegate?.filterChange()
+    }
+    
+    func didDeslectTag(tags: [PicnicTag], at indexPath: IndexPath) {
+        PicnicManager.default.picnicQuery("Picnics")?.setTags(tags: tags)
+        delegate?.filterChange()
+    }
 }
