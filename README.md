@@ -9,9 +9,9 @@ The geo-query functionality is done by storing a relatively precise [Geohash](ht
 Future Additions:
 The app has some bugs which need to be worked out, particularly with the settings page because I tried to mix SwiftUI with UIKit and that did not go well, and with the map query. The search feature needs to be improved. I would initially do this with string reverse indexing but would like to be able to add natural language querying. As far as deleting/moderating content goes I would like to implement a system similar to stack overflow or reddit which shows only the best version of a post for a given location, allowing for competition. This would require that users be unable to delete their own posts once others add to them, which is odd but should be fine since they can still remove images or propose changes if they wish.
 
-![Image 1](https://github.com/burns534/Picnic/IMG_1639.jpeg)
-![Image 2](https://github.com/burns534/Picnic/IMG_1640.jpeg)
-![Image 3](https://github.com/burns534/Picnic/IMG_1641.jpeg)
-![Image 4](https://github.com/burns534/Picnic/IMG_1642.jpeg)
+![Image 1](https://github.com/burns534/Picnic/blob/master/IMG_1639.jpeg)
+![Image 2](https://github.com/burns534/Picnic/blob/master/IMG_1640.jpeg)
+![Image 3](https://github.com/burns534/Picnic/blob/master/IMG_1641.jpeg)
+![Image 4](https://github.com/burns534/Picnic/blob/master/IMG_1642.jpeg)
 
 
